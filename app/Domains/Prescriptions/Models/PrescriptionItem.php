@@ -12,7 +12,7 @@ class PrescriptionItem extends Model
 
     protected $fillable = [
         'prescription_id',
-        'medicine_name',
+        'medicine_id',
         'dosage',
         'frequency',
         'duration',
@@ -22,5 +22,10 @@ class PrescriptionItem extends Model
     public function prescription(): BelongsTo
     {
         return $this->belongsTo(Prescription::class);
+    }
+
+    public function medicine(): BelongsTo
+    {
+        return $this->belongsTo(Medicine::class);
     }
 }

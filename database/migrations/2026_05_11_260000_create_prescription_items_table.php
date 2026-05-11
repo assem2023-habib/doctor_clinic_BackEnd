@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('prescription_items', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('prescription_id')->constrained('prescriptions')->cascadeOnDelete();
-            $table->string('medicine_name');
+            $table->foreignUuid('medicine_id')->constrained('medicines')->cascadeOnDelete();
             $table->string('dosage');
             $table->string('frequency');
             $table->string('duration');
