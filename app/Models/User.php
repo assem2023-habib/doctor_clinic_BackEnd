@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Domains\Appointments\Models\Appointment;
 use App\Domains\Doctors\Models\Doctor;
+use App\Domains\Notifications\Models\Notification;
 use App\Domains\Receptionists\Models\Receptionist;
 use App\Enums\GenderEnum;
 use App\Enums\RoleEnum;
@@ -60,5 +61,12 @@ class User extends Authenticatable
     public function createdAppointments()
     {
         return $this->hasMany(Appointment::class, 'created_by');
+    }
+
+    public function notifications()
+    {
+        return $this->belongsToMany(Notification::class)
+            ->withPivot('read_at')
+            ->withTimestamps();
     }
 }
