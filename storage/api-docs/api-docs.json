@@ -1,0 +1,23 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Doctor Clinic API",
+        "description": "API for managing doctor clinic appointments, medical records, and prescriptions",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost",
+            "description": "Local server"
+        }
+    ],
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "Passport",
+                "scheme": "bearer"
+            }
+        }
+    }
+}
