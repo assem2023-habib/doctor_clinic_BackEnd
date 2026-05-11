@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Domains\Doctors\Models;
+namespace App\Domains\Patients\Models;
 
-use App\Domains\Appointments\Models\Appointment;
 use App\Models\User;
 use App\Traits\HasUuidV7;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Doctor extends Model
+class Patient extends Model
 {
     use HasUuidV7;
 
@@ -20,13 +19,8 @@ class Doctor extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function schedules(): HasMany
-    {
-        return $this->hasMany(DoctorSchedule::class);
-    }
-
     public function appointments(): HasMany
     {
-        return $this->hasMany(Appointment::class);
+        return $this->hasMany(\App\Domains\Appointments\Models\Appointment::class);
     }
 }
