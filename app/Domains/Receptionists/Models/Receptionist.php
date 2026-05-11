@@ -11,7 +11,7 @@ class Receptionist extends Model
 {
     use HasUuidV7;
 
-    protected $fillable = ['user_id'];
+    protected $fillable = ['user_id', 'shift_start', 'shift_end'];
 
     public function user(): BelongsTo
     {

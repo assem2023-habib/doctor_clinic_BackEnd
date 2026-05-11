@@ -11,6 +11,8 @@ return new class extends Migration
         Schema::create('receptionists', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('user_id')->constrained('users')->cascadeOnDelete();
+            $table->time('shift_start')->nullable();
+            $table->time('shift_end')->nullable();
             $table->timestamps();
         });
     }

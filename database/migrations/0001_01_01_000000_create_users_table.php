@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\GenderEnum;
+use App\Enums\RoleEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,9 +18,9 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('phone')->nullable();
             $table->text('address')->nullable();
-            $table->string('gender');
+            $table->enum('gender', GenderEnum::values());
             $table->date('birthday_date')->nullable();
-            $table->string('role');
+            $table->enum('role', RoleEnum::values());
             $table->boolean('is_active')->default(true);
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
