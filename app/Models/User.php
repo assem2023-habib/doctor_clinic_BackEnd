@@ -6,6 +6,7 @@ use App\Domains\Appointments\Models\Appointment;
 use App\Domains\Doctors\Models\Doctor;
 use App\Domains\Notifications\Models\Notification;
 use App\Domains\Patients\Models\Patient;
+use App\Domains\Ratings\Models\Rating;
 use App\Domains\Receptionists\Models\Receptionist;
 use App\Enums\GenderEnum;
 use App\Enums\RoleEnum;
@@ -74,5 +75,15 @@ class User extends Authenticatable
         return $this->belongsToMany(Notification::class)
             ->withPivot('read_at')
             ->withTimestamps();
+    }
+
+    public function ratingsGiven()
+    {
+        return $this->hasMany(Rating::class, 'rater_id');
+    }
+
+    public function ratingsReceived()
+    {
+        return $this->morphMany(Rating::class, 'rateable');
     }
 }
