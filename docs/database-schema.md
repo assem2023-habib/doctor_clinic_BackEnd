@@ -34,7 +34,12 @@ pending, confirmed, cancelled, completed
 ```
 user, doctor, patient, receptionist, doctor_schedule,
 appointment, appointment_status_log, medical_record,
-prescription, prescription_item, medicine, notification
+prescription, prescription_item, medicine, notification, rating
+```
+
+### `RatingTypeEnum`
+```
+user, service, center, appointment_system
 ```
 
 ---
@@ -210,7 +215,24 @@ prescription, prescription_item, medicine, notification
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 16. `activity_logs`
+### 16. `ratings`
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | uuid | PK |
+| rater_id | uuid | FK → users |
+| type | enum (RatingTypeEnum) | user, service, center, appointment_system |
+| rateable_id | uuid | nullable (polymorphic) |
+| rateable_type | string | nullable (polymorphic) |
+| rating | tinyint unsigned | 1–5 |
+| comment | text | nullable |
+| created_at | timestamp | |
+| updated_at | timestamp | |
+| Index | | (rateable_type, rateable_id) |
+| Index | | (rater_id) |
+
+> `rateable_id` + `rateable_type` are nullable — only used when `type = user`.
+
+### 17. `activity_logs`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -256,6 +278,14 @@ notifications N──M users  (pivot: notification_user)
 
 users 1──N activity_logs
     └── polymorphic: (model_type, model_id)
+
+users 1──N ratings (rater_id)
+
+users 1──N ratings (rateable — morph, type = user only)
+    └── polymorphic: (rateable_type, rateable_id)
+
+rating.type enum: user, service, center, appointment_system
+    └── when type ≠ user → rateable_id + rateable_type are NULL
 ```
 
 ---
