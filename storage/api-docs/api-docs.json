@@ -11,6 +11,1167 @@
             "description": "Local server"
         }
     ],
+    "paths": {
+        "/api/v1/auth/register/patient": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Register a new patient",
+                "operationId": "ed6f5273a3bce9f715b60bc643f21fba",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "first_name": {
+                                        "description": "First name",
+                                        "type": "string",
+                                        "example": "Ahmed"
+                                    },
+                                    "last_name": {
+                                        "description": "Last name",
+                                        "type": "string",
+                                        "example": "Ali"
+                                    },
+                                    "username": {
+                                        "description": "Username (unique)",
+                                        "type": "string",
+                                        "example": "ahmedali"
+                                    },
+                                    "email": {
+                                        "description": "Email (unique)",
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "patient@example.com"
+                                    },
+                                    "phone": {
+                                        "description": "Phone number",
+                                        "type": "string",
+                                        "example": "+963912345678"
+                                    },
+                                    "address": {
+                                        "description": "Address",
+                                        "type": "string",
+                                        "example": "Damascus, Syria"
+                                    },
+                                    "gender": {
+                                        "description": "Gender",
+                                        "type": "string",
+                                        "example": "male",
+                                        "enum": [
+                                            "male",
+                                            "female"
+                                        ]
+                                    },
+                                    "birthday_date": {
+                                        "description": "Birthday date",
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1995-06-15"
+                                    },
+                                    "password": {
+                                        "description": "Password (min 8 characters)",
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "Password@123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Patient registered and logged in",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "access_token": {
+                                            "description": "JWT access token",
+                                            "type": "string",
+                                            "example": "eyJ0eXAiOiJKV1Qi..."
+                                        },
+                                        "refresh_token": {
+                                            "description": "Refresh token",
+                                            "type": "string",
+                                            "example": "def50200..."
+                                        },
+                                        "expires_in": {
+                                            "description": "Token expiration in seconds",
+                                            "type": "integer",
+                                            "example": 31536000
+                                        },
+                                        "token_type": {
+                                            "description": "Token type",
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        },
+                                        "user": {
+                                            "description": "User profile",
+                                            "properties": {
+                                                "id": {
+                                                    "description": "User UUID",
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009"
+                                                },
+                                                "first_name": {
+                                                    "type": "string",
+                                                    "example": "Ahmed"
+                                                },
+                                                "last_name": {
+                                                    "type": "string",
+                                                    "example": "Ali"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "format": "email",
+                                                    "example": "patient@example.com"
+                                                },
+                                                "role": {
+                                                    "type": "string",
+                                                    "example": "patient",
+                                                    "enum": [
+                                                        "admin",
+                                                        "doctor",
+                                                        "patient",
+                                                        "receptionist"
+                                                    ]
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+963912345678"
+                                                },
+                                                "address": {
+                                                    "type": "string",
+                                                    "example": "Damascus, Syria"
+                                                },
+                                                "gender": {
+                                                    "type": "string",
+                                                    "example": "male",
+                                                    "enum": [
+                                                        "male",
+                                                        "female"
+                                                    ]
+                                                },
+                                                "birthday_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "1995-06-15"
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Error message",
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        },
+                                        "errors": {
+                                            "description": "Validation errors",
+                                            "type": "object",
+                                            "example": {
+                                                "email": [
+                                                    "The email has already been taken."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/register/doctor": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Register a new doctor",
+                "operationId": "fa0092ff8121fed0715e0c7a5ec3fa6c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "first_name": {
+                                        "description": "First name",
+                                        "type": "string",
+                                        "example": "Khaled"
+                                    },
+                                    "last_name": {
+                                        "description": "Last name",
+                                        "type": "string",
+                                        "example": "Suleiman"
+                                    },
+                                    "username": {
+                                        "description": "Username (unique)",
+                                        "type": "string",
+                                        "example": "drkhaled"
+                                    },
+                                    "email": {
+                                        "description": "Email (unique)",
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "doctor@example.com"
+                                    },
+                                    "phone": {
+                                        "description": "Phone number",
+                                        "type": "string",
+                                        "example": "+963912345679"
+                                    },
+                                    "address": {
+                                        "description": "Address",
+                                        "type": "string",
+                                        "example": "Aleppo, Syria"
+                                    },
+                                    "gender": {
+                                        "description": "Gender",
+                                        "type": "string",
+                                        "example": "male",
+                                        "enum": [
+                                            "male",
+                                            "female"
+                                        ]
+                                    },
+                                    "birthday_date": {
+                                        "description": "Birthday date",
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1985-03-20"
+                                    },
+                                    "password": {
+                                        "description": "Password (min 8 characters)",
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "Password@123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Doctor registered and logged in",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "access_token": {
+                                            "description": "JWT access token",
+                                            "type": "string",
+                                            "example": "eyJ0eXAiOiJKV1Qi..."
+                                        },
+                                        "refresh_token": {
+                                            "description": "Refresh token",
+                                            "type": "string",
+                                            "example": "def50200..."
+                                        },
+                                        "expires_in": {
+                                            "description": "Token expiration in seconds",
+                                            "type": "integer",
+                                            "example": 31536000
+                                        },
+                                        "token_type": {
+                                            "description": "Token type",
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        },
+                                        "user": {
+                                            "description": "User profile",
+                                            "properties": {
+                                                "id": {
+                                                    "description": "User UUID",
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009"
+                                                },
+                                                "first_name": {
+                                                    "type": "string",
+                                                    "example": "Khaled"
+                                                },
+                                                "last_name": {
+                                                    "type": "string",
+                                                    "example": "Suleiman"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "format": "email",
+                                                    "example": "doctor@example.com"
+                                                },
+                                                "role": {
+                                                    "type": "string",
+                                                    "example": "doctor",
+                                                    "enum": [
+                                                        "admin",
+                                                        "doctor",
+                                                        "patient",
+                                                        "receptionist"
+                                                    ]
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+963912345679"
+                                                },
+                                                "address": {
+                                                    "type": "string",
+                                                    "example": "Aleppo, Syria"
+                                                },
+                                                "gender": {
+                                                    "type": "string",
+                                                    "example": "male",
+                                                    "enum": [
+                                                        "male",
+                                                        "female"
+                                                    ]
+                                                },
+                                                "birthday_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "1985-03-20"
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Error message",
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        },
+                                        "errors": {
+                                            "description": "Validation errors",
+                                            "type": "object",
+                                            "example": {
+                                                "email": [
+                                                    "The email has already been taken."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/register/receptionist": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Register a new receptionist",
+                "operationId": "7757fe22e30e28196a7d1e97269a50fe",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "first_name": {
+                                        "description": "First name",
+                                        "type": "string",
+                                        "example": "Layla"
+                                    },
+                                    "last_name": {
+                                        "description": "Last name",
+                                        "type": "string",
+                                        "example": "Hassan"
+                                    },
+                                    "username": {
+                                        "description": "Username (unique)",
+                                        "type": "string",
+                                        "example": "laylah"
+                                    },
+                                    "email": {
+                                        "description": "Email (unique)",
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "receptionist@example.com"
+                                    },
+                                    "phone": {
+                                        "description": "Phone number",
+                                        "type": "string",
+                                        "example": "+963912345680"
+                                    },
+                                    "address": {
+                                        "description": "Address",
+                                        "type": "string",
+                                        "example": "Homs, Syria"
+                                    },
+                                    "gender": {
+                                        "description": "Gender",
+                                        "type": "string",
+                                        "example": "female",
+                                        "enum": [
+                                            "male",
+                                            "female"
+                                        ]
+                                    },
+                                    "birthday_date": {
+                                        "description": "Birthday date",
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1998-11-05"
+                                    },
+                                    "password": {
+                                        "description": "Password (min 8 characters)",
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "Password@123"
+                                    },
+                                    "shift_start": {
+                                        "description": "Shift start time",
+                                        "type": "string",
+                                        "format": "time",
+                                        "example": "09:00"
+                                    },
+                                    "shift_end": {
+                                        "description": "Shift end time",
+                                        "type": "string",
+                                        "format": "time",
+                                        "example": "17:00"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Receptionist registered and logged in",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "access_token": {
+                                            "description": "JWT access token",
+                                            "type": "string",
+                                            "example": "eyJ0eXAiOiJKV1Qi..."
+                                        },
+                                        "refresh_token": {
+                                            "description": "Refresh token",
+                                            "type": "string",
+                                            "example": "def50200..."
+                                        },
+                                        "expires_in": {
+                                            "description": "Token expiration in seconds",
+                                            "type": "integer",
+                                            "example": 31536000
+                                        },
+                                        "token_type": {
+                                            "description": "Token type",
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        },
+                                        "user": {
+                                            "description": "User profile",
+                                            "properties": {
+                                                "id": {
+                                                    "description": "User UUID",
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009"
+                                                },
+                                                "first_name": {
+                                                    "type": "string",
+                                                    "example": "Layla"
+                                                },
+                                                "last_name": {
+                                                    "type": "string",
+                                                    "example": "Hassan"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "format": "email",
+                                                    "example": "receptionist@example.com"
+                                                },
+                                                "role": {
+                                                    "type": "string",
+                                                    "example": "receptionist",
+                                                    "enum": [
+                                                        "admin",
+                                                        "doctor",
+                                                        "patient",
+                                                        "receptionist"
+                                                    ]
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+963912345680"
+                                                },
+                                                "address": {
+                                                    "type": "string",
+                                                    "example": "Homs, Syria"
+                                                },
+                                                "gender": {
+                                                    "type": "string",
+                                                    "example": "female",
+                                                    "enum": [
+                                                        "male",
+                                                        "female"
+                                                    ]
+                                                },
+                                                "birthday_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "1998-11-05"
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "shift_start": {
+                                                    "type": "string",
+                                                    "format": "time",
+                                                    "example": "09:00"
+                                                },
+                                                "shift_end": {
+                                                    "type": "string",
+                                                    "format": "time",
+                                                    "example": "17:00"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Error message",
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        },
+                                        "errors": {
+                                            "description": "Validation errors",
+                                            "type": "object",
+                                            "example": {
+                                                "email": [
+                                                    "The email has already been taken."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Login with email and password",
+                "operationId": "9d0bb5c770cbec19b0b9566606ef4adb",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "description": "User email",
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "admin@gmail.com"
+                                    },
+                                    "password": {
+                                        "description": "User password",
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "access_token": {
+                                            "description": "JWT access token",
+                                            "type": "string",
+                                            "example": "eyJ0eXAiOiJKV1Qi..."
+                                        },
+                                        "refresh_token": {
+                                            "description": "Refresh token",
+                                            "type": "string",
+                                            "example": "def50200..."
+                                        },
+                                        "expires_in": {
+                                            "description": "Token expiration in seconds",
+                                            "type": "integer",
+                                            "example": 31536000
+                                        },
+                                        "token_type": {
+                                            "description": "Token type",
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        },
+                                        "user": {
+                                            "description": "User profile",
+                                            "properties": {
+                                                "id": {
+                                                    "description": "User UUID",
+                                                    "type": "string",
+                                                    "format": "uuid",
+                                                    "example": "019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009"
+                                                },
+                                                "first_name": {
+                                                    "type": "string",
+                                                    "example": "Admin"
+                                                },
+                                                "last_name": {
+                                                    "type": "string",
+                                                    "example": "User"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "format": "email",
+                                                    "example": "admin@gmail.com"
+                                                },
+                                                "role": {
+                                                    "type": "string",
+                                                    "example": "admin",
+                                                    "enum": [
+                                                        "admin",
+                                                        "doctor",
+                                                        "patient",
+                                                        "receptionist"
+                                                    ]
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+963912345678"
+                                                },
+                                                "address": {
+                                                    "type": "string",
+                                                    "example": "Damascus, Syria"
+                                                },
+                                                "gender": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "male",
+                                                        "female"
+                                                    ]
+                                                },
+                                                "birthday_date": {
+                                                    "type": "string",
+                                                    "format": "date"
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Error message",
+                                            "type": "string",
+                                            "example": "Invalid credentials"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Error message",
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        },
+                                        "errors": {
+                                            "description": "Validation errors",
+                                            "type": "object",
+                                            "example": {
+                                                "email": [
+                                                    "The email field is required."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logout and revoke current token",
+                "operationId": "3a27a9e02ceb521eb3f98c8d2394aef9",
+                "responses": {
+                    "200": {
+                        "description": "Logged out successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logged out successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/refresh": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Refresh access token using refresh token",
+                "operationId": "437b695fba1c5eecef1841f958322adc",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "refresh_token": {
+                                        "description": "Refresh token from login/register",
+                                        "type": "string",
+                                        "example": "def50200..."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "New tokens issued",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "access_token": {
+                                            "description": "New JWT access token",
+                                            "type": "string",
+                                            "example": "eyJ0eXAiOiJKV1Qi..."
+                                        },
+                                        "refresh_token": {
+                                            "description": "New refresh token",
+                                            "type": "string",
+                                            "example": "def50200..."
+                                        },
+                                        "expires_in": {
+                                            "description": "Token expiration in seconds",
+                                            "type": "integer",
+                                            "example": 31536000
+                                        },
+                                        "token_type": {
+                                            "description": "Token type",
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid refresh token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invalid refresh token"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        },
+                                        "errors": {
+                                            "description": "Validation errors",
+                                            "type": "object",
+                                            "example": {
+                                                "refresh_token": [
+                                                    "The refresh token field is required."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/account": {
+            "delete": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Delete authenticated user account permanently",
+                "operationId": "62d1fc89a97ee54dc45e1dc6f6da228b",
+                "responses": {
+                    "200": {
+                        "description": "Account deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Account deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/password": {
+            "put": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Change authenticated user password",
+                "operationId": "88c7b432de94871f38a511d612ee01b4",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "old_password": {
+                                        "description": "Current password",
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password"
+                                    },
+                                    "new_password": {
+                                        "description": "New password (min 8 characters)",
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "NewPassword@123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Password changed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Password changed successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated or wrong old password",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Wrong old password"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        },
+                                        "errors": {
+                                            "description": "Validation errors",
+                                            "type": "object",
+                                            "example": {
+                                                "new_password": [
+                                                    "The new password must be at least 8 characters."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/me": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Get authenticated user profile",
+                "operationId": "7edb820901b8b3a880fc4d7a0a7290fb",
+                "responses": {
+                    "200": {
+                        "description": "User profile retrieved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "description": "User UUID",
+                                            "type": "string",
+                                            "format": "uuid",
+                                            "example": "019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009"
+                                        },
+                                        "first_name": {
+                                            "type": "string",
+                                            "example": "Admin"
+                                        },
+                                        "last_name": {
+                                            "type": "string",
+                                            "example": "User"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "format": "email",
+                                            "example": "admin@gmail.com"
+                                        },
+                                        "role": {
+                                            "type": "string",
+                                            "example": "admin",
+                                            "enum": [
+                                                "admin",
+                                                "doctor",
+                                                "patient",
+                                                "receptionist"
+                                            ]
+                                        },
+                                        "phone": {
+                                            "type": "string",
+                                            "example": "+963912345678"
+                                        },
+                                        "address": {
+                                            "type": "string",
+                                            "example": "Damascus, Syria"
+                                        },
+                                        "gender": {
+                                            "type": "string",
+                                            "enum": [
+                                                "male",
+                                                "female"
+                                            ]
+                                        },
+                                        "birthday_date": {
+                                            "type": "string",
+                                            "format": "date"
+                                        },
+                                        "is_active": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
     "components": {
         "securitySchemes": {
             "bearerAuth": {
@@ -19,5 +1180,11 @@
                 "scheme": "bearer"
             }
         }
-    }
+    },
+    "tags": [
+        {
+            "name": "Auth",
+            "description": "Auth"
+        }
+    ]
 }
