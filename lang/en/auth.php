@@ -18,5 +18,6 @@ return [
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
     'not_activated' => 'Account is not activated.',
     'logout' => 'Logged out successfully.',
+    'account_deleted' => 'Account deleted successfully.',
 
 ];

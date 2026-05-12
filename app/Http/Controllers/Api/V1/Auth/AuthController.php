@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Api\V1\Auth;
 
+use App\Domains\Auth\Actions\DeleteAccountAction;
 use App\Domains\Auth\Actions\LoginAction;
 use App\Domains\Auth\Actions\LogoutAction;
 use App\Domains\Auth\Actions\RegisterDoctorAction;
 use App\Domains\Auth\Actions\RegisterPatientAction;
 use App\Domains\Auth\Actions\RegisterReceptionistAction;
+use App\Domains\Auth\Requests\DeleteAccountRequest;
 use App\Domains\Auth\DTOs\LoginData;
 use App\Domains\Auth\DTOs\RegisterDoctorData;
 use App\Domains\Auth\DTOs\RegisterPatientData;
@@ -34,6 +36,7 @@ class AuthController
         private readonly RegisterReceptionistAction $registerReceptionistAction,
         private readonly LoginAction $loginAction,
         private readonly LogoutAction $logoutAction,
+        private readonly DeleteAccountAction $deleteAccountAction,
         private readonly AuthService $authService,
     ) {}
 
@@ -92,6 +95,13 @@ class AuthController
             'expires_in' => $tokenData->expiresIn,
             'token_type' => 'Bearer',
         ]);
+    }
+
+    public function deleteAccount(DeleteAccountRequest $request): JsonResponse
+    {
+        $this->deleteAccountAction->execute($request->user());
+
+        return response()->json(['message' => __('auth.account_deleted')]);
     }
 
     public function me(Request $request): UserResource
