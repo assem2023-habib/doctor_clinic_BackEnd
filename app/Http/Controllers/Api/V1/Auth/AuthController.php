@@ -26,6 +26,7 @@ use App\Domains\Doctors\Resources\DoctorResource;
 use App\Domains\Patients\Resources\PatientResource;
 use App\Domains\Receptionists\Resources\ReceptionistResource;
 use App\Domains\Shared\Resources\UserResource;
+use App\Domains\Shared\Responses\ApiResponse;
 use App\Enums\RoleEnum;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -43,68 +44,88 @@ class AuthController
         private readonly AuthService $authService,
     ) {}
 
-    public function registerPatient(RegisterPatientRequest $request): AuthResource
+    public function registerPatient(RegisterPatientRequest $request): JsonResponse
     {
         $dto = RegisterPatientData::fromRequest($request);
         $user = $this->registerPatientAction->execute($dto);
         $tokenData = $this->loginAction->execute(LoginData::fromCredentials($dto->email, $dto->password));
 
-        return new AuthResource((object) compact('user', 'tokenData'));
+        return ApiResponse::created(
+            new AuthResource((object) compact('user', 'tokenData')),
+            __('auth.register_success')
+        );
     }
 
-    public function registerDoctor(RegisterDoctorRequest $request): AuthResource
+    public function registerDoctor(RegisterDoctorRequest $request): JsonResponse
     {
         $dto = RegisterDoctorData::fromRequest($request);
         $user = $this->registerDoctorAction->execute($dto);
         $tokenData = $this->loginAction->execute(LoginData::fromCredentials($dto->email, $dto->password));
 
-        return new AuthResource((object) compact('user', 'tokenData'));
+        return ApiResponse::created(
+            new AuthResource((object) compact('user', 'tokenData')),
+            __('auth.register_success')
+        );
     }
 
-    public function registerReceptionist(RegisterReceptionistRequest $request): AuthResource
+    public function registerReceptionist(RegisterReceptionistRequest $request): JsonResponse
     {
         $dto = RegisterReceptionistData::fromRequest($request);
         $user = $this->registerReceptionistAction->execute($dto);
         $tokenData = $this->loginAction->execute(LoginData::fromCredentials($dto->email, $dto->password));
 
-        return new AuthResource((object) compact('user', 'tokenData'));
+        return ApiResponse::created(
+            new AuthResource((object) compact('user', 'tokenData')),
+            __('auth.register_success')
+        );
     }
 
-    public function login(LoginRequest $request): AuthResource
+    public function login(LoginRequest $request): JsonResponse
     {
-        $dto = LoginData::fromRequest($request);
-        $tokenData = $this->loginAction->execute($dto);
-        $user = User::where('email', $dto->email)->firstOrFail();
+        try {
+            $dto = LoginData::fromRequest($request);
+            $tokenData = $this->loginAction->execute($dto);
+            $user = User::where('email', $dto->email)->firstOrFail();
 
-        return new AuthResource((object) compact('user', 'tokenData'));
+            return ApiResponse::success(
+                new AuthResource((object) compact('user', 'tokenData')),
+                __('auth.login_success')
+            );
+        } catch (\Illuminate\Auth\AuthenticationException $e) {
+            return ApiResponse::unauthorized($e->getMessage());
+        }
     }
 
     public function logout(): JsonResponse
     {
         $this->logoutAction->execute();
 
-        return response()->json(['message' => __('auth.logout')]);
+        return ApiResponse::success(null, __('auth.logout_success'));
     }
 
     public function refresh(Request $request): JsonResponse
     {
         $request->validate(['refresh_token' => 'required|string']);
 
-        $tokenData = $this->authService->refreshToken($request->refresh_token);
+        try {
+            $tokenData = $this->authService->refreshToken($request->refresh_token);
 
-        return response()->json([
-            'access_token' => $tokenData->accessToken,
-            'refresh_token' => $tokenData->refreshToken,
-            'expires_in' => $tokenData->expiresIn,
-            'token_type' => 'Bearer',
-        ]);
+            return ApiResponse::success([
+                'access_token' => $tokenData->accessToken,
+                'refresh_token' => $tokenData->refreshToken,
+                'expires_in' => $tokenData->expiresIn,
+                'token_type' => 'Bearer',
+            ], __('auth.refresh_success'));
+        } catch (\Illuminate\Http\Client\RequestException $e) {
+            return ApiResponse::unauthorized(__('Invalid or expired refresh token.'));
+        }
     }
 
     public function deleteAccount(DeleteAccountRequest $request): JsonResponse
     {
         $this->deleteAccountAction->execute($request->user());
 
-        return response()->json(['message' => __('auth.account_deleted')]);
+        return ApiResponse::success(null, __('auth.account_deleted'));
     }
 
     public function changePassword(ChangePasswordRequest $request): JsonResponse
@@ -114,18 +135,20 @@ class AuthController
             newPassword: $request->new_password,
         );
 
-        return response()->json(['message' => __('auth.password_changed')]);
+        return ApiResponse::success(null, __('auth.password_changed'));
     }
 
-    public function me(Request $request): UserResource
+    public function me(Request $request): JsonResponse
     {
         $user = $request->user();
 
-        return match ($user->role) {
+        $resource = match ($user->role) {
             RoleEnum::Patient => new PatientResource($user),
             RoleEnum::Doctor => new DoctorResource($user),
             RoleEnum::Receptionist => new ReceptionistResource($user),
             default => new UserResource($user),
         };
+
+        return ApiResponse::success($resource, __('auth.profile_retrieved'));
     }
 }

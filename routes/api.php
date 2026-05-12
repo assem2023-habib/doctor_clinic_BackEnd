@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\Doctor\DoctorController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,4 +18,9 @@ Route::prefix('v1/auth')->group(function () {
         Route::delete('/account', [AuthController::class, 'deleteAccount']);
         Route::get('/me', [AuthController::class, 'me']);
     });
+});
+
+Route::prefix('v1/doctors')->group(function () {
+    Route::get('/', [DoctorController::class, 'index']);
+    Route::get('/{doctor}', [DoctorController::class, 'show']);
 });

@@ -7,7 +7,7 @@ use App\Domains\Auth\DTOs\TokenData;
 use App\Domains\Auth\Services\AuthService;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\AuthenticationException;
+use Illuminate\Auth\AuthenticationException;
 
 class LoginAction
 {

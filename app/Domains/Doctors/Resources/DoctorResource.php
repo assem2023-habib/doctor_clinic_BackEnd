@@ -8,6 +8,14 @@ class DoctorResource extends UserResource
 {
     public function toArray($request): array
     {
-        return parent::toArray($request);
+        return array_merge(parent::toArray($request), [
+            'schedules' => $this->doctor?->schedules->map(fn ($schedule) => [
+                'id' => $schedule->id,
+                'day_of_week' => $schedule->day_of_week?->value,
+                'start_time' => $schedule->start_time?->format('H:i'),
+                'end_time' => $schedule->end_time?->format('H:i'),
+                'is_active' => $schedule->is_active,
+            ]),
+        ]);
     }
 }

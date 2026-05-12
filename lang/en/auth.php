@@ -17,7 +17,11 @@ return [
     'password' => 'The provided password is incorrect.',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
     'not_activated' => 'Account is not activated.',
-    'logout' => 'Logged out successfully.',
+    'register_success' => 'Registered successfully.',
+    'login_success' => 'Logged in successfully.',
+    'logout_success' => 'Logged out successfully.',
+    'refresh_success' => 'Token refreshed successfully.',
+    'profile_retrieved' => 'User profile retrieved successfully.',
     'account_deleted' => 'Account deleted successfully.',
     'password_changed' => 'Password changed successfully.',
 

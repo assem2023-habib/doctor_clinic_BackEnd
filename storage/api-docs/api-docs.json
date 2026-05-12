@@ -1170,9 +1170,256 @@
                     }
                 ]
             }
+        },
+        "/api/v1/doctors": {
+            "get": {
+                "tags": [
+                    "Doctors"
+                ],
+                "summary": "List all doctors",
+                "operationId": "7095aef1a637d9202f97d15b1c22afc2",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "schema": {
+                            "type": "integer",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Doctors retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Doctors retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/DoctorResource"
+                                            }
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "pagination": {
+                                                    "properties": {
+                                                        "current_page": {
+                                                            "type": "integer"
+                                                        },
+                                                        "last_page": {
+                                                            "type": "integer"
+                                                        },
+                                                        "per_page": {
+                                                            "type": "integer"
+                                                        },
+                                                        "total": {
+                                                            "type": "integer"
+                                                        },
+                                                        "from": {
+                                                            "type": "integer"
+                                                        },
+                                                        "to": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/doctors/{doctor}": {
+            "get": {
+                "tags": [
+                    "Doctors"
+                ],
+                "summary": "Get a single doctor",
+                "operationId": "c22a4f35b2ede81696e18117184f0593",
+                "parameters": [
+                    {
+                        "name": "doctor",
+                        "in": "path",
+                        "description": "Doctor ID (UUID)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Doctor retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Doctor retrieved successfully"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/DoctorResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Doctor not found"
+                    }
+                }
+            }
         }
     },
     "components": {
+        "schemas": {
+            "DoctorResource": {
+                "description": "Doctor resource",
+                "properties": {
+                    "id": {
+                        "description": "User UUID",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "first_name": {
+                        "type": "string",
+                        "example": "Jane"
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "example": "Smith"
+                    },
+                    "username": {
+                        "type": "string",
+                        "example": "janesmith"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "doctor@example.com"
+                    },
+                    "phone": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "+963912345678"
+                    },
+                    "address": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "Damascus, Syria"
+                    },
+                    "gender": {
+                        "type": "string",
+                        "example": "female",
+                        "enum": [
+                            "male",
+                            "female"
+                        ]
+                    },
+                    "birthday_date": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date",
+                        "example": "1985-05-15"
+                    },
+                    "role": {
+                        "type": "string",
+                        "example": "doctor",
+                        "enum": [
+                            "admin",
+                            "doctor",
+                            "patient",
+                            "receptionist"
+                        ]
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "schedules": {
+                        "type": [
+                            "array",
+                            "null"
+                        ],
+                        "items": {
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                },
+                                "day_of_week": {
+                                    "type": "string",
+                                    "enum": [
+                                        "sunday",
+                                        "monday",
+                                        "tuesday",
+                                        "wednesday",
+                                        "thursday",
+                                        "friday",
+                                        "saturday"
+                                    ]
+                                },
+                                "start_time": {
+                                    "type": "string",
+                                    "example": "09:00"
+                                },
+                                "end_time": {
+                                    "type": "string",
+                                    "example": "17:00"
+                                },
+                                "is_active": {
+                                    "type": "boolean",
+                                    "example": true
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                },
+                "type": "object"
+            }
+        },
         "securitySchemes": {
             "bearerAuth": {
                 "type": "http",
@@ -1185,6 +1432,10 @@
         {
             "name": "Auth",
             "description": "Auth"
+        },
+        {
+            "name": "Doctors",
+            "description": "Doctors"
         }
     ]
 }
