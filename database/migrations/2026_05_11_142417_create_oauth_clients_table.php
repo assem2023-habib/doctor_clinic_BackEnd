@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('provider')->nullable();
             $table->text('redirect_uris');
             $table->text('grant_types');
+            $table->boolean('personal_access_client')->default(false);
+            $table->boolean('password_client')->default(false);
             $table->boolean('revoked');
             $table->timestamps();
         });

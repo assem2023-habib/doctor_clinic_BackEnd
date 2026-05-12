@@ -6,7 +6,6 @@ use App\Enums\GenderEnum;
 use App\Enums\RoleEnum;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
@@ -61,14 +60,37 @@ class AuthTest extends TestCase
             'shift_end' => '17:00',
         ];
 
-        Http::fake([
-            '*/oauth/token' => Http::response([
-                'token_type' => 'Bearer',
-                'expires_in' => 3600,
-                'access_token' => 'test-access-token',
-                'refresh_token' => 'test-refresh-token',
-            ], 200),
+        $this->setupPassportKeys();
+        $this->createPasswordGrantClient();
+    }
+
+    private function setupPassportKeys(): void
+    {
+        $privatePath = Passport::keyPath('oauth-private.key');
+        $publicPath = Passport::keyPath('oauth-public.key');
+
+        if (file_exists($privatePath) && file_exists($publicPath)) {
+            return;
+        }
+
+        $this->artisan('passport:keys', ['--force' => true]);
+    }
+
+    private function createPasswordGrantClient(): void
+    {
+        $client = \Laravel\Passport\Client::create([
+            'name' => 'Test Password Grant Client',
+            'secret' => \Illuminate\Support\Str::random(40),
+            'provider' => 'users',
+            'redirect_uris' => ['http://localhost'],
+            'grant_types' => ['password', 'refresh_token'],
+            'personal_access_client' => false,
+            'password_client' => true,
+            'revoked' => false,
         ]);
+
+        config(['passport.password_client_id' => $client->id]);
+        config(['passport.password_client_secret' => $client->secret]);
     }
 
     private function assertApiResponseStructure(array $json, array $keys = ['data']): void
