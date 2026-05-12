@@ -13,6 +13,7 @@ Route::prefix('v1/auth')->group(function () {
 
     Route::middleware('auth:api')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
+        Route::put('/password', [AuthController::class, 'changePassword']);
         Route::delete('/account', [AuthController::class, 'deleteAccount']);
         Route::get('/me', [AuthController::class, 'me']);
     });

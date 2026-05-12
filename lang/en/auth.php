@@ -19,5 +19,6 @@ return [
     'not_activated' => 'Account is not activated.',
     'logout' => 'Logged out successfully.',
     'account_deleted' => 'Account deleted successfully.',
+    'password_changed' => 'Password changed successfully.',
 
 ];

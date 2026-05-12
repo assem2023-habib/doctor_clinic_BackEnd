@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Api\V1\Auth;
 
+use App\Domains\Auth\Actions\ChangePasswordAction;
 use App\Domains\Auth\Actions\DeleteAccountAction;
 use App\Domains\Auth\Actions\LoginAction;
 use App\Domains\Auth\Actions\LogoutAction;
 use App\Domains\Auth\Actions\RegisterDoctorAction;
 use App\Domains\Auth\Actions\RegisterPatientAction;
 use App\Domains\Auth\Actions\RegisterReceptionistAction;
+use App\Domains\Auth\Requests\ChangePasswordRequest;
 use App\Domains\Auth\Requests\DeleteAccountRequest;
 use App\Domains\Auth\DTOs\LoginData;
 use App\Domains\Auth\DTOs\RegisterDoctorData;
@@ -37,6 +39,7 @@ class AuthController
         private readonly LoginAction $loginAction,
         private readonly LogoutAction $logoutAction,
         private readonly DeleteAccountAction $deleteAccountAction,
+        private readonly ChangePasswordAction $changePasswordAction,
         private readonly AuthService $authService,
     ) {}
 
@@ -102,6 +105,16 @@ class AuthController
         $this->deleteAccountAction->execute($request->user());
 
         return response()->json(['message' => __('auth.account_deleted')]);
+    }
+
+    public function changePassword(ChangePasswordRequest $request): JsonResponse
+    {
+        $this->changePasswordAction->execute(
+            user: $request->user(),
+            newPassword: $request->new_password,
+        );
+
+        return response()->json(['message' => __('auth.password_changed')]);
     }
 
     public function me(Request $request): UserResource
