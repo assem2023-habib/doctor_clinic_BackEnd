@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Domains\Appointments\Models\Appointment;
 use App\Domains\Doctors\Models\Doctor;
 use App\Domains\Notifications\Models\Notification;
+use App\Domains\Patients\Models\Patient;
 use App\Domains\Receptionists\Models\Receptionist;
 use App\Enums\GenderEnum;
 use App\Enums\RoleEnum;
@@ -56,6 +57,11 @@ class User extends Authenticatable
     public function receptionist()
     {
         return $this->hasOne(Receptionist::class);
+    }
+
+    public function patient()
+    {
+        return $this->hasOne(Patient::class);
     }
 
     public function createdAppointments()
