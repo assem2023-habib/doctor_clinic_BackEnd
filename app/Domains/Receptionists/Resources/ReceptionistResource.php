@@ -9,7 +9,6 @@ class ReceptionistResource extends UserResource
     public function toArray($request): array
     {
         return array_merge(parent::toArray($request), [
-            'receptionist_id' => $this->receptionist?->id,
             'shift_start' => $this->receptionist?->shift_start,
             'shift_end' => $this->receptionist?->shift_end,
         ]);

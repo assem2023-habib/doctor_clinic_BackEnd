@@ -8,8 +8,6 @@ class PatientResource extends UserResource
 {
     public function toArray($request): array
     {
-        return array_merge(parent::toArray($request), [
-            'patient_id' => $this->patient?->id,
-        ]);
+        return parent::toArray($request);
     }
 }
