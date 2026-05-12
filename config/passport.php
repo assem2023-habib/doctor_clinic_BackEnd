@@ -45,4 +45,17 @@ return [
 
     'connection' => env('PASSPORT_CONNECTION'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Password Grant Client
+    |--------------------------------------------------------------------------
+    |
+    | These credentials are used internally by AuthService to issue access
+    | and refresh tokens via the Password Grant flow.
+    |
+    */
+
+    'password_client_id' => env('PASSPORT_PASSWORD_CLIENT_ID'),
+    'password_client_secret' => env('PASSPORT_PASSWORD_CLIENT_SECRET'),
+
 ];
