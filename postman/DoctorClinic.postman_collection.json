@@ -1,0 +1,442 @@
+{
+	"info": {
+		"name": "Doctor Clinic API",
+		"description": "Doctor Clinic API – Auth endpoints\n\n## Token Auto-Storage\n\nAll Login/Register responses include a **Tests** script that automatically stores `access_token`, `refresh_token`, and `expires_in` as collection variables. No manual copy-paste needed.\n\n## Authenticated Requests\n\nThe **Auth** folder has a **Pre-request Script** that attaches `Authorization: Bearer {{access_token}}` to every request automatically.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "doctor-clinic"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refresh_token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Auth",
+			"description": "All authentication operations.\n\n**Pre-request Script** attaches the Bearer token automatically for protected routes.",
+			"item": [
+				{
+					"name": "Register Patient",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('access_token', json.access_token);",
+									"    pm.collectionVariables.set('refresh_token', json.refresh_token);",
+									"    pm.collectionVariables.set('expires_in', json.expires_in);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"first_name\": \"Ahmed\",\n    \"last_name\": \"Ali\",\n    \"username\": \"ahmedali\",\n    \"email\": \"patient@example.com\",\n    \"phone\": \"+963912345678\",\n    \"address\": \"Damascus, Syria\",\n    \"gender\": \"male\",\n    \"birthday_date\": \"1995-06-15\",\n    \"password\": \"Password@123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/register/patient",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "register", "patient"]
+						}
+					},
+					"response": [
+						{
+							"name": "Created",
+							"status": "Created",
+							"code": 201,
+							"body": "{\n    \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n    \"refresh_token\": \"def50200...\",\n    \"expires_in\": 31536000,\n    \"token_type\": \"Bearer\",\n    \"user\": {\n        \"id\": \"019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009\",\n        \"first_name\": \"Ahmed\",\n        \"last_name\": \"Ali\",\n        \"email\": \"patient@example.com\",\n        \"role\": \"patient\",\n        \"phone\": \"+963912345678\",\n        \"address\": \"Damascus, Syria\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1995-06-15\",\n        \"is_active\": true\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Register Doctor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('access_token', json.access_token);",
+									"    pm.collectionVariables.set('refresh_token', json.refresh_token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"first_name\": \"Khaled\",\n    \"last_name\": \"Suleiman\",\n    \"username\": \"drkhaled\",\n    \"email\": \"doctor@example.com\",\n    \"phone\": \"+963912345679\",\n    \"address\": \"Aleppo, Syria\",\n    \"gender\": \"male\",\n    \"birthday_date\": \"1985-03-20\",\n    \"password\": \"Password@123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/register/doctor",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "register", "doctor"]
+						}
+					},
+					"response": [
+						{
+							"name": "Created",
+							"status": "Created",
+							"code": 201,
+							"body": "{\n    \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n    \"refresh_token\": \"def50200...\",\n    \"expires_in\": 31536000,\n    \"token_type\": \"Bearer\",\n    \"user\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor@example.com\",\n        \"role\": \"doctor\",\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Register Receptionist",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('access_token', json.access_token);",
+									"    pm.collectionVariables.set('refresh_token', json.refresh_token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"first_name\": \"Layla\",\n    \"last_name\": \"Hassan\",\n    \"username\": \"laylah\",\n    \"email\": \"receptionist@example.com\",\n    \"phone\": \"+963912345680\",\n    \"address\": \"Homs, Syria\",\n    \"gender\": \"female\",\n    \"birthday_date\": \"1998-11-05\",\n    \"password\": \"Password@123\",\n    \"shift_start\": \"09:00\",\n    \"shift_end\": \"17:00\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/register/receptionist",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "register", "receptionist"]
+						}
+					},
+					"response": [
+						{
+							"name": "Created",
+							"status": "Created",
+							"code": 201,
+							"body": "{\n    \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n    \"refresh_token\": \"def50200...\",\n    \"expires_in\": 31536000,\n    \"token_type\": \"Bearer\",\n    \"user\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Layla\",\n        \"last_name\": \"Hassan\",\n        \"email\": \"receptionist@example.com\",\n        \"role\": \"receptionist\",\n        \"shift_start\": \"09:00\",\n        \"shift_end\": \"17:00\",\n        \"phone\": \"+963912345680\",\n        \"gender\": \"female\",\n        \"birthday_date\": \"1998-11-05\",\n        \"is_active\": true\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('access_token', json.access_token);",
+									"    pm.collectionVariables.set('refresh_token', json.refresh_token);",
+									"    pm.collectionVariables.set('expires_in', json.expires_in);",
+									"    console.log('Tokens stored successfully');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@gmail.com\",\n    \"password\": \"password\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "login"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n    \"refresh_token\": \"def50200...\",\n    \"expires_in\": 31536000,\n    \"token_type\": \"Bearer\",\n    \"user\": {\n        \"id\": \"019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009\",\n        \"first_name\": \"Admin\",\n        \"last_name\": \"User\",\n        \"email\": \"admin@gmail.com\",\n        \"role\": \"admin\",\n        \"is_active\": true\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/logout",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "logout"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"message\": \"Logged out successfully\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('access_token', json.access_token);",
+									"    pm.collectionVariables.set('refresh_token', json.refresh_token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refresh_token\": \"{{refresh_token}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/refresh",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "refresh"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n    \"refresh_token\": \"def50200...\",\n    \"expires_in\": 31536000,\n    \"token_type\": \"Bearer\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"old_password\": \"password\",\n    \"new_password\": \"NewPassword@123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/password",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "password"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"message\": \"Password changed successfully\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete Account",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/account",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "account"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"message\": \"Account deleted successfully\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Me",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/me",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "me"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success (Admin)",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"id\": \"019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009\",\n    \"first_name\": \"Admin\",\n    \"last_name\": \"User\",\n    \"email\": \"admin@gmail.com\",\n    \"role\": \"admin\",\n    \"is_active\": true\n}"
+						},
+						{
+							"name": "Success (Patient)",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"id\": \"019e1d0f-...\",\n    \"first_name\": \"Ahmed\",\n    \"last_name\": \"Ali\",\n    \"email\": \"patient@example.com\",\n    \"role\": \"patient\",\n    \"phone\": \"+963912345678\",\n    \"address\": \"Damascus, Syria\",\n    \"gender\": \"male\",\n    \"birthday_date\": \"1995-06-15\",\n    \"is_active\": true\n}"
+						},
+						{
+							"name": "Success (Doctor)",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"id\": \"019e1d0f-...\",\n    \"first_name\": \"Khaled\",\n    \"last_name\": \"Suleiman\",\n    \"email\": \"doctor@example.com\",\n    \"role\": \"doctor\",\n    \"phone\": \"+963912345679\",\n    \"gender\": \"male\",\n    \"birthday_date\": \"1985-03-20\",\n    \"is_active\": true\n}"
+						},
+						{
+							"name": "Success (Receptionist)",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"id\": \"019e1d0f-...\",\n    \"first_name\": \"Layla\",\n    \"last_name\": \"Hassan\",\n    \"email\": \"receptionist@example.com\",\n    \"role\": \"receptionist\",\n    \"shift_start\": \"09:00\",\n    \"shift_end\": \"17:00\",\n    \"phone\": \"+963912345680\",\n    \"gender\": \"female\",\n    \"birthday_date\": \"1998-11-05\",\n    \"is_active\": true\n}"
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Auto-attach Bearer token to all Auth folder requests",
+							"var token = pm.collectionVariables.get('access_token');",
+							"if (token) {",
+							"    pm.request.headers.add({",
+							"        key: 'Authorization',",
+							"        value: 'Bearer ' + token",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		}
+	]
+}
