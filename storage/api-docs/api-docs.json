@@ -18,7 +18,7 @@
                     "Auth"
                 ],
                 "summary": "Register a new patient",
-                "operationId": "ed6f5273a3bce9f715b60bc643f21fba",
+                "operationId": "1627791a53367d6fd7790fecc24df633",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -211,7 +211,7 @@
                     "Auth"
                 ],
                 "summary": "Register a new doctor",
-                "operationId": "fa0092ff8121fed0715e0c7a5ec3fa6c",
+                "operationId": "db47d5c3f3d37b7ef75af37192872bc9",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -404,7 +404,7 @@
                     "Auth"
                 ],
                 "summary": "Register a new receptionist",
-                "operationId": "7757fe22e30e28196a7d1e97269a50fe",
+                "operationId": "4d20f8b441cd4b9f72c59f80bc432771",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -619,7 +619,7 @@
                     "Auth"
                 ],
                 "summary": "Login with email and password",
-                "operationId": "9d0bb5c770cbec19b0b9566606ef4adb",
+                "operationId": "02a98850c262cc971a2f18fa826b127a",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -787,7 +787,7 @@
                     "Auth"
                 ],
                 "summary": "Logout and revoke current token",
-                "operationId": "3a27a9e02ceb521eb3f98c8d2394aef9",
+                "operationId": "05d3f9d49123393fc82a1b8492bfcf8c",
                 "responses": {
                     "200": {
                         "description": "Logged out successfully",
@@ -835,7 +835,7 @@
                     "Auth"
                 ],
                 "summary": "Refresh access token using refresh token",
-                "operationId": "437b695fba1c5eecef1841f958322adc",
+                "operationId": "98d2760b133da362d30652568033ae4b",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -936,7 +936,7 @@
                     "Auth"
                 ],
                 "summary": "Delete authenticated user account permanently",
-                "operationId": "62d1fc89a97ee54dc45e1dc6f6da228b",
+                "operationId": "5964401898b475bc09f97605dca03b50",
                 "responses": {
                     "200": {
                         "description": "Account deleted successfully",
@@ -984,7 +984,7 @@
                     "Auth"
                 ],
                 "summary": "Change authenticated user password",
-                "operationId": "88c7b432de94871f38a511d612ee01b4",
+                "operationId": "1277f9dc28f54b8147b49c94235dfcbc",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1081,7 +1081,7 @@
                     "Auth"
                 ],
                 "summary": "Get authenticated user profile",
-                "operationId": "7edb820901b8b3a880fc4d7a0a7290fb",
+                "operationId": "bbd8e75db1ed83c7d6e48ca0da5495a1",
                 "responses": {
                     "200": {
                         "description": "User profile retrieved",
