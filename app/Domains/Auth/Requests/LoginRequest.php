@@ -13,4 +13,16 @@ class LoginRequest extends FormRequest
             'password' => ['required', 'string'],
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'email.required' => __('auth_messages.email_required'),
+            'email.email' => __('auth_messages.email_email'),
+            'email.exists' => __('auth_messages.email_exists'),
+
+            'password.required' => __('auth_messages.password_required'),
+            'password.string' => __('auth_messages.password_string'),
+        ];
+    }
 }
