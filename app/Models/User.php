@@ -11,6 +11,8 @@ use App\Domains\Receptionists\Models\Receptionist;
 use App\Enums\GenderEnum;
 use App\Enums\RoleEnum;
 use App\Traits\HasUuidV7;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -31,6 +33,8 @@ use Laravel\Passport\HasApiTokens;
     'role',
     'is_active',
     'password',
+    'country_id',
+    'city_id',
 ])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
@@ -85,5 +89,20 @@ class User extends Authenticatable
     public function ratingsReceived()
     {
         return $this->morphMany(Rating::class, 'rateable');
+    }
+
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class);
+    }
+
+    public function city(): BelongsTo
+    {
+        return $this->belongsTo(City::class);
+    }
+
+    public function image()
+    {
+        return $this->morphOne(Image::class, 'imageable');
     }
 }

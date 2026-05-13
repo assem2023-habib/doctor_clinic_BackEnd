@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\Country;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Laravel\Passport\Passport;
 
@@ -11,6 +14,11 @@ class AuthServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Relation::morphMap([
+            'user' => User::class,
+            'country' => Country::class,
+        ]);
+
         Passport::$passwordGrantEnabled = true;
 
         Passport::tokensExpireIn(now()->addMinutes(15));

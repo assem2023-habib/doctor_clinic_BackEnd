@@ -42,6 +42,11 @@ prescription, prescription_item, medicine, notification, rating
 user, service, center, appointment_system
 ```
 
+### `ImageTypeEnum`
+```
+user, country
+```
+
 ---
 
 ## Tables
@@ -60,6 +65,8 @@ user, service, center, appointment_system
 | birthday_date | date | nullable |
 | role | enum (RoleEnum) | |
 | is_active | boolean | default true |
+| country_id | uuid | FK → countries, nullable |
+| city_id | uuid | FK → cities, nullable |
 | email_verified_at | timestamp | nullable |
 | password | string | hashed |
 | remember_token | string | nullable |
@@ -73,7 +80,26 @@ user, service, center, appointment_system
 | token | string | |
 | created_at | timestamp | nullable |
 
-### 3. `sessions`
+### 3. `countries`
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | uuid | PK |
+| name | json | `{"ar": "…", "en": "…"}` |
+| code | string(2) | unique |
+| flag | string | nullable |
+| created_at | timestamp | |
+| updated_at | timestamp | |
+
+### 4. `cities`
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | uuid | PK |
+| name | json | `{"ar": "…", "en": "…"}` |
+| country_id | uuid | FK → countries |
+| created_at | timestamp | |
+| updated_at | timestamp | |
+
+### 5. `sessions`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | string | PK |
@@ -83,7 +109,7 @@ user, service, center, appointment_system
 | payload | longText | |
 | last_activity | integer | indexed |
 
-### 4. `doctors`
+### 6. `doctors`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -91,7 +117,7 @@ user, service, center, appointment_system
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 5. `receptionists`
+### 7. `receptionists`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -101,7 +127,7 @@ user, service, center, appointment_system
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 6. `doctor_schedules`
+### 8. `doctor_schedules`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -113,7 +139,7 @@ user, service, center, appointment_system
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 7. `patients`
+### 9. `patients`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -121,7 +147,7 @@ user, service, center, appointment_system
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 8. `appointments`
+### 10. `appointments`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -137,7 +163,7 @@ user, service, center, appointment_system
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 9. `appointment_status_logs`
+### 11. `appointment_status_logs`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -149,7 +175,7 @@ user, service, center, appointment_system
 
 > No `updated_at` — immutable log.
 
-### 10. `medical_records`
+### 12. `medical_records`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -162,7 +188,7 @@ user, service, center, appointment_system
 
 > No `updated_at` — immutable record.
 
-### 11. `prescriptions`
+### 13. `prescriptions`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -173,7 +199,7 @@ user, service, center, appointment_system
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 12. `prescription_items`
+### 14. `prescription_items`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -186,7 +212,7 @@ user, service, center, appointment_system
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 13. `medicines`
+### 15. `medicines`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -196,7 +222,7 @@ user, service, center, appointment_system
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 14. `notifications`
+### 16. `notifications`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -206,7 +232,7 @@ user, service, center, appointment_system
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 15. `notification_user` (pivot)
+### 17. `notification_user` (pivot)
 | Column | Type | Constraints |
 |--------|------|-------------|
 | notification_id | uuid | FK → notifications, PK |
@@ -215,7 +241,7 @@ user, service, center, appointment_system
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 16. `ratings`
+### 18. `ratings`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -232,7 +258,7 @@ user, service, center, appointment_system
 
 > `rateable_id` + `rateable_type` are nullable — only used when `type = user`.
 
-### 17. `activity_logs`
+### 19. `activity_logs`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -246,11 +272,30 @@ user, service, center, appointment_system
 
 > Polymorphic reference: `model_type` + `model_id` point to any table.
 
+### 20. `images`
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | uuid | PK |
+| url | string | |
+| imageable_type | string | `user` \| `country` |
+| imageable_id | uuid | |
+| created_at | timestamp | |
+| updated_at | timestamp | |
+| Index | | unique (imageable_type, imageable_id) |
+
+> Polymorphic table: `imageable_type` stores the enum value (`user` or `country`). 1:1 relation — each object has one image.
+> See `app/Enums/ImageTypeEnum.php`.
+
 ---
 
 ## Relationships (ER)
 
 ```
+countries 1──N cities
+
+users N──1 countries
+users N──1 cities
+
 users 1──1 doctors
 users 1──1 receptionists
 users 1──1 patients
@@ -286,9 +331,16 @@ users 1──N ratings (rateable — morph, type = user only)
 
 rating.type enum: user, service, center, appointment_system
     └── when type ≠ user → rateable_id + rateable_type are NULL
+
+users 1──1 images (morph — imageable)
+countries 1──1 images (morph — imageable)
+    └── polymorphic: (imageable_type, imageable_id) UNIQUE
+    └── type values: user, country (ImageTypeEnum)
 ```
 
 ---
+
+> Total custom tables: 20
 
 ## Laravel Default Tables
 
