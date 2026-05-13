@@ -47,6 +47,10 @@ user, service, center, appointment_system
 user, country
 ```
 
+> **Max size per type** (defined in `config/images.php`):
+> - `user` → 2048 KB (2 MB)
+> - `country` → 5120 KB (5 MB)
+
 ---
 
 ## Tables
@@ -284,7 +288,7 @@ user, country
 | Index | | unique (imageable_type, imageable_id) |
 
 > Polymorphic table: `imageable_type` stores the enum value (`user` or `country`). 1:1 relation — each object has one image.
-> See `app/Enums/ImageTypeEnum.php`.
+> File size limits are configured centrally in `config/images.php` per `ImageTypeEnum`.
 
 ---
 
