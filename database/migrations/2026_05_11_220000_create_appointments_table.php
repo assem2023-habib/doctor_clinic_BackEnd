@@ -21,6 +21,12 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->foreignUuid('created_by')->constrained('users');
             $table->timestamps();
+
+            $table->index('doctor_id');
+            $table->index('patient_id');
+            $table->index('appointment_date');
+            $table->index('status');
+            $table->index(['doctor_id', 'appointment_date'], 'idx_appointments_doctor_date');
         });
     }
 
