@@ -4,6 +4,7 @@ namespace App\Domains\Shared\Responses;
 
 use App\Enums\HttpStatusEnum;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ApiResponse
 {
@@ -24,6 +25,18 @@ class ApiResponse
         }
 
         return response()->json($response, $status->value);
+    }
+
+    public static function pagination(LengthAwarePaginator $paginator): array
+    {
+        return [
+            'current_page' => $paginator->currentPage(),
+            'last_page' => $paginator->lastPage(),
+            'limit' => $paginator->perPage(),
+            'total' => $paginator->total(),
+            'hasNextPage' => $paginator->hasMorePages(),
+            'hasPreviousPage' => $paginator->currentPage() > 1,
+        ];
     }
 
     public static function created(

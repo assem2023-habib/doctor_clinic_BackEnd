@@ -36,14 +36,7 @@ class CityController
         return ApiResponse::success(
             CityResource::collection($cities),
             __('Cities retrieved successfully'),
-            pagination: [
-                'current_page' => $cities->currentPage(),
-                'last_page' => $cities->lastPage(),
-                'limit' => $cities->perPage(),
-                'total' => $cities->total(),
-                'from' => $cities->firstItem(),
-                'to' => $cities->lastItem(),
-            ]
+            pagination: ApiResponse::pagination($cities)
         );
     }
 

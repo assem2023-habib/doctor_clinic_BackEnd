@@ -27,14 +27,7 @@ class DoctorController
         return ApiResponse::success(
             DoctorResource::collection($doctors),
             __('Doctors retrieved successfully'),
-            pagination: [
-                'current_page' => $doctors->currentPage(),
-                'last_page' => $doctors->lastPage(),
-                'limit' => $doctors->perPage(),
-                'total' => $doctors->total(),
-                'from' => $doctors->firstItem(),
-                'to' => $doctors->lastItem(),
-            ]
+            pagination: ApiResponse::pagination($doctors)
         );
     }
 

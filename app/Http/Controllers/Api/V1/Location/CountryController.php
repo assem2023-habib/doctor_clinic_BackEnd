@@ -35,14 +35,7 @@ class CountryController
         return ApiResponse::success(
             CountryResource::collection($countries),
             __('Countries retrieved successfully'),
-            pagination: [
-                'current_page' => $countries->currentPage(),
-                'last_page' => $countries->lastPage(),
-                'limit' => $countries->perPage(),
-                'total' => $countries->total(),
-                'from' => $countries->firstItem(),
-                'to' => $countries->lastItem(),
-            ]
+            pagination: ApiResponse::pagination($countries)
         );
     }
 
