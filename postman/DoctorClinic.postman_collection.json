@@ -1,7 +1,7 @@
 {
 	"info": {
 		"name": "Doctor Clinic API",
-		"description": "Doctor Clinic API – Auth endpoints\n\n## Token Auto-Storage\n\nAll Login/Register responses include a **Tests** script that automatically stores `access_token`, `refresh_token`, and `expires_in` as collection variables. No manual copy-paste needed.\n\n## Authenticated Requests\n\nThe **Auth** folder has a **Pre-request Script** that attaches `Authorization: Bearer {{access_token}}` to every request automatically.",
+		"description": "Doctor Clinic API – All Endpoints\n\n## Token Auto-Storage\n\nAll Login/Register responses include a **Tests** script that automatically stores `access_token`, `refresh_token`, and `expires_in` as collection variables. No manual copy-paste needed.\n\n## Authenticated Requests\n\nThe **Auth**, **Locations** (management), and **Images** folders have a **Pre-request Script** that attaches `Authorization: Bearer {{access_token}}` to every request automatically.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "doctor-clinic"
 	},
@@ -73,7 +73,7 @@
 							"name": "Created",
 							"status": "Created",
 							"code": 201,
-							"body": "{\n    \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n    \"refresh_token\": \"def50200...\",\n    \"expires_in\": 31536000,\n    \"token_type\": \"Bearer\",\n    \"user\": {\n        \"id\": \"019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009\",\n        \"first_name\": \"Ahmed\",\n        \"last_name\": \"Ali\",\n        \"email\": \"patient@example.com\",\n        \"role\": \"patient\",\n        \"phone\": \"+963912345678\",\n        \"address\": \"Damascus, Syria\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1995-06-15\",\n        \"is_active\": true\n    }\n}"
+							"body": "{\n    \"status\": 201,\n    \"message\": \"Registered successfully\",\n    \"data\": {\n        \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n        \"refresh_token\": \"def50200...\",\n        \"expires_in\": 31536000,\n        \"token_type\": \"Bearer\",\n        \"user\": {\n            \"id\": \"019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009\",\n            \"first_name\": \"Ahmed\",\n            \"last_name\": \"Ali\",\n            \"email\": \"patient@example.com\",\n            \"role\": \"patient\",\n            \"phone\": \"+963912345678\",\n            \"address\": \"Damascus, Syria\",\n            \"gender\": \"male\",\n            \"birthday_date\": \"1995-06-15\",\n            \"is_active\": true\n        }\n    }\n}"
 						}
 					]
 				},
@@ -88,6 +88,7 @@
 									"    var json = pm.response.json();",
 									"    pm.collectionVariables.set('access_token', json.access_token);",
 									"    pm.collectionVariables.set('refresh_token', json.refresh_token);",
+									"    pm.collectionVariables.set('expires_in', json.expires_in);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -122,7 +123,7 @@
 							"name": "Created",
 							"status": "Created",
 							"code": 201,
-							"body": "{\n    \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n    \"refresh_token\": \"def50200...\",\n    \"expires_in\": 31536000,\n    \"token_type\": \"Bearer\",\n    \"user\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor@example.com\",\n        \"role\": \"doctor\",\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true\n    }\n}"
+							"body": "{\n    \"status\": 201,\n    \"message\": \"Registered successfully\",\n    \"data\": {\n        \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n        \"refresh_token\": \"def50200...\",\n        \"expires_in\": 31536000,\n        \"token_type\": \"Bearer\",\n        \"user\": {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Khaled\",\n            \"last_name\": \"Suleiman\",\n            \"email\": \"doctor@example.com\",\n            \"role\": \"doctor\",\n            \"phone\": \"+963912345679\",\n            \"gender\": \"male\",\n            \"birthday_date\": \"1985-03-20\",\n            \"is_active\": true\n        }\n    }\n}"
 						}
 					]
 				},
@@ -137,6 +138,7 @@
 									"    var json = pm.response.json();",
 									"    pm.collectionVariables.set('access_token', json.access_token);",
 									"    pm.collectionVariables.set('refresh_token', json.refresh_token);",
+									"    pm.collectionVariables.set('expires_in', json.expires_in);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -171,7 +173,7 @@
 							"name": "Created",
 							"status": "Created",
 							"code": 201,
-							"body": "{\n    \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n    \"refresh_token\": \"def50200...\",\n    \"expires_in\": 31536000,\n    \"token_type\": \"Bearer\",\n    \"user\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Layla\",\n        \"last_name\": \"Hassan\",\n        \"email\": \"receptionist@example.com\",\n        \"role\": \"receptionist\",\n        \"shift_start\": \"09:00\",\n        \"shift_end\": \"17:00\",\n        \"phone\": \"+963912345680\",\n        \"gender\": \"female\",\n        \"birthday_date\": \"1998-11-05\",\n        \"is_active\": true\n    }\n}"
+							"body": "{\n    \"status\": 201,\n    \"message\": \"Registered successfully\",\n    \"data\": {\n        \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n        \"refresh_token\": \"def50200...\",\n        \"expires_in\": 31536000,\n        \"token_type\": \"Bearer\",\n        \"user\": {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Layla\",\n            \"last_name\": \"Hassan\",\n            \"email\": \"receptionist@example.com\",\n            \"role\": \"receptionist\",\n            \"shift_start\": \"09:00\",\n            \"shift_end\": \"17:00\",\n            \"phone\": \"+963912345680\",\n            \"gender\": \"female\",\n            \"birthday_date\": \"1998-11-05\",\n            \"is_active\": true\n        }\n    }\n}"
 						}
 					]
 				},
@@ -184,9 +186,9 @@
 								"exec": [
 									"if (pm.response.code === 200) {",
 									"    var json = pm.response.json();",
-									"    pm.collectionVariables.set('access_token', json.access_token);",
-									"    pm.collectionVariables.set('refresh_token', json.refresh_token);",
-									"    pm.collectionVariables.set('expires_in', json.expires_in);",
+									"    pm.collectionVariables.set('access_token', json.data.access_token);",
+									"    pm.collectionVariables.set('refresh_token', json.data.refresh_token);",
+									"    pm.collectionVariables.set('expires_in', json.data.expires_in);",
 									"    console.log('Tokens stored successfully');",
 									"}"
 								],
@@ -222,7 +224,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n    \"refresh_token\": \"def50200...\",\n    \"expires_in\": 31536000,\n    \"token_type\": \"Bearer\",\n    \"user\": {\n        \"id\": \"019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009\",\n        \"first_name\": \"Admin\",\n        \"last_name\": \"User\",\n        \"email\": \"admin@gmail.com\",\n        \"role\": \"admin\",\n        \"is_active\": true\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Login successful\",\n    \"data\": {\n        \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n        \"refresh_token\": \"def50200...\",\n        \"expires_in\": 31536000,\n        \"token_type\": \"Bearer\",\n        \"user\": {\n            \"id\": \"019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009\",\n            \"first_name\": \"Admin\",\n            \"last_name\": \"User\",\n            \"email\": \"admin@gmail.com\",\n            \"role\": \"admin\",\n            \"is_active\": true\n        }\n    }\n}"
 						}
 					]
 				},
@@ -251,7 +253,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"message\": \"Logged out successfully\"\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Logged out successfully\"\n}"
 						}
 					]
 				},
@@ -264,8 +266,8 @@
 								"exec": [
 									"if (pm.response.code === 200) {",
 									"    var json = pm.response.json();",
-									"    pm.collectionVariables.set('access_token', json.access_token);",
-									"    pm.collectionVariables.set('refresh_token', json.refresh_token);",
+									"    pm.collectionVariables.set('access_token', json.data.access_token);",
+									"    pm.collectionVariables.set('refresh_token', json.data.refresh_token);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -300,7 +302,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n    \"refresh_token\": \"def50200...\",\n    \"expires_in\": 31536000,\n    \"token_type\": \"Bearer\"\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Token refreshed successfully\",\n    \"data\": {\n        \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n        \"refresh_token\": \"def50200...\",\n        \"expires_in\": 31536000,\n        \"token_type\": \"Bearer\"\n    }\n}"
 						}
 					]
 				},
@@ -338,7 +340,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"message\": \"Password changed successfully\"\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Password changed successfully\"\n}"
 						}
 					]
 				},
@@ -367,7 +369,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"message\": \"Account deleted successfully\"\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Account deleted successfully\"\n}"
 						}
 					]
 				},
@@ -396,25 +398,25 @@
 							"name": "Success (Admin)",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"id\": \"019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009\",\n    \"first_name\": \"Admin\",\n    \"last_name\": \"User\",\n    \"email\": \"admin@gmail.com\",\n    \"role\": \"admin\",\n    \"is_active\": true\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"User retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009\",\n        \"first_name\": \"Admin\",\n        \"last_name\": \"User\",\n        \"email\": \"admin@gmail.com\",\n        \"role\": \"admin\",\n        \"is_active\": true\n    }\n}"
 						},
 						{
 							"name": "Success (Patient)",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"id\": \"019e1d0f-...\",\n    \"first_name\": \"Ahmed\",\n    \"last_name\": \"Ali\",\n    \"email\": \"patient@example.com\",\n    \"role\": \"patient\",\n    \"phone\": \"+963912345678\",\n    \"address\": \"Damascus, Syria\",\n    \"gender\": \"male\",\n    \"birthday_date\": \"1995-06-15\",\n    \"is_active\": true\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"User retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Ahmed\",\n        \"last_name\": \"Ali\",\n        \"email\": \"patient@example.com\",\n        \"role\": \"patient\",\n        \"phone\": \"+963912345678\",\n        \"address\": \"Damascus, Syria\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1995-06-15\",\n        \"is_active\": true\n    }\n}"
 						},
 						{
 							"name": "Success (Doctor)",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"id\": \"019e1d0f-...\",\n    \"first_name\": \"Khaled\",\n    \"last_name\": \"Suleiman\",\n    \"email\": \"doctor@example.com\",\n    \"role\": \"doctor\",\n    \"phone\": \"+963912345679\",\n    \"gender\": \"male\",\n    \"birthday_date\": \"1985-03-20\",\n    \"is_active\": true\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"User retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor@example.com\",\n        \"role\": \"doctor\",\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true\n    }\n}"
 						},
 						{
 							"name": "Success (Receptionist)",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"id\": \"019e1d0f-...\",\n    \"first_name\": \"Layla\",\n    \"last_name\": \"Hassan\",\n    \"email\": \"receptionist@example.com\",\n    \"role\": \"receptionist\",\n    \"shift_start\": \"09:00\",\n    \"shift_end\": \"17:00\",\n    \"phone\": \"+963912345680\",\n    \"gender\": \"female\",\n    \"birthday_date\": \"1998-11-05\",\n    \"is_active\": true\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"User retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Layla\",\n        \"last_name\": \"Hassan\",\n        \"email\": \"receptionist@example.com\",\n        \"role\": \"receptionist\",\n        \"shift_start\": \"09:00\",\n        \"shift_end\": \"17:00\",\n        \"phone\": \"+963912345680\",\n        \"gender\": \"female\",\n        \"birthday_date\": \"1998-11-05\",\n        \"is_active\": true\n    }\n}"
 						}
 					]
 				}
@@ -424,7 +426,566 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"// Auto-attach Bearer token to all Auth folder requests",
+							"var token = pm.collectionVariables.get('access_token');",
+							"if (token) {",
+							"    pm.request.headers.add({",
+							"        key: 'Authorization',",
+							"        value: 'Bearer ' + token",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "Locations",
+			"description": "Countries and Cities CRUD.\n\nPublic routes: List / Get.\nProtected routes (auth required): Create, Update, Delete.",
+			"item": [
+				{
+					"name": "Countries",
+					"description": "",
+					"item": [
+						{
+							"name": "List Countries",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/countries",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "countries"],
+									"query": [
+										{
+											"key": "per_page",
+											"value": "20",
+											"description": "Items per page (max 100)"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"status": "OK",
+									"code": 200,
+									"body": "{\n    \"status\": 200,\n    \"message\": \"Countries retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"name\": {\"ar\": \"سوريا\", \"en\": \"Syria\"},\n            \"code\": \"SY\",\n            \"flag\": null,\n            \"cities\": [\n                {\n                    \"id\": \"019e1d0f-...\",\n                    \"name\": {\"ar\": \"دمشق\", \"en\": \"Damascus\"},\n                    \"country_id\": \"019e1d0f-...\",\n                    \"created_at\": \"2026-05-13T00:00:00.000000Z\",\n                    \"updated_at\": \"2026-05-13T00:00:00.000000Z\"\n                }\n            ],\n            \"created_at\": \"2026-05-13T00:00:00.000000Z\",\n            \"updated_at\": \"2026-05-13T00:00:00.000000Z\"\n        }\n    ],\n    \"pagination\": {\n        \"current_page\": 1,\n        \"last_page\": 1,\n        \"per_page\": 20,\n        \"total\": 1,\n        \"from\": 1,\n        \"to\": 1\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Get Country",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/countries/{{country_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "countries", "{{country_id}}"]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"status": "OK",
+									"code": 200,
+									"body": "{\n    \"status\": 200,\n    \"message\": \"Country retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"name\": {\"ar\": \"سوريا\", \"en\": \"Syria\"},\n        \"code\": \"SY\",\n        \"flag\": null,\n        \"cities\": [],\n        \"created_at\": \"2026-05-13T00:00:00.000000Z\",\n        \"updated_at\": \"2026-05-13T00:00:00.000000Z\"\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Create Country",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 201) {",
+											"    var json = pm.response.json();",
+											"    pm.collectionVariables.set('country_id', json.data.id);",
+											"    console.log('Country created:', json.data.id);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name_ar\": \"سوريا\",\n    \"name_en\": \"Syria\",\n    \"code\": \"SY\",\n    \"flag\": null\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/countries",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "countries"]
+								}
+							},
+							"response": [
+								{
+									"name": "Created",
+									"status": "Created",
+									"code": 201,
+									"body": "{\n    \"status\": 201,\n    \"message\": \"Country created successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"name\": {\"ar\": \"سوريا\", \"en\": \"Syria\"},\n        \"code\": \"SY\",\n        \"flag\": null,\n        \"cities\": [],\n        \"created_at\": \"2026-05-13T00:00:00.000000Z\",\n        \"updated_at\": \"2026-05-13T00:00:00.000000Z\"\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Update Country",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name_ar\": \"سوريا\",\n    \"name_en\": \"Syria\",\n    \"code\": \"SY\",\n    \"flag\": \"https://flagcdn.com/sy.svg\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/countries/{{country_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "countries", "{{country_id}}"]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"status": "OK",
+									"code": 200,
+									"body": "{\n    \"status\": 200,\n    \"message\": \"Country updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"name\": {\"ar\": \"سوريا\", \"en\": \"Syria\"},\n        \"code\": \"SY\",\n        \"flag\": \"https://flagcdn.com/sy.svg\",\n        \"cities\": [],\n        \"created_at\": \"2026-05-13T00:00:00.000000Z\",\n        \"updated_at\": \"2026-05-13T00:00:00.000000Z\"\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Delete Country",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/countries/{{country_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "countries", "{{country_id}}"]
+								}
+							},
+							"response": [
+								{
+									"name": "No Content",
+									"status": "No Content",
+									"code": 204
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Cities",
+					"description": "",
+					"item": [
+						{
+							"name": "List Cities",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/cities",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "cities"],
+									"query": [
+										{
+											"key": "per_page",
+											"value": "20",
+											"description": "Items per page (max 100)"
+										},
+										{
+											"key": "country_id",
+											"value": "",
+											"description": "Filter by country UUID"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"status": "OK",
+									"code": 200,
+									"body": "{\n    \"status\": 200,\n    \"message\": \"Cities retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"name\": {\"ar\": \"دمشق\", \"en\": \"Damascus\"},\n            \"country_id\": \"019e1d0f-...\",\n            \"created_at\": \"2026-05-13T00:00:00.000000Z\",\n            \"updated_at\": \"2026-05-13T00:00:00.000000Z\"\n        }\n    ],\n    \"pagination\": {\n        \"current_page\": 1,\n        \"last_page\": 1,\n        \"per_page\": 20,\n        \"total\": 1,\n        \"from\": 1,\n        \"to\": 1\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Get City",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/cities/{{city_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "cities", "{{city_id}}"]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"status": "OK",
+									"code": 200,
+									"body": "{\n    \"status\": 200,\n    \"message\": \"City retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"name\": {\"ar\": \"دمشق\", \"en\": \"Damascus\"},\n        \"country_id\": \"019e1d0f-...\",\n        \"created_at\": \"2026-05-13T00:00:00.000000Z\",\n        \"updated_at\": \"2026-05-13T00:00:00.000000Z\"\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Create City",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 201) {",
+											"    var json = pm.response.json();",
+											"    pm.collectionVariables.set('city_id', json.data.id);",
+											"    console.log('City created:', json.data.id);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name_ar\": \"دمشق\",\n    \"name_en\": \"Damascus\",\n    \"country_id\": \"{{country_id}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/cities",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "cities"]
+								}
+							},
+							"response": [
+								{
+									"name": "Created",
+									"status": "Created",
+									"code": 201,
+									"body": "{\n    \"status\": 201,\n    \"message\": \"City created successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"name\": {\"ar\": \"دمشق\", \"en\": \"Damascus\"},\n        \"country_id\": \"019e1d0f-...\",\n        \"created_at\": \"2026-05-13T00:00:00.000000Z\",\n        \"updated_at\": \"2026-05-13T00:00:00.000000Z\"\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Update City",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name_ar\": \"دمشق\",\n    \"name_en\": \"Damascus\",\n    \"country_id\": \"{{country_id}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/cities/{{city_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "cities", "{{city_id}}"]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"status": "OK",
+									"code": 200,
+									"body": "{\n    \"status\": 200,\n    \"message\": \"City updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"name\": {\"ar\": \"دمشق\", \"en\": \"Damascus\"},\n        \"country_id\": \"019e1d0f-...\",\n        \"created_at\": \"2026-05-13T00:00:00.000000Z\",\n        \"updated_at\": \"2026-05-13T00:00:00.000000Z\"\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Delete City",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/cities/{{city_id}}",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "cities", "{{city_id}}"]
+								}
+							},
+							"response": [
+								{
+									"name": "No Content",
+									"status": "No Content",
+									"code": 204
+								}
+							]
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var token = pm.collectionVariables.get('access_token');",
+							"var url = pm.request.url.toString();",
+							"var needsAuth = pm.request.method !== 'GET';",
+							"if (token && needsAuth) {",
+							"    pm.request.headers.add({",
+							"        key: 'Authorization',",
+							"        value: 'Bearer ' + token",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "Images",
+			"description": "Image upload & delete.\n\nAll endpoints require authentication (Bearer token).\n\nUpload accepts `multipart/form-data`:\n- `file`: image file (jpg, jpeg, png, webp)\n- `type`: enum (`user`, `country`)\n- `imageable_id`: UUID of the target object",
+			"item": [
+				{
+					"name": "Upload Image",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('image_id', json.data.id);",
+									"    console.log('Image uploaded:', json.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "",
+									"description": "Image file (jpg, jpeg, png, webp)"
+								},
+								{
+									"key": "type",
+									"value": "user",
+									"type": "text",
+									"description": "Image type: user or country"
+								},
+								{
+									"key": "imageable_id",
+									"value": "{{imageable_id}}",
+									"type": "text",
+									"description": "UUID of the target object"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/images",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "images"]
+						}
+					},
+					"response": [
+						{
+							"name": "Created",
+							"status": "Created",
+							"code": 201,
+							"body": "{\n    \"status\": 201,\n    \"message\": \"Image uploaded successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"url\": \"http://localhost:8000/storage/uploads/user/019e1d0f-.../uuid.jpg\",\n        \"type\": \"user\",\n        \"imageable_id\": \"019e1d0f-...\",\n        \"created_at\": \"2026-05-13T00:00:00.000000Z\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete Image",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/images/{{image_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "images", "{{image_id}}"]
+						}
+					},
+					"response": [
+						{
+							"name": "No Content",
+							"status": "No Content",
+							"code": 204
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
 							"var token = pm.collectionVariables.get('access_token');",
 							"if (token) {",
 							"    pm.request.headers.add({",
