@@ -2,6 +2,7 @@
 
 namespace App\Domains\Shared\Resources;
 
+use App\Domains\Images\Resources\ImageResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserResource extends JsonResource
@@ -20,6 +21,7 @@ class UserResource extends JsonResource
             'birthday_date' => $this->birthday_date?->format('Y-m-d'),
             'role' => $this->role?->value,
             'is_active' => $this->is_active,
+            'image' => new ImageResource($this->image),
         ];
     }
 }
