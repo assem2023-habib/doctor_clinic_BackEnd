@@ -39,16 +39,18 @@ Route::prefix('v1/cities')->group(function () {
 });
 
 Route::middleware('auth:api')->group(function () {
-    Route::prefix('v1/countries')->group(function () {
-        Route::post('/', [CountryController::class, 'store']);
-        Route::put('/{country}', [CountryController::class, 'update']);
-        Route::delete('/{country}', [CountryController::class, 'destroy']);
-    });
+    Route::middleware('admin')->group(function () {
+        Route::prefix('v1/countries')->group(function () {
+            Route::post('/', [CountryController::class, 'store']);
+            Route::put('/{country}', [CountryController::class, 'update']);
+            Route::delete('/{country}', [CountryController::class, 'destroy']);
+        });
 
-    Route::prefix('v1/cities')->group(function () {
-        Route::post('/', [CityController::class, 'store']);
-        Route::put('/{city}', [CityController::class, 'update']);
-        Route::delete('/{city}', [CityController::class, 'destroy']);
+        Route::prefix('v1/cities')->group(function () {
+            Route::post('/', [CityController::class, 'store']);
+            Route::put('/{city}', [CityController::class, 'update']);
+            Route::delete('/{city}', [CityController::class, 'destroy']);
+        });
     });
 
     Route::prefix('v1/images')->group(function () {

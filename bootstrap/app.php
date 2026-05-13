@@ -1,6 +1,7 @@
 <?php
 
 use App\Domains\Shared\Responses\ApiResponse;
+use App\Http\Middleware\CheckAdminRole;
 use App\Http\Middleware\LogApiBearerAndRequestDetails;
 use App\Http\Middleware\NormalizeDuplicateBearerAuthorization;
 use App\Http\Middleware\ValidateApiBodySize;
@@ -25,6 +26,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prependToGroup('api', ValidateApiBodySize::class);
         $middleware->prependToGroup('api', LogApiBearerAndRequestDetails::class);
         $middleware->prependToGroup('api', NormalizeDuplicateBearerAuthorization::class);
+
+        $middleware->alias([
+            'admin' => CheckAdminRole::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (ValidationException $e, $request) {

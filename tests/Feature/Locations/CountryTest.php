@@ -3,6 +3,7 @@
 namespace Tests\Feature\Locations;
 
 use App\Domains\Locations\Models\Country;
+use App\Enums\RoleEnum;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
@@ -109,14 +110,32 @@ class CountryTest extends TestCase
 
     public function test_unauthenticated_user_cannot_create_country(): void
     {
-        $response = $this->postJson('/api/v1/countries', $this->validPayload);
+        $response = $this->postJson('/api/v1/countries', [
+            'name_ar' => 'Test Country',
+            'name_en' => 'Test Country',
+            'code' => 'TC',
+        ]);
 
         $response->assertStatus(401);
     }
 
+    public function test_non_admin_user_cannot_create_country(): void
+    {
+        $user = \App\Models\User::factory()->create(['role' => RoleEnum::Doctor]);
+        Passport::actingAs($user);
+
+        $response = $this->postJson('/api/v1/countries', [
+            'name_ar' => 'Test Country',
+            'name_en' => 'Test Country',
+            'code' => 'TC',
+        ]);
+
+        $response->assertStatus(403);
+    }
+
     public function test_can_create_country(): void
     {
-        $user = \App\Models\User::factory()->create();
+        $user = \App\Models\User::factory()->create(['role' => RoleEnum::Admin]);
         Passport::actingAs($user);
 
         $response = $this->postJson('/api/v1/countries', $this->validPayload);
@@ -136,7 +155,7 @@ class CountryTest extends TestCase
 
     public function test_create_fails_with_duplicate_code(): void
     {
-        $user = \App\Models\User::factory()->create();
+        $user = \App\Models\User::factory()->create(['role' => RoleEnum::Admin]);
         Passport::actingAs($user);
 
         Country::create([
@@ -164,7 +183,7 @@ class CountryTest extends TestCase
 
     public function test_can_update_country(): void
     {
-        $user = \App\Models\User::factory()->create();
+        $user = \App\Models\User::factory()->create(['role' => RoleEnum::Admin]);
         Passport::actingAs($user);
 
         $country = Country::create([
@@ -196,9 +215,24 @@ class CountryTest extends TestCase
         $response->assertStatus(401);
     }
 
+    public function test_non_admin_user_cannot_delete_country(): void
+    {
+        $user = \App\Models\User::factory()->create(['role' => RoleEnum::Doctor]);
+        Passport::actingAs($user);
+
+        $country = Country::create([
+            'name' => ['ar' => 'سوريا', 'en' => 'Syria'],
+            'code' => 'SY',
+        ]);
+
+        $response = $this->deleteJson("/api/v1/countries/{$country->id}");
+
+        $response->assertStatus(403);
+    }
+
     public function test_can_delete_country(): void
     {
-        $user = \App\Models\User::factory()->create();
+        $user = \App\Models\User::factory()->create(['role' => RoleEnum::Admin]);
         Passport::actingAs($user);
 
         $country = Country::create([
