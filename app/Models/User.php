@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Domains\Appointments\Models\Appointment;
 use App\Domains\Doctors\Models\Doctor;
+use App\Domains\Locations\Models\City;
+use App\Domains\Locations\Models\Country;
 use App\Domains\Notifications\Models\Notification;
 use App\Domains\Patients\Models\Patient;
 use App\Domains\Ratings\Models\Rating;

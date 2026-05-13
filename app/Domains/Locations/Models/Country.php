@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Models;
+namespace App\Domains\Locations\Models;
 
+use App\Domains\Locations\Models\City;
 use App\Traits\HasUuidV7;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Country extends Model
 {
@@ -24,6 +26,6 @@ class Country extends Model
 
     public function image()
     {
-        return $this->morphOne(Image::class, 'imageable');
+        return $this->morphOne(\App\Models\Image::class, 'imageable');
     }
 }
