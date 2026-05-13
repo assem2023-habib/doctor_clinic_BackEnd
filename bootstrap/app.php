@@ -5,6 +5,7 @@ use App\Http\Middleware\CheckAdminRole;
 use App\Http\Middleware\LogApiBearerAndRequestDetails;
 use App\Http\Middleware\NormalizeDuplicateBearerAuthorization;
 use App\Http\Middleware\ValidateApiBodySize;
+use App\Http\Middleware\ValidateImageContent;
 use App\Providers\AuthServiceProvider;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
@@ -29,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'admin' => CheckAdminRole::class,
+            'image.content' => ValidateImageContent::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -6,7 +6,7 @@ use App\Domains\Images\DTOs\UploadImageData;
 use App\Domains\Images\Models\Image;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Laravel\Facades\Image;
+use Intervention\Image\Laravel\Facades\Image as InterventionImage;
 use Ramsey\Uuid\Uuid;
 
 class UploadImageAction
@@ -28,6 +28,9 @@ class UploadImageAction
             $filename,
             'local'
         );
+
+        InterventionImage::decodePath(Storage::disk('local')->path($relativePath))
+            ->save(quality: 80);
 
         return Image::create([
             'url' => $relativePath,
