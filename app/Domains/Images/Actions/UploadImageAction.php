@@ -6,6 +6,7 @@ use App\Domains\Images\DTOs\UploadImageData;
 use App\Domains\Images\Models\Image;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Laravel\Facades\Image;
 use Ramsey\Uuid\Uuid;
 
 class UploadImageAction
