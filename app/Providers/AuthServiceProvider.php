@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Domains\Images\Models\Image;
 use App\Domains\Locations\Models\Country;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\Relation;

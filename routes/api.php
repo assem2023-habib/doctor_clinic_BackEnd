@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Doctor\DoctorController;
+use App\Http\Controllers\Api\V1\Image\ImageController;
 use App\Http\Controllers\Api\V1\Location\CityController;
 use App\Http\Controllers\Api\V1\Location\CountryController;
 use Illuminate\Http\Request;
@@ -48,5 +49,10 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/', [CityController::class, 'store']);
         Route::put('/{city}', [CityController::class, 'update']);
         Route::delete('/{city}', [CityController::class, 'destroy']);
+    });
+
+    Route::prefix('v1/images')->group(function () {
+        Route::post('/', [ImageController::class, 'store']);
+        Route::delete('/{image}', [ImageController::class, 'destroy']);
     });
 });

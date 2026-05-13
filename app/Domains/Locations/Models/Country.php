@@ -2,6 +2,7 @@
 
 namespace App\Domains\Locations\Models;
 
+use App\Domains\Images\Models\Image;
 use App\Domains\Locations\Models\City;
 use App\Traits\HasUuidV7;
 use Illuminate\Database\Eloquent\Model;
@@ -26,6 +27,6 @@ class Country extends Model
 
     public function image()
     {
-        return $this->morphOne(\App\Models\Image::class, 'imageable');
+        return $this->morphOne(Image::class, 'imageable');
     }
 }
