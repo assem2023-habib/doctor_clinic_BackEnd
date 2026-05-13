@@ -21,4 +21,13 @@ class UploadImageData
             imageableId: $validated['imageable_id'],
         );
     }
+
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            file: $data['file'],
+            type: $data['type'],
+            imageableId: $data['imageable_id'],
+        );
+    }
 }

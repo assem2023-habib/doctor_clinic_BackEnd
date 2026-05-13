@@ -11,4 +11,9 @@ enum ImageTypeEnum: string
     {
         return array_column(self::cases(), 'value');
     }
+
+    public function maxSize(): int
+    {
+        return config("images.max_size.{$this->value}", 2048);
+    }
 }

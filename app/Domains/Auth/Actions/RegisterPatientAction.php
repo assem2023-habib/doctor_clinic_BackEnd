@@ -3,12 +3,19 @@
 namespace App\Domains\Auth\Actions;
 
 use App\Domains\Auth\DTOs\RegisterPatientData;
+use App\Domains\Images\Actions\UploadImageAction;
+use App\Domains\Images\DTOs\UploadImageData;
 use App\Domains\Patients\Models\Patient;
+use App\Enums\ImageTypeEnum;
 use App\Enums\RoleEnum;
 use App\Models\User;
 
 class RegisterPatientAction
 {
+    public function __construct(
+        private readonly UploadImageAction $uploadImageAction,
+    ) {}
+
     public function execute(RegisterPatientData $data): User
     {
         $user = User::create([
@@ -26,6 +33,14 @@ class RegisterPatientAction
         ]);
 
         $user->patient()->create([]);
+
+        if ($data->file) {
+            $this->uploadImageAction->execute(UploadImageData::fromArray([
+                'file' => $data->file,
+                'type' => ImageTypeEnum::User,
+                'imageable_id' => $user->id,
+            ]));
+        }
 
         return $user;
     }

@@ -3,11 +3,18 @@
 namespace App\Domains\Auth\Actions;
 
 use App\Domains\Auth\DTOs\RegisterReceptionistData;
+use App\Domains\Images\Actions\UploadImageAction;
+use App\Domains\Images\DTOs\UploadImageData;
+use App\Enums\ImageTypeEnum;
 use App\Enums\RoleEnum;
 use App\Models\User;
 
 class RegisterReceptionistAction
 {
+    public function __construct(
+        private readonly UploadImageAction $uploadImageAction,
+    ) {}
+
     public function execute(RegisterReceptionistData $data): User
     {
         $user = User::create([
@@ -28,6 +35,14 @@ class RegisterReceptionistAction
             'shift_start' => $data->shiftStart,
             'shift_end' => $data->shiftEnd,
         ]);
+
+        if ($data->file) {
+            $this->uploadImageAction->execute(UploadImageData::fromArray([
+                'file' => $data->file,
+                'type' => ImageTypeEnum::User,
+                'imageable_id' => $user->id,
+            ]));
+        }
 
         return $user;
     }

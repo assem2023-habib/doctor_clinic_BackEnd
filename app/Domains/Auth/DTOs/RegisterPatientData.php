@@ -4,6 +4,7 @@ namespace App\Domains\Auth\DTOs;
 
 use App\Domains\Auth\Requests\RegisterPatientRequest;
 use App\Enums\GenderEnum;
+use Illuminate\Http\UploadedFile;
 
 class RegisterPatientData
 {
@@ -17,6 +18,7 @@ class RegisterPatientData
         public readonly GenderEnum $gender,
         public readonly ?string $birthdayDate,
         public readonly string $password,
+        public readonly ?UploadedFile $file,
     ) {}
 
     public static function fromRequest(RegisterPatientRequest $request): self
@@ -31,6 +33,7 @@ class RegisterPatientData
             gender: GenderEnum::from($request->gender),
             birthdayDate: $request->birthday_date,
             password: $request->password,
+            file: $request->file('file'),
         );
     }
 }

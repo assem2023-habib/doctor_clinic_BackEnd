@@ -3,6 +3,7 @@
 namespace App\Domains\Auth\Requests;
 
 use App\Enums\GenderEnum;
+use App\Enums\ImageTypeEnum;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -21,6 +22,7 @@ class RegisterPatientRequest extends FormRequest
             'gender' => ['required', Rule::enum(GenderEnum::class)],
             'birthday_date' => ['nullable', 'date'],
             'password' => ['required', Password::defaults()],
+            'file' => ['nullable', 'image', 'max:' . ImageTypeEnum::User->maxSize(), 'mimes:jpg,jpeg,png,webp'],
         ];
     }
 

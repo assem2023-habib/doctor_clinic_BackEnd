@@ -4,6 +4,7 @@ namespace App\Domains\Auth\DTOs;
 
 use App\Domains\Auth\Requests\RegisterReceptionistRequest;
 use App\Enums\GenderEnum;
+use Illuminate\Http\UploadedFile;
 
 class RegisterReceptionistData
 {
@@ -19,6 +20,7 @@ class RegisterReceptionistData
         public readonly string $password,
         public readonly ?string $shiftStart,
         public readonly ?string $shiftEnd,
+        public readonly ?UploadedFile $file,
     ) {}
 
     public static function fromRequest(RegisterReceptionistRequest $request): self
@@ -35,6 +37,7 @@ class RegisterReceptionistData
             password: $request->password,
             shiftStart: $request->shift_start,
             shiftEnd: $request->shift_end,
+            file: $request->file('file'),
         );
     }
 }
