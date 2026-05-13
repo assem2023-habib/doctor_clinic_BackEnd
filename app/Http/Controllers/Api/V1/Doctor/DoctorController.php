@@ -14,10 +14,15 @@ class DoctorController
 {
     public function index(Request $request): JsonResponse
     {
-        $perPage = (int) $request->integer('per_page', 20);
+        $limit = (int) $request->integer('limit', 20);
         $doctors = User::where('role', RoleEnum::Doctor)
             ->with('doctor.schedules')
-            ->paginate(min($perPage, 100));
+            ->when($request->search, fn ($q, $v) => $q->where(function ($q) use ($v) {
+                $q->where('first_name', 'like', "%{$v}%")
+                  ->orWhere('last_name', 'like', "%{$v}%")
+                  ->orWhere('email', 'like', "%{$v}%");
+            }))
+            ->paginate(min($limit, 100));
 
         return ApiResponse::success(
             DoctorResource::collection($doctors),
@@ -25,7 +30,7 @@ class DoctorController
             pagination: [
                 'current_page' => $doctors->currentPage(),
                 'last_page' => $doctors->lastPage(),
-                'per_page' => $doctors->perPage(),
+                'limit' => $doctors->perPage(),
                 'total' => $doctors->total(),
                 'from' => $doctors->firstItem(),
                 'to' => $doctors->lastItem(),

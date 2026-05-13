@@ -74,7 +74,7 @@ class CityTest extends TestCase
             ->assertJsonStructure([
                 'status', 'message',
                 'data' => [['id', 'name', 'country_id', 'created_at', 'updated_at']],
-                'pagination',
+                'meta' => ['pagination'],
             ]);
 
         $json = $response->json();

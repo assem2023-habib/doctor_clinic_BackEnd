@@ -74,7 +74,7 @@ class CountryTest extends TestCase
             ->assertJsonStructure([
                 'status', 'message',
                 'data' => [['id', 'name', 'code', 'flag', 'cities', 'created_at', 'updated_at']],
-                'pagination',
+                'meta' => ['pagination'],
             ]);
 
         $json = $response->json();
@@ -124,7 +124,7 @@ class CountryTest extends TestCase
         $response->assertStatus(201)
             ->assertJsonStructure([
                 'status', 'message',
-                'data' => ['id', 'name', 'code', 'flag', 'cities', 'created_at', 'updated_at'],
+                'data' => ['id', 'name', 'code', 'flag', 'created_at', 'updated_at'],
             ]);
 
         $json = $response->json();

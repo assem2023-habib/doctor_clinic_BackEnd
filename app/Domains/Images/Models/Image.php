@@ -11,6 +11,8 @@ class Image extends Model
 {
     use HasUuidV7;
 
+    protected $fillable = ['url', 'type', 'imageable_id', 'imageable_type'];
+
     public function imageable(): MorphTo
     {
         return $this->morphTo();

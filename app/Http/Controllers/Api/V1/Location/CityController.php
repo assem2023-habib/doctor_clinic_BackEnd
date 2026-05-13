@@ -24,10 +24,14 @@ class CityController
 
     public function index(Request $request): JsonResponse
     {
-        $perPage = (int) $request->integer('per_page', 20);
+        $limit = (int) $request->integer('limit', 20);
         $cities = City::with('country')
             ->when($request->country_id, fn ($q, $v) => $q->where('country_id', $v))
-            ->paginate(min($perPage, 100));
+            ->when($request->search, fn ($q, $v) => $q->where(function ($q) use ($v) {
+                $q->where('name->ar', 'like', "%{$v}%")
+                  ->orWhere('name->en', 'like', "%{$v}%");
+            }))
+            ->paginate(min($limit, 100));
 
         return ApiResponse::success(
             CityResource::collection($cities),
@@ -35,7 +39,7 @@ class CityController
             pagination: [
                 'current_page' => $cities->currentPage(),
                 'last_page' => $cities->lastPage(),
-                'per_page' => $cities->perPage(),
+                'limit' => $cities->perPage(),
                 'total' => $cities->total(),
                 'from' => $cities->firstItem(),
                 'to' => $cities->lastItem(),

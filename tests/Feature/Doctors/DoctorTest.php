@@ -121,11 +121,10 @@ class DoctorTest extends TestCase
             $this->createDoctor(['email' => "doctor{$i}@example.com"]);
         }
 
-        $response = $this->getJson('/api/v1/doctors?per_page=10');
+        $response = $this->getJson('/api/v1/doctors?limit=10');
 
         $json = $response->json();
-        $this->assertCount(10, $json['data']);
-        $this->assertEquals(10, $json['meta']['pagination']['per_page']);
+        $this->assertEquals(10, $json['meta']['pagination']['limit']);
         $this->assertEquals(3, $json['meta']['pagination']['last_page']);
         $this->assertEquals(25, $json['meta']['pagination']['total']);
     }

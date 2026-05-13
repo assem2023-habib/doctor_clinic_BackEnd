@@ -13,6 +13,8 @@ class Country extends Model
 {
     use HasUuidV7;
 
+    protected $fillable = ['name', 'code', 'flag'];
+
     protected function casts(): array
     {
         return [

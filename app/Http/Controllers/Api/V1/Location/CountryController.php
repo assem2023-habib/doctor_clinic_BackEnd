@@ -24,9 +24,13 @@ class CountryController
 
     public function index(Request $request): JsonResponse
     {
-        $perPage = (int) $request->integer('per_page', 20);
+        $limit = (int) $request->integer('limit', 20);
         $countries = Country::with('cities')
-            ->paginate(min($perPage, 100));
+            ->when($request->search, fn ($q, $v) => $q->where(function ($q) use ($v) {
+                $q->where('name->ar', 'like', "%{$v}%")
+                  ->orWhere('name->en', 'like', "%{$v}%");
+            }))
+            ->paginate(min($limit, 100));
 
         return ApiResponse::success(
             CountryResource::collection($countries),
@@ -34,7 +38,7 @@ class CountryController
             pagination: [
                 'current_page' => $countries->currentPage(),
                 'last_page' => $countries->lastPage(),
-                'per_page' => $countries->perPage(),
+                'limit' => $countries->perPage(),
                 'total' => $countries->total(),
                 'from' => $countries->firstItem(),
                 'to' => $countries->lastItem(),

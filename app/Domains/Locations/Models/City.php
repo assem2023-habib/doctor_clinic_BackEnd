@@ -11,6 +11,8 @@ class City extends Model
 {
     use HasUuidV7;
 
+    protected $fillable = ['name', 'country_id'];
+
     protected function casts(): array
     {
         return [
