@@ -9,7 +9,7 @@ class DeleteImageAction
 {
     public function execute(Image $image): void
     {
-        Storage::disk('public')->delete($image->url);
+        Storage::disk('local')->delete($image->getRawOriginal('url'));
         $image->delete();
     }
 }

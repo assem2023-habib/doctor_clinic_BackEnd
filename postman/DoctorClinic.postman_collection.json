@@ -1022,7 +1022,7 @@
 		},
 		{
 			"name": "Images",
-			"description": "Image upload & delete.\n\nAll endpoints require authentication (Bearer token).\n\nUpload accepts `multipart/form-data`:\n- `file`: image file (jpg, jpeg, png, webp)\n- `type`: enum (`user`, `country`)\n- `imageable_id`: UUID of the target object",
+			"description": "Image upload, serve & delete.\n\nAll endpoints require authentication (Bearer token). Images are stored privately and served through the API (not publicly accessible).\n\nUpload accepts `multipart/form-data`:\n- `file`: image file (jpg, jpeg, png, webp)\n- `type`: enum (`user`, `country`)\n- `imageable_id`: UUID of the target object",
 			"item": [
 				{
 					"name": "Upload Image",
@@ -1093,7 +1093,47 @@
 							"name": "Created",
 							"status": "Created",
 							"code": 201,
-							"body": "{\n    \"status\": 201,\n    \"message\": \"Image uploaded successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"url\": \"http://localhost:8000/storage/uploads/user/019e1d0f-.../uuid.jpg\",\n        \"type\": \"user\",\n        \"imageable_id\": \"019e1d0f-...\",\n        \"created_at\": \"2026-05-13T00:00:00.000000Z\"\n    }\n}"
+							"body": "{\n    \"status\": 201,\n    \"message\": \"Image uploaded successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"url\": \"http://localhost:8000/api/v1/images/019e1d0f-...\",\n        \"type\": \"user\",\n        \"imageable_id\": \"019e1d0f-...\",\n        \"created_at\": \"2026-05-13T00:00:00.000000Z\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Image",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/images/{{image_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "images", "{{image_id}}"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "(binary image data)"
+						},
+						{
+							"name": "Not Found",
+							"status": "Not Found",
+							"code": 404
 						}
 					]
 				},

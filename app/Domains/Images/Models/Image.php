@@ -24,6 +24,15 @@ class Image extends Model
             return null;
         }
 
-        return Storage::disk('public')->url($value);
+        return url('/api/v1/images/' . $this->id);
+    }
+
+    public function isOwnedBy(\App\Models\User $user): bool
+    {
+        if ($this->imageable_type !== 'user') {
+            return false;
+        }
+
+        return $this->imageable_id === $user->id;
     }
 }

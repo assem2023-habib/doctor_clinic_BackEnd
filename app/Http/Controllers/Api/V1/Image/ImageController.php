@@ -9,7 +9,9 @@ use App\Domains\Images\Models\Image;
 use App\Domains\Images\Requests\UploadImageRequest;
 use App\Domains\Images\Resources\ImageResource;
 use App\Domains\Shared\Responses\ApiResponse;
+use App\Enums\RoleEnum;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 
 class ImageController
 {
@@ -27,6 +29,25 @@ class ImageController
             new ImageResource($image),
             __('Image uploaded successfully')
         );
+    }
+
+    public function show(Image $image): \Illuminate\Http\Response
+    {
+        $user = auth()->user();
+
+        if ($user->role !== RoleEnum::Admin && !$image->isOwnedBy($user)) {
+            return ApiResponse::forbidden(__('You do not own this image'));
+        }
+
+        $path = $image->getRawOriginal('url');
+
+        if (! Storage::disk('local')->exists($path)) {
+            abort(404);
+        }
+
+        return response(Storage::disk('local')->get($path), 200, [
+            'Content-Type' => Storage::disk('local')->mimeType($path),
+        ]);
     }
 
     public function destroy(Image $image): JsonResponse

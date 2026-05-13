@@ -17,7 +17,7 @@ class UploadImageAction
             ->first();
 
         if ($existing) {
-            Storage::disk('public')->delete($existing->url);
+            Storage::disk('local')->delete($existing->getRawOriginal('url'));
             $existing->delete();
         }
 
@@ -25,7 +25,7 @@ class UploadImageAction
         $relativePath = $data->file->storeAs(
             'uploads/' . $data->type->value . '/' . $data->imageableId,
             $filename,
-            'public'
+            'local'
         );
 
         return Image::create([

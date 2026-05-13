@@ -54,6 +54,7 @@ Route::middleware('auth:api')->group(function () {
     });
 
     Route::prefix('v1/images')->group(function () {
+        Route::get('/{image}', [ImageController::class, 'show']);
         Route::post('/', [ImageController::class, 'store']);
         Route::delete('/{image}', [ImageController::class, 'destroy']);
     });
