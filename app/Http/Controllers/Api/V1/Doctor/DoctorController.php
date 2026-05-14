@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1\Doctor;
 use App\Domains\Doctors\Actions\DeleteDoctorAction;
 use App\Domains\Doctors\Actions\UpdateDoctorAction;
 use App\Domains\Doctors\Models\Doctor;
+use App\Domains\Doctors\Requests\PatchDoctorRequest;
 use App\Domains\Doctors\Requests\UpdateDoctorRequest;
 use App\Domains\Doctors\Resources\DoctorResource;
 use App\Domains\Shared\Responses\ApiResponse;
@@ -54,6 +55,17 @@ class DoctorController
     public function update(UpdateDoctorRequest $request, Doctor $doctor): JsonResponse
     {
         $dto = \App\Domains\Doctors\DTOs\UpdateDoctorData::fromRequest($request);
+        $user = $this->updateDoctorAction->execute($doctor, $dto);
+
+        return ApiResponse::success(
+            new DoctorResource($user),
+            __('Doctor updated successfully')
+        );
+    }
+
+    public function updatePartial(PatchDoctorRequest $request, Doctor $doctor): JsonResponse
+    {
+        $dto = \App\Domains\Doctors\DTOs\UpdateDoctorData::fromRequestPartial($request);
         $user = $this->updateDoctorAction->execute($doctor, $dto);
 
         return ApiResponse::success(

@@ -19,18 +19,9 @@ class UpdateDoctorAction
     {
         $user = $doctor->user;
 
-        $user->update([
-            'first_name' => $data->firstName,
-            'last_name' => $data->lastName,
-            'username' => $data->username,
-            'email' => $data->email,
-            'phone' => $data->phone,
-            'address' => $data->address,
-            'gender' => $data->gender,
-            'birthday_date' => $data->birthdayDate,
-        ]);
+        $user->update($data->toUpdateArray());
 
-        if ($data->file) {
+        if ($data->hasFile()) {
             $this->uploadImageAction->execute(UploadImageData::fromArray([
                 'file' => $data->file,
                 'type' => ImageTypeEnum::User,

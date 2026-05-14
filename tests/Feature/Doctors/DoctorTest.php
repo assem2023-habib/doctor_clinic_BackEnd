@@ -298,4 +298,62 @@ class DoctorTest extends TestCase
 
         $response->assertStatus(401);
     }
+
+    public function test_admin_can_partially_update_doctor_with_patch(): void
+    {
+        $admin = $this->createAdmin();
+        Passport::actingAs($admin);
+
+        $doctor = $this->createDoctor([
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'john@example.com',
+        ]);
+
+        $response = $this->patchJson("/api/v1/doctors/{$doctor->doctor->id}", [
+            'first_name' => 'Johnny',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonStructure(['status', 'message', 'data' => ['id', 'first_name', 'last_name', 'email']]);
+
+        $json = $response->json();
+        $this->assertEquals('Johnny', $json['data']['first_name']);
+        $this->assertEquals('Doe', $json['data']['last_name']);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $doctor->id,
+            'first_name' => 'Johnny',
+            'last_name' => 'Doe',
+        ]);
+    }
+
+    public function test_patch_does_not_overwrite_unsent_fields(): void
+    {
+        $admin = $this->createAdmin();
+        Passport::actingAs($admin);
+
+        $doctor = $this->createDoctor([
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'john@example.com',
+            'username' => 'johndoe',
+            'phone' => '+963911111111',
+        ]);
+
+        $response = $this->patchJson("/api/v1/doctors/{$doctor->doctor->id}", [
+            'email' => 'john.new@example.com',
+        ]);
+
+        $response->assertStatus(200);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $doctor->id,
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'john.new@example.com',
+            'username' => 'johndoe',
+            'phone' => '+963911111111',
+        ]);
+    }
 }

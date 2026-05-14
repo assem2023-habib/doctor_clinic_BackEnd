@@ -20,6 +20,11 @@
 			"key": "refresh_token",
 			"value": "",
 			"type": "string"
+		},
+		{
+			"key": "doctor_id",
+			"value": "",
+			"type": "string"
 		}
 	],
 	"item": [
@@ -1179,6 +1184,381 @@
 						"exec": [
 							"var token = pm.collectionVariables.get('access_token');",
 							"if (token) {",
+							"    pm.request.headers.add({",
+							"        key: 'Authorization',",
+							"        value: 'Bearer ' + token",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "Doctors",
+			"description": "Doctor management.\n\nPublic routes: List / Get.\nProtected routes (auth required + admin): Update, Delete.",
+			"item": [
+				{
+					"name": "List Doctors",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    if (json.data && json.data.length > 0) {",
+									"        pm.collectionVariables.set('doctor_id', json.data[0].id);",
+									"        console.log('Doctor ID stored:', json.data[0].id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/doctors",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"doctors"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Filter by name or email"
+								},
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Items per page (max 100)"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctors retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Khaled\",\n            \"last_name\": \"Suleiman\",\n            \"email\": \"doctor@example.com\",\n            \"role\": \"doctor\",\n            \"phone\": \"+963912345679\",\n            \"gender\": \"male\",\n            \"birthday_date\": \"1985-03-20\",\n            \"is_active\": true,\n            \"schedules\": []\n        }\n    ],\n    \"meta\": {\n        \"pagination\": {\n            \"current_page\": 1,\n            \"last_page\": 1,\n            \"per_page\": 20,\n            \"total\": 1,\n            \"from\": 1,\n            \"to\": 1,\n            \"limit\": 20\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Doctor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('doctor_id', json.data.id);",
+									"    console.log('Doctor ID stored:', json.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/doctors/{{doctor_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"doctors",
+								"{{doctor_id}}"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctor retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor@example.com\",\n        \"role\": \"doctor\",\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"schedules\": []\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Doctor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    console.log('Doctor updated:', json.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "first_name",
+									"value": "Khaled",
+									"type": "text"
+								},
+								{
+									"key": "last_name",
+									"value": "Suleiman Updated",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "drkhaled",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "doctor@example.com",
+									"type": "text"
+								},
+								{
+									"key": "phone",
+									"value": "+963912345679",
+									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "Aleppo, Syria",
+									"type": "text"
+								},
+								{
+									"key": "gender",
+									"value": "male",
+									"type": "text"
+								},
+								{
+									"key": "birthday_date",
+									"value": "1985-03-20",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": "",
+									"description": "Profile image (jpg, jpeg, png, webp) - optional"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/doctors/{{doctor_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"doctors",
+								"{{doctor_id}}"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctor updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman Updated\",\n        \"email\": \"doctor@example.com\",\n        \"role\": \"doctor\",\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"schedules\": []\n    }\n}"
+						},
+						{
+							"name": "Forbidden",
+							"status": "Forbidden",
+							"code": 403,
+							"body": "{\n    \"status\": 403,\n    \"message\": \"Forbidden\"\n}"
+						}
+					]
+				},
+                {
+                    "name": "Update Doctor (PATCH)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    var json = pm.response.json();",
+                                    "    console.log('Doctor patched:', json.data.id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "first_name",
+                                    "value": "Khaled",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "email",
+                                    "value": "doctor.new@example.com",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "file",
+                                    "type": "file",
+                                    "src": "",
+                                    "description": "Profile image (jpg, jpeg, png, webp) - optional"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/doctors/{{doctor_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "doctors",
+                                "{{doctor_id}}"
+                            ]
+                        }
+                    },
+                    "response": [
+                        {
+                            "name": "Success",
+                            "status": "OK",
+                            "code": 200,
+                            "body": "{\n    \"status\": 200,\n    \"message\": \"Doctor updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor.new@example.com\",\n        \"role\": \"doctor\",\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"schedules\": []\n    }\n}"
+                        },
+                        {
+                            "name": "Forbidden",
+                            "status": "Forbidden",
+                            "code": 403,
+                            "body": "{\n    \"status\": 403,\n    \"message\": \"Forbidden\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Delete Doctor",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/doctors/{{doctor_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"doctors",
+								"{{doctor_id}}"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "No Content",
+							"status": "No Content",
+							"code": 204
+						},
+						{
+							"name": "Conflict (Active Appointments)",
+							"status": "Conflict",
+							"code": 409,
+							"body": "{\n    \"status\": 409,\n    \"message\": \"Doctor has active appointments. Cannot delete.\"\n}"
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var token = pm.collectionVariables.get('access_token');",
+							"var url = pm.request.url.toString();",
+							"var needsAuth = pm.request.method !== 'GET';",
+							"if (token && needsAuth) {",
 							"    pm.request.headers.add({",
 							"        key: 'Authorization',",
 							"        value: 'Bearer ' + token",
