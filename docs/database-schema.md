@@ -3,7 +3,8 @@
 ## Conventions
 
 - All primary keys use **UUID v7** (generated via `HasUuidV7` trait)
-- All foreign keys are `foreignUuid` with `cascadeOnDelete`
+- All foreign keys are `foreignUuid` with `cascadeOnDelete` unless noted
+- `created_by` / `changed_by` columns store `"{uuid}: {first_name} {last_name}"` as a plain string (not FK) — allows doctor/user deletion without losing history
 - Timestamps: `created_at` / `updated_at` unless noted
 
 ---
@@ -155,7 +156,7 @@ user, country
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
-| doctor_id | uuid | FK → doctors |
+| doctor_id | uuid | nullable, no FK |
 | patient_id | uuid | FK → patients |
 | appointment_date | date | |
 | start_time | time | |
@@ -163,7 +164,7 @@ user, country
 | status | enum (AppointmentStatusEnum) | default 'pending' |
 | reason | text | nullable |
 | notes | text | nullable |
-| created_by | uuid | FK → users |
+| created_by | string(500) | `"{uuid}: {name}"`, no FK |
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
@@ -174,7 +175,7 @@ user, country
 | appointment_id | uuid | FK → appointments |
 | old_status | enum (AppointmentStatusEnum) | |
 | new_status | enum (AppointmentStatusEnum) | |
-| changed_by | uuid | FK → users |
+| changed_by | string(500) | `"{uuid}: {name}"`, no FK |
 | created_at | timestamp | nullable |
 
 > No `updated_at` — immutable log.
@@ -184,7 +185,7 @@ user, country
 |--------|------|-------------|
 | id | uuid | PK |
 | patient_id | uuid | FK → patients |
-| doctor_id | uuid | FK → doctors |
+| doctor_id | uuid | nullable, no FK |
 | appointment_id | uuid | FK → appointments |
 | diagnosis | text | |
 | notes | text | nullable |
@@ -197,7 +198,7 @@ user, country
 |--------|------|-------------|
 | id | uuid | PK |
 | medical_record_id | uuid | FK → medical_records |
-| doctor_id | uuid | FK → doctors |
+| doctor_id | uuid | nullable, no FK |
 | patient_id | uuid | FK → patients |
 | notes | text | nullable |
 | created_at | timestamp | |
@@ -305,9 +306,9 @@ users 1──1 receptionists
 users 1──1 patients
 
 doctors 1──N doctor_schedules
-doctors 1──N appointments
-doctors 1──N medical_records
-doctors 1──N prescriptions
+doctors 1──N appointments        (doctor_id is nullable, no FK — nulled on doctor delete)
+doctors 1──N medical_records     (doctor_id is nullable, no FK — nulled on doctor delete)
+doctors 1──N prescriptions       (doctor_id is nullable, no FK — nulled on doctor delete)
 
 patients 1──N appointments
 patients 1──N medical_records
@@ -340,7 +341,12 @@ users 1──1 images (morph — imageable)
 countries 1──1 images (morph — imageable)
     └── polymorphic: (imageable_type, imageable_id) UNIQUE
     └── type values: user, country (ImageTypeEnum)
+
 ```
+
+> **Notes**
+> - `appointments.created_by` and `appointment_status_logs.changed_by` are plain strings (`"{uuid}: {name}"`), not foreign keys — they preserve audit history when users/doctors are deleted.
+> - `appointments.doctor_id`, `medical_records.doctor_id`, and `prescriptions.doctor_id` are nullable with no FK constraint — set to `null` when a doctor is deleted for non-pending records.
 
 ---
 
