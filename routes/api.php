@@ -20,6 +20,7 @@ Route::prefix('v1/auth')->group(function () {
         Route::put('/password', [AuthController::class, 'changePassword']);
         Route::delete('/account', [AuthController::class, 'deleteAccount']);
         Route::get('/me', [AuthController::class, 'me']);
+        Route::put('/me', [AuthController::class, 'updateProfile'])->middleware('image.content');
     });
 });
 

@@ -9,6 +9,8 @@ use App\Domains\Auth\Actions\LogoutAction;
 use App\Domains\Auth\Actions\RegisterDoctorAction;
 use App\Domains\Auth\Actions\RegisterPatientAction;
 use App\Domains\Auth\Actions\RegisterReceptionistAction;
+use App\Domains\Auth\Actions\UpdateProfileAction;
+use App\Domains\Auth\DTOs\UpdateProfileData;
 use App\Domains\Auth\Requests\ChangePasswordRequest;
 use App\Domains\Auth\Requests\DeleteAccountRequest;
 use App\Domains\Auth\DTOs\LoginData;
@@ -16,6 +18,7 @@ use App\Domains\Auth\DTOs\RegisterDoctorData;
 use App\Domains\Auth\DTOs\RegisterPatientData;
 use App\Domains\Auth\DTOs\RegisterReceptionistData;
 use App\Domains\Auth\Requests\LoginRequest;
+use App\Domains\Auth\Requests\UpdateProfileRequest;
 use App\Models\User;
 use App\Domains\Auth\Requests\RegisterDoctorRequest;
 use App\Domains\Auth\Requests\RegisterPatientRequest;
@@ -41,6 +44,7 @@ class AuthController
         private readonly LogoutAction $logoutAction,
         private readonly DeleteAccountAction $deleteAccountAction,
         private readonly ChangePasswordAction $changePasswordAction,
+        private readonly UpdateProfileAction $updateProfileAction,
         private readonly AuthService $authService,
     ) {}
 
@@ -150,5 +154,21 @@ class AuthController
         };
 
         return ApiResponse::success($resource, __('auth.profile_retrieved'));
+    }
+
+    public function updateProfile(UpdateProfileRequest $request): JsonResponse
+    {
+        $user = $request->user();
+        $dto = UpdateProfileData::fromRequest($request);
+        $user = $this->updateProfileAction->execute($user, $dto);
+
+        $resource = match ($user->role) {
+            RoleEnum::Patient => new PatientResource($user),
+            RoleEnum::Doctor => new DoctorResource($user),
+            RoleEnum::Receptionist => new ReceptionistResource($user),
+            default => new UserResource($user),
+        };
+
+        return ApiResponse::success($resource, __('Profile updated successfully'));
     }
 }
