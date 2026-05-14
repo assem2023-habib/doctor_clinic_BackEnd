@@ -4,6 +4,7 @@ namespace Tests\Feature\Auth;
 
 use App\Enums\GenderEnum;
 use App\Enums\RoleEnum;
+use App\Enums\SpecializationEnum;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -43,6 +44,8 @@ class AuthTest extends TestCase
             'address' => '456 Oak Ave',
             'gender' => GenderEnum::Female->value,
             'birthday_date' => '1985-05-15',
+            'specialization' => SpecializationEnum::Cardiology->value,
+            'experience_months' => 60,
             'password' => 'Password1!',
         ];
 

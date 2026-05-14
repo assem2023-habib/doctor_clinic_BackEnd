@@ -31,7 +31,10 @@ class RegisterDoctorAction
             'password' => bcrypt($data->password),
         ]);
 
-        $user->doctor()->create([]);
+        $user->doctor()->create([
+            'specialization' => $data->specialization,
+            'experience_months' => $data->experienceMonths,
+        ]);
 
         if ($data->file) {
             $this->uploadImageAction->execute(UploadImageData::fromArray([

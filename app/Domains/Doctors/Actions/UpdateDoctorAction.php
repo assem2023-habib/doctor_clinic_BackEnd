@@ -19,7 +19,11 @@ class UpdateDoctorAction
     {
         $user = $doctor->user;
 
-        $user->update($data->toUpdateArray());
+        $user->update($data->getUserFields());
+
+        if (!empty($data->getDoctorFields())) {
+            $doctor->update($data->getDoctorFields());
+        }
 
         if ($data->hasFile()) {
             $this->uploadImageAction->execute(UploadImageData::fromArray([

@@ -9,6 +9,7 @@ use App\Enums\AppointmentStatusEnum;
 use App\Enums\DayOfWeekEnum;
 use App\Enums\GenderEnum;
 use App\Enums\RoleEnum;
+use App\Enums\SpecializationEnum;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Passport\Passport;
@@ -68,7 +69,10 @@ class DoctorTest extends TestCase
             'role' => RoleEnum::Doctor,
         ], $overrides));
 
-        $user->doctor()->create([]);
+        $user->doctor()->create([
+            'specialization' => SpecializationEnum::GeneralPractitioner,
+            'experience_months' => 24,
+        ]);
 
         return $user;
     }
@@ -194,21 +198,31 @@ class DoctorTest extends TestCase
             'username' => 'johnupdated',
             'email' => 'john.updated@example.com',
             'gender' => GenderEnum::Male->value,
+            'specialization' => SpecializationEnum::Cardiology->value,
+            'experience_months' => 36,
         ]);
 
         $response->assertStatus(200)
             ->assertJsonStructure([
-                'status', 'message', 'data' => ['id', 'first_name', 'last_name', 'email'],
+                'status', 'message', 'data' => ['id', 'first_name', 'last_name', 'email', 'specialization', 'experience_months'],
             ]);
 
         $json = $response->json();
         $this->assertEquals('John Updated', $json['data']['first_name']);
         $this->assertEquals('john.updated@example.com', $json['data']['email']);
+        $this->assertEquals(SpecializationEnum::Cardiology->value, $json['data']['specialization']);
+        $this->assertEquals(36, $json['data']['experience_months']);
 
         $this->assertDatabaseHas('users', [
             'id' => $doctor->id,
             'first_name' => 'John Updated',
             'email' => 'john.updated@example.com',
+        ]);
+
+        $this->assertDatabaseHas('doctors', [
+            'id' => $doctor->doctor->id,
+            'specialization' => SpecializationEnum::Cardiology->value,
+            'experience_months' => 36,
         ]);
     }
 
@@ -225,6 +239,8 @@ class DoctorTest extends TestCase
             'username' => 'hacked',
             'email' => 'hacked@example.com',
             'gender' => GenderEnum::Male->value,
+            'specialization' => SpecializationEnum::Cardiology->value,
+            'experience_months' => 12,
         ]);
 
         $response->assertStatus(403);
@@ -294,6 +310,8 @@ class DoctorTest extends TestCase
             'username' => 'hacked',
             'email' => 'hacked@example.com',
             'gender' => GenderEnum::Male->value,
+            'specialization' => SpecializationEnum::Cardiology->value,
+            'experience_months' => 12,
         ]);
 
         $response->assertStatus(401);

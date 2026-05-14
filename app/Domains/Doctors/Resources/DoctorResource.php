@@ -9,6 +9,8 @@ class DoctorResource extends UserResource
     public function toArray($request): array
     {
         return array_merge(parent::toArray($request), [
+            'specialization' => $this->doctor?->specialization?->value,
+            'experience_months' => $this->doctor?->experience_months,
             'schedules' => $this->doctor?->schedules->map(fn ($schedule) => [
                 'id' => $schedule->id,
                 'day_of_week' => $schedule->day_of_week?->value,

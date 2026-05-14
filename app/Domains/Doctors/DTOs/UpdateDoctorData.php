@@ -5,11 +5,14 @@ namespace App\Domains\Doctors\DTOs;
 use App\Domains\Doctors\Requests\PatchDoctorRequest;
 use App\Domains\Doctors\Requests\UpdateDoctorRequest;
 use App\Enums\GenderEnum;
+use App\Enums\SpecializationEnum;
 use Illuminate\Http\UploadedFile;
 
 class UpdateDoctorData
 {
-    private array $fields = [];
+    private array $userFields = [];
+
+    private array $doctorFields = [];
 
     public ?UploadedFile $file = null;
 
@@ -18,7 +21,7 @@ class UpdateDoctorData
     public static function fromRequest(UpdateDoctorRequest $request): self
     {
         $dto = new self;
-        $dto->fields = [
+        $dto->userFields = [
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'username' => $request->username,
@@ -27,6 +30,10 @@ class UpdateDoctorData
             'address' => $request->address,
             'gender' => GenderEnum::from($request->gender)->value,
             'birthday_date' => $request->birthday_date,
+        ];
+        $dto->doctorFields = [
+            'specialization' => SpecializationEnum::from($request->specialization)->value,
+            'experience_months' => (int) $request->experience_months,
         ];
         $dto->file = $request->file('file');
         return $dto;
@@ -38,12 +45,20 @@ class UpdateDoctorData
 
         foreach (['first_name', 'last_name', 'username', 'email', 'phone', 'address', 'birthday_date'] as $field) {
             if ($request->exists($field)) {
-                $dto->fields[$field] = $request->$field;
+                $dto->userFields[$field] = $request->$field;
             }
         }
 
         if ($request->exists('gender') && $request->gender !== null) {
-            $dto->fields['gender'] = GenderEnum::from($request->gender)->value;
+            $dto->userFields['gender'] = GenderEnum::from($request->gender)->value;
+        }
+
+        if ($request->exists('specialization')) {
+            $dto->doctorFields['specialization'] = SpecializationEnum::from($request->specialization)->value;
+        }
+
+        if ($request->exists('experience_months')) {
+            $dto->doctorFields['experience_months'] = (int) $request->experience_months;
         }
 
         if ($request->exists('file')) {
@@ -53,9 +68,14 @@ class UpdateDoctorData
         return $dto;
     }
 
-    public function toUpdateArray(): array
+    public function getUserFields(): array
     {
-        return $this->fields;
+        return $this->userFields;
+    }
+
+    public function getDoctorFields(): array
+    {
+        return $this->doctorFields;
     }
 
     public function hasFile(): bool

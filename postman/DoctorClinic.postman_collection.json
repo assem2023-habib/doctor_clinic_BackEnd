@@ -199,6 +199,18 @@
 									"type": "text"
 								},
 								{
+									"key": "specialization",
+									"value": "cardiology",
+									"type": "text",
+									"description": "Doctor specialization from SpecializationEnum"
+								},
+								{
+									"key": "experience_months",
+									"value": "60",
+									"type": "text",
+									"description": "Experience in months"
+								},
+								{
 									"key": "password",
 									"value": "Password@123",
 									"type": "text"
@@ -222,7 +234,7 @@
 							"name": "Created",
 							"status": "Created",
 							"code": 201,
-							"body": "{\n    \"status\": 201,\n    \"message\": \"Registered successfully\",\n    \"data\": {\n        \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n        \"refresh_token\": \"def50200...\",\n        \"expires_in\": 31536000,\n        \"token_type\": \"Bearer\",\n        \"user\": {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Khaled\",\n            \"last_name\": \"Suleiman\",\n            \"email\": \"doctor@example.com\",\n            \"role\": \"doctor\",\n            \"phone\": \"+963912345679\",\n            \"gender\": \"male\",\n            \"birthday_date\": \"1985-03-20\",\n            \"is_active\": true\n        }\n    }\n}"
+							"body": "{\n    \"status\": 201,\n    \"message\": \"Registered successfully\",\n    \"data\": {\n        \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n        \"refresh_token\": \"def50200...\",\n        \"expires_in\": 31536000,\n        \"token_type\": \"Bearer\",\n        \"user\": {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Khaled\",\n            \"last_name\": \"Suleiman\",\n            \"email\": \"doctor@example.com\",\n            \"role\": \"doctor\",\n            \"phone\": \"+963912345679\",\n            \"gender\": \"male\",\n            \"birthday_date\": \"1985-03-20\",\n            \"is_active\": true,\n            \"specialization\": \"cardiology\",\n            \"experience_months\": 60\n        }\n    }\n}"
 						}
 					]
 				},
@@ -671,7 +683,7 @@
 							"name": "Success (Doctor)",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"User retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor@example.com\",\n        \"role\": \"doctor\",\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"User retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor@example.com\",\n        \"role\": \"doctor\",\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"specialization\": \"cardiology\",\n        \"experience_months\": 60\n    }\n}"
 						},
 						{
 							"name": "Success (Receptionist)",
@@ -1360,7 +1372,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctors retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Khaled\",\n            \"last_name\": \"Suleiman\",\n            \"email\": \"doctor@example.com\",\n            \"role\": \"doctor\",\n            \"phone\": \"+963912345679\",\n            \"gender\": \"male\",\n            \"birthday_date\": \"1985-03-20\",\n            \"is_active\": true,\n            \"schedules\": []\n        }\n    ],\n    \"meta\": {\n        \"pagination\": {\n            \"current_page\": 1,\n            \"last_page\": 1,\n            \"per_page\": 20,\n            \"total\": 1,\n            \"from\": 1,\n            \"to\": 1,\n            \"limit\": 20\n        }\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctors retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Khaled\",\n            \"last_name\": \"Suleiman\",\n            \"email\": \"doctor@example.com\",\n            \"role\": \"doctor\",\n            \"phone\": \"+963912345679\",\n            \"gender\": \"male\",\n            \"birthday_date\": \"1985-03-20\",\n            \"is_active\": true,\n            \"specialization\": \"cardiology\",\n            \"experience_months\": 60,\n            \"schedules\": []\n        }\n    ],\n    \"meta\": {\n        \"pagination\": {\n            \"current_page\": 1,\n            \"last_page\": 1,\n            \"per_page\": 20,\n            \"total\": 1,\n            \"from\": 1,\n            \"to\": 1,\n            \"limit\": 20\n        }\n    }\n}"
 						}
 					]
 				},
@@ -1407,7 +1419,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctor retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor@example.com\",\n        \"role\": \"doctor\",\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"schedules\": []\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctor retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor@example.com\",\n        \"role\": \"doctor\",\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"specialization\": \"cardiology\",\n        \"experience_months\": 60,\n        \"schedules\": []\n    }\n}"
 						}
 					]
 				},
@@ -1489,6 +1501,18 @@
 									"type": "text"
 								},
 								{
+									"key": "specialization",
+									"value": "cardiology",
+									"type": "text",
+									"description": "Doctor specialization from SpecializationEnum"
+								},
+								{
+									"key": "experience_months",
+									"value": "60",
+									"type": "text",
+									"description": "Experience in months"
+								},
+								{
 									"key": "file",
 									"type": "file",
 									"src": "",
@@ -1514,7 +1538,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctor updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman Updated\",\n        \"email\": \"doctor@example.com\",\n        \"role\": \"doctor\",\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"schedules\": []\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctor updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman Updated\",\n        \"email\": \"doctor@example.com\",\n        \"role\": \"doctor\",\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"specialization\": \"cardiology\",\n        \"experience_months\": 60,\n        \"schedules\": []\n    }\n}"
 						},
 						{
 							"name": "Forbidden",

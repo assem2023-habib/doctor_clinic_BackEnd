@@ -4,6 +4,7 @@ namespace App\Domains\Auth\DTOs;
 
 use App\Domains\Auth\Requests\RegisterDoctorRequest;
 use App\Enums\GenderEnum;
+use App\Enums\SpecializationEnum;
 use Illuminate\Http\UploadedFile;
 
 class RegisterDoctorData
@@ -17,6 +18,8 @@ class RegisterDoctorData
         public readonly ?string $address,
         public readonly GenderEnum $gender,
         public readonly ?string $birthdayDate,
+        public readonly SpecializationEnum $specialization,
+        public readonly int $experienceMonths,
         public readonly string $password,
         public readonly ?UploadedFile $file,
     ) {}
@@ -32,6 +35,8 @@ class RegisterDoctorData
             address: $request->address,
             gender: GenderEnum::from($request->gender),
             birthdayDate: $request->birthday_date,
+            specialization: SpecializationEnum::from($request->specialization),
+            experienceMonths: (int) $request->experience_months,
             password: $request->password,
             file: $request->file('file'),
         );
