@@ -51,6 +51,11 @@ Route::middleware('auth:api')->group(function () {
             Route::put('/{city}', [CityController::class, 'update']);
             Route::delete('/{city}', [CityController::class, 'destroy']);
         });
+
+        Route::prefix('v1/doctors')->group(function () {
+            Route::put('/{doctor}', [DoctorController::class, 'update']);
+            Route::delete('/{doctor}', [DoctorController::class, 'destroy']);
+        });
     });
 
     Route::prefix('v1/images')->group(function () {

@@ -1,0 +1,69 @@
+<?php
+
+namespace App\Domains\Doctors\Actions;
+
+use App\Domains\Appointments\Models\Appointment;
+use App\Domains\Doctors\Models\Doctor;
+use App\Domains\MedicalRecords\Models\MedicalRecord;
+use App\Domains\Prescriptions\Models\Prescription;
+use App\Enums\AppointmentStatusEnum;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+
+class DeleteDoctorAction
+{
+    public function execute(Doctor $doctor, User $admin): void
+    {
+        $user = $doctor->user;
+
+        $activeStatuses = [
+            AppointmentStatusEnum::Confirmed,
+            AppointmentStatusEnum::Completed,
+        ];
+
+        $activeCount = Appointment::where('doctor_id', $doctor->id)
+            ->whereIn('status', $activeStatuses)
+            ->count();
+
+        if ($activeCount > 0) {
+            abort(409, __('Doctor has active appointments. Cannot delete.'));
+        }
+
+        DB::transaction(function () use ($doctor, $user, $admin) {
+            $adminLabel = $admin->id . ': ' . $admin->first_name . ' ' . $admin->last_name;
+
+            Appointment::where('doctor_id', $doctor->id)
+                ->whereIn('status', [AppointmentStatusEnum::Confirmed, AppointmentStatusEnum::Completed, AppointmentStatusEnum::Cancelled])
+                ->each(function (Appointment $appointment) use ($doctor) {
+                    MedicalRecord::where('appointment_id', $appointment->id)
+                        ->where('doctor_id', $doctor->id)
+                        ->update(['doctor_id' => null]);
+
+                    Prescription::whereIn('medical_record_id',
+                        MedicalRecord::where('appointment_id', $appointment->id)->pluck('id')
+                    )->where('doctor_id', $doctor->id)
+                        ->update(['doctor_id' => null]);
+
+                    $appointment->update(['doctor_id' => null]);
+                });
+
+            Appointment::where('doctor_id', $doctor->id)
+                ->where('status', AppointmentStatusEnum::Pending)
+                ->delete();
+
+            Appointment::where('doctor_id', $doctor->id)->update(['doctor_id' => null]);
+
+            Appointment::where('created_by', $user->id)->update(['created_by' => $adminLabel]);
+
+            if ($user->image) {
+                Storage::disk('local')->delete($user->image->getRawOriginal('url'));
+                $user->image->delete();
+            }
+
+            $doctor->schedules()->delete();
+
+            $user->delete();
+        });
+    }
+}

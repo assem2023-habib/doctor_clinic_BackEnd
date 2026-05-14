@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\Api\V1\Doctor;
 
+use App\Domains\Doctors\Actions\DeleteDoctorAction;
+use App\Domains\Doctors\Actions\UpdateDoctorAction;
 use App\Domains\Doctors\Models\Doctor;
+use App\Domains\Doctors\Requests\UpdateDoctorRequest;
 use App\Domains\Doctors\Resources\DoctorResource;
 use App\Domains\Shared\Responses\ApiResponse;
 use App\Enums\RoleEnum;
@@ -12,6 +15,11 @@ use Illuminate\Http\Request;
 
 class DoctorController
 {
+    public function __construct(
+        private readonly UpdateDoctorAction $updateDoctorAction,
+        private readonly DeleteDoctorAction $deleteDoctorAction,
+    ) {}
+
     public function index(Request $request): JsonResponse
     {
         $limit = (int) $request->integer('limit', 20);
@@ -41,5 +49,23 @@ class DoctorController
             new DoctorResource($user),
             __('Doctor retrieved successfully')
         );
+    }
+
+    public function update(UpdateDoctorRequest $request, Doctor $doctor): JsonResponse
+    {
+        $dto = \App\Domains\Doctors\DTOs\UpdateDoctorData::fromRequest($request);
+        $user = $this->updateDoctorAction->execute($doctor, $dto);
+
+        return ApiResponse::success(
+            new DoctorResource($user),
+            __('Doctor updated successfully')
+        );
+    }
+
+    public function destroy(Doctor $doctor): JsonResponse
+    {
+        $this->deleteDoctorAction->execute($doctor, request()->user());
+
+        return ApiResponse::noContent(__('Doctor deleted successfully'));
     }
 }
