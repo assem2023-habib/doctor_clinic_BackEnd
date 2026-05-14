@@ -2,6 +2,7 @@
 
 use App\Domains\Shared\Responses\ApiResponse;
 use App\Http\Middleware\CheckAdminRole;
+use App\Http\Middleware\CheckStaffRole;
 use App\Http\Middleware\LogApiBearerAndRequestDetails;
 use App\Http\Middleware\NormalizeDuplicateBearerAuthorization;
 use App\Http\Middleware\ValidateApiBodySize;
@@ -30,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'admin' => CheckAdminRole::class,
+            'staff' => CheckStaffRole::class,
             'image.content' => ValidateImageContent::class,
         ]);
     })

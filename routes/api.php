@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Doctor\DoctorController;
 use App\Http\Controllers\Api\V1\Image\ImageController;
+use App\Http\Controllers\Api\V1\Patient\PatientController;
 use App\Http\Controllers\Api\V1\Location\CityController;
 use App\Http\Controllers\Api\V1\Location\CountryController;
 use Illuminate\Http\Request;
@@ -27,6 +28,11 @@ Route::prefix('v1/auth')->group(function () {
 Route::prefix('v1/doctors')->group(function () {
     Route::get('/', [DoctorController::class, 'index']);
     Route::get('/{doctor}', [DoctorController::class, 'show']);
+});
+
+Route::middleware(['auth:api', 'staff'])->prefix('v1/patients')->group(function () {
+    Route::get('/', [PatientController::class, 'index']);
+    Route::get('/{patient}', [PatientController::class, 'show']);
 });
 
 Route::prefix('v1/countries')->group(function () {
@@ -57,6 +63,12 @@ Route::middleware('auth:api')->group(function () {
             Route::put('/{doctor}', [DoctorController::class, 'update']);
             Route::patch('/{doctor}', [DoctorController::class, 'updatePartial']);
             Route::delete('/{doctor}', [DoctorController::class, 'destroy']);
+        });
+
+        Route::prefix('v1/patients')->group(function () {
+            Route::put('/{patient}', [PatientController::class, 'update']);
+            Route::patch('/{patient}', [PatientController::class, 'updatePartial']);
+            Route::delete('/{patient}', [PatientController::class, 'destroy']);
         });
     });
 
