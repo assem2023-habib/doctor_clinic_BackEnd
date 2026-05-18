@@ -10,10 +10,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1/auth')->group(function () {
-    Route::post('/register/patient', [AuthController::class, 'registerPatient'])->middleware('image.content');
-    Route::post('/register/doctor', [AuthController::class, 'registerDoctor'])->middleware('image.content');
-    Route::post('/register/receptionist', [AuthController::class, 'registerReceptionist'])->middleware('image.content');
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/register/patient', [AuthController::class, 'registerPatient'])
+        ->middleware(['throttle:register', 'image.content']);
+    Route::post('/register/doctor', [AuthController::class, 'registerDoctor'])
+        ->middleware(['throttle:register', 'image.content']);
+    Route::post('/register/receptionist', [AuthController::class, 'registerReceptionist'])
+        ->middleware(['throttle:register', 'image.content']);
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
     Route::post('/refresh', [AuthController::class, 'refresh']);
 
     Route::middleware('auth:api')->group(function () {

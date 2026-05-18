@@ -5,6 +5,7 @@ use App\Http\Middleware\CheckAdminRole;
 use App\Http\Middleware\CheckStaffRole;
 use App\Http\Middleware\LogApiBearerAndRequestDetails;
 use App\Http\Middleware\NormalizeDuplicateBearerAuthorization;
+use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\ValidateApiBodySize;
 use App\Http\Middleware\ValidateImageContent;
 use App\Providers\AuthServiceProvider;
@@ -25,6 +26,8 @@ return Application::configure(basePath: dirname(__DIR__))
         AuthServiceProvider::class,
     ])
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->appendToGroup('api', SecurityHeaders::class);
+        $middleware->appendToGroup('api', 'throttle:api');
         $middleware->prependToGroup('api', ValidateApiBodySize::class);
         $middleware->prependToGroup('api', LogApiBearerAndRequestDetails::class);
         $middleware->prependToGroup('api', NormalizeDuplicateBearerAuthorization::class);
