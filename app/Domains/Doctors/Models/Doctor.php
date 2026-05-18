@@ -3,11 +3,13 @@
 namespace App\Domains\Doctors\Models;
 
 use App\Domains\Appointments\Models\Appointment;
+use App\Domains\Patients\Models\Patient;
 use App\Enums\SpecializationEnum;
 use App\Models\User;
 use App\Traits\HasUuidV7;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Doctor extends Model
@@ -37,5 +39,12 @@ class Doctor extends Model
     public function appointments(): HasMany
     {
         return $this->hasMany(Appointment::class);
+    }
+
+    public function patients(): BelongsToMany
+    {
+        return $this->belongsToMany(Patient::class, 'doctor_patient')
+            ->withPivot('assigned_by', 'notes', 'created_at')
+            ->withTimestamps();
     }
 }

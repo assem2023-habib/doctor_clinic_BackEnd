@@ -1,0 +1,34 @@
+<?php
+
+namespace App\Domains\Supervisions\Resources;
+
+use App\Domains\Images\Resources\ImageResource;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class SupervisionDoctorResource extends JsonResource
+{
+    public function toArray($request): array
+    {
+        return [
+            'id' => $this->id,
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            'username' => $this->username,
+            'email' => $this->email,
+            'phone' => $this->phone,
+            'address' => $this->address,
+            'gender' => $this->gender?->value,
+            'birthday_date' => $this->birthday_date?->format('Y-m-d'),
+            'role' => $this->role?->value,
+            'is_active' => $this->is_active,
+            'image' => new ImageResource($this->image),
+            'specialization' => $this->doctor?->specialization?->value,
+            'experience_months' => $this->doctor?->experience_months,
+            'supervision' => [
+                'assigned_by' => $this->pivot?->assigned_by,
+                'notes' => $this->pivot?->notes,
+                'assigned_at' => $this->pivot?->created_at?->toIso8601String(),
+            ],
+        ];
+    }
+}

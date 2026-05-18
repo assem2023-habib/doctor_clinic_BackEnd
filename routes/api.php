@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Domains\Supervisions\Controllers\SupervisionController;
 use App\Http\Controllers\Api\V1\Doctor\DoctorController;
 use App\Http\Controllers\Api\V1\Image\ImageController;
 use App\Http\Controllers\Api\V1\Patient\PatientController;
@@ -49,6 +50,14 @@ Route::prefix('v1/cities')->group(function () {
 });
 
 Route::middleware('auth:api')->group(function () {
+    Route::get('/v1/doctors/{doctor}/patients', [SupervisionController::class, 'doctorPatients']);
+    Route::get('/v1/patients/{patient}/doctors', [SupervisionController::class, 'patientDoctors']);
+
+    Route::middleware('staff')->group(function () {
+        Route::post('/v1/doctors/{doctor}/patients', [SupervisionController::class, 'assign']);
+        Route::delete('/v1/doctors/{doctor}/patients/{patient}', [SupervisionController::class, 'remove']);
+    });
+
     Route::middleware('admin')->group(function () {
         Route::prefix('v1/countries')->group(function () {
             Route::post('/', [CountryController::class, 'store']);
