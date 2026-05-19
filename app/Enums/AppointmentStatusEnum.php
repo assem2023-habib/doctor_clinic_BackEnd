@@ -5,6 +5,10 @@ namespace App\Enums;
 enum AppointmentStatusEnum: string
 {
     case Pending = 'pending';
+    case Requested = 'requested';
+    case Set = 'set';
+    case Accepted = 'accepted';
+    case Rejected = 'rejected';
     case Confirmed = 'confirmed';
     case Cancelled = 'cancelled';
     case Completed = 'completed';

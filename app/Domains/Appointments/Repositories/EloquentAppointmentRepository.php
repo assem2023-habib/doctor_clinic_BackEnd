@@ -15,7 +15,7 @@ class EloquentAppointmentRepository implements AppointmentRepositoryInterface
         ?string $excludeAppointmentId = null,
     ): bool {
         $query = Appointment::where('doctor_id', $doctorId)
-            ->where('appointment_date', $date)
+            ->whereDate('appointment_date', $date)
             ->whereNotIn('status', [AppointmentStatusEnum::Cancelled->value])
             ->where('start_time', '<', $endTime)
             ->where('end_time', '>', $startTime);

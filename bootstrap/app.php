@@ -8,6 +8,7 @@ use App\Http\Middleware\NormalizeDuplicateBearerAuthorization;
 use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\ValidateApiBodySize;
 use App\Http\Middleware\ValidateImageContent;
+use App\Domains\Notifications\Providers\NotificationServiceProvider;
 use App\Providers\AuthServiceProvider;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
@@ -24,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withProviders([
         AuthServiceProvider::class,
+        NotificationServiceProvider::class,
     ])
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->appendToGroup('api', SecurityHeaders::class);

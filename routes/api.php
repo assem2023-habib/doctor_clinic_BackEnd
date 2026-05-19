@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Domains\Appointments\Controllers\AppointmentController;
 use App\Domains\Supervisions\Controllers\SupervisionController;
+use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Doctor\DoctorController;
 use App\Http\Controllers\Api\V1\Image\ImageController;
 use App\Http\Controllers\Api\V1\Patient\PatientController;
@@ -49,6 +50,8 @@ Route::prefix('v1/cities')->group(function () {
     Route::get('/{city}', [CityController::class, 'show']);
 });
 
+Route::get('/v1/doctors/{doctor}/available-slots', [AppointmentController::class, 'availableSlots']);
+
 Route::middleware('auth:api')->group(function () {
     Route::get('/v1/doctors/{doctor}/patients', [SupervisionController::class, 'doctorPatients']);
     Route::get('/v1/patients/{patient}/doctors', [SupervisionController::class, 'patientDoctors']);
@@ -88,5 +91,16 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/{image}', [ImageController::class, 'show']);
         Route::post('/', [ImageController::class, 'store'])->middleware('image.content');
         Route::delete('/{image}', [ImageController::class, 'destroy']);
+    });
+
+    Route::prefix('v1/appointments')->group(function () {
+        Route::get('/', [AppointmentController::class, 'index']);
+        Route::get('/{appointment}', [AppointmentController::class, 'show']);
+        Route::post('/', [AppointmentController::class, 'store']);
+        Route::post('/{appointment}/respond', [AppointmentController::class, 'respond']);
+        Route::post('/{appointment}/set-time', [AppointmentController::class, 'setTime']);
+        Route::post('/{appointment}/cancel', [AppointmentController::class, 'cancel']);
+        Route::post('/{appointment}/complete', [AppointmentController::class, 'complete']);
+        Route::post('/{appointment}/suggest-alternative', [AppointmentController::class, 'suggestAlternative']);
     });
 });
