@@ -30,6 +30,26 @@
 			"key": "patient_id",
 			"value": "",
 			"type": "string"
+		},
+		{
+			"key": "country_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "city_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "image_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "appointment_id",
+			"value": "",
+			"type": "string"
 		}
 	],
 	"item": [
@@ -379,7 +399,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"admin@gmail.com\",\n    \"password\": \"password\"\n}",
+							"raw": "{\n    \"email\": \"admin@gmail.com\",\n    \"password\": \"password\",\n    \"device_fingerprint\": \"\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1693,6 +1713,559 @@
 							"var url = pm.request.url.toString();",
 							"var needsAuth = pm.request.method !== 'GET';",
 							"if (token && needsAuth) {",
+							"    pm.request.headers.add({",
+							"        key: 'Authorization',",
+							"        value: 'Bearer ' + token",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "Appointments",
+			"description": "Full appointment lifecycle: request, set time, respond, cancel, complete, suggest alternative.\n\nAll endpoints require authentication (Bearer token). Available slots is public.",
+			"item": [
+				{
+					"name": "Get Available Slots",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/doctors/{{doctor_id}}/available-slots",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "doctors", "{{doctor_id}}", "available-slots"],
+							"query": [
+								{
+									"key": "date",
+									"value": "2026-05-20",
+									"description": "Date (YYYY-MM-DD) - optional, defaults to today"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Available slots retrieved successfully\",\n    \"data\": [\n        {\n            \"start_time\": \"09:00\",\n            \"end_time\": \"09:30\"\n        },\n        {\n            \"start_time\": \"09:30\",\n            \"end_time\": \"10:00\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "List Appointments",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    if (json.data && json.data.length > 0) {",
+									"        pm.collectionVariables.set('appointment_id', json.data[0].id);",
+									"        console.log('Appointment ID stored:', json.data[0].id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/appointments",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "appointments"],
+							"query": [
+								{
+									"key": "status",
+									"value": "",
+									"description": "Filter by status: pending, requested, set, accepted, rejected, confirmed, cancelled, completed"
+								},
+								{
+									"key": "per_page",
+									"value": "20",
+									"description": "Items per page (max 100)"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Appointments retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"doctor_id\": \"...\",\n            \"patient_id\": \"...\",\n            \"appointment_date\": null,\n            \"start_time\": null,\n            \"end_time\": null,\n            \"status\": \"requested\",\n            \"reason\": \"Checkup\",\n            \"created_by\": \"...\",\n            \"created_at\": \"2026-05-19T00:00:00.000000Z\"\n        }\n    ],\n    \"meta\": {\n        \"pagination\": {\n            \"current_page\": 1,\n            \"last_page\": 1,\n            \"per_page\": 20,\n            \"total\": 1\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Appointment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('appointment_id', json.data.id);",
+									"    console.log('Appointment ID stored:', json.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/appointments/{{appointment_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "appointments", "{{appointment_id}}"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Appointment retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"doctor_id\": \"...\",\n        \"patient_id\": \"...\",\n        \"appointment_date\": \"2026-05-20\",\n        \"start_time\": \"09:00\",\n        \"end_time\": \"09:30\",\n        \"status\": \"requested\",\n        \"reason\": \"Checkup\",\n        \"notes\": null,\n        \"created_by\": \"...\",\n        \"created_at\": \"2026-05-19T00:00:00.000000Z\",\n        \"updated_at\": \"2026-05-19T00:00:00.000000Z\"\n    }\n}"
+						},
+						{
+							"name": "Not Found",
+							"status": "Not Found",
+							"code": 404
+						}
+					]
+				},
+				{
+					"name": "Create Appointment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('appointment_id', json.data.id);",
+									"    console.log('Appointment created:', json.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"doctor_id\": \"{{doctor_id}}\",\n    \"reason\": \"Annual checkup\",\n    \"notes\": \"Patient has history of hypertension\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/appointments",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "appointments"]
+						}
+					},
+					"response": [
+						{
+							"name": "Created",
+							"status": "Created",
+							"code": 201,
+							"body": "{\n    \"status\": 201,\n    \"message\": \"Appointment requested successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"doctor_id\": \"...\",\n        \"patient_id\": \"...\",\n        \"appointment_date\": null,\n        \"start_time\": null,\n        \"end_time\": null,\n        \"status\": \"requested\",\n        \"reason\": \"Annual checkup\",\n        \"notes\": \"Patient has history of hypertension\",\n        \"created_by\": \"...\",\n        \"created_at\": \"2026-05-19T00:00:00.000000Z\",\n        \"updated_at\": \"2026-05-19T00:00:00.000000Z\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Set Appointment Time",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    console.log('Appointment time set:', json.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"appointment_date\": \"2026-05-20\",\n    \"start_time\": \"09:00\",\n    \"end_time\": \"09:30\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/appointments/{{appointment_id}}/set-time",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "appointments", "{{appointment_id}}", "set-time"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Appointment time set successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"appointment_date\": \"2026-05-20\",\n        \"start_time\": \"09:00\",\n        \"end_time\": \"09:30\",\n        \"status\": \"set\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Respond to Appointment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"response\": \"accepted\",\n    \"notes\": \"Available at that time\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/appointments/{{appointment_id}}/respond",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "appointments", "{{appointment_id}}", "respond"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success (Accepted)",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Appointment accepted successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"status\": \"accepted\"\n    }\n}"
+						},
+						{
+							"name": "Success (Rejected)",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Appointment rejected\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"status\": \"rejected\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Cancel Appointment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"reason\": \"Patient cancelled due to emergency\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/appointments/{{appointment_id}}/cancel",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "appointments", "{{appointment_id}}", "cancel"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Appointment cancelled successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"status\": \"cancelled\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Complete Appointment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/appointments/{{appointment_id}}/complete",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "appointments", "{{appointment_id}}", "complete"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Appointment completed successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"status\": \"completed\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Suggest Alternative",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"suggested_date\": \"2026-05-22\",\n    \"suggested_start_time\": \"10:00\",\n    \"suggested_end_time\": \"10:30\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/appointments/{{appointment_id}}/suggest-alternative",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "appointments", "{{appointment_id}}", "suggest-alternative"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Alternative time suggested successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"status\": \"requested\",\n        \"appointment_date\": \"2026-05-22\",\n        \"start_time\": \"10:00\",\n        \"end_time\": \"10:30\"\n    }\n}"
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var token = pm.collectionVariables.get('access_token');",
+							"if (token) {",
+							"    pm.request.headers.add({",
+							"        key: 'Authorization',",
+							"        value: 'Bearer ' + token",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "Supervisions",
+			"description": "Doctor-Patient assignment management.\n\nAll endpoints require authentication. Assign/Remove require staff role (admin or receptionist).",
+			"item": [
+				{
+					"name": "Get Doctor's Patients",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/doctors/{{doctor_id}}/patients",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "doctors", "{{doctor_id}}", "patients"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Patients retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Ahmed\",\n            \"last_name\": \"Ali\",\n            \"email\": \"patient@example.com\",\n            \"phone\": \"+963912345678\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Patient's Doctors",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/patients/{{patient_id}}/doctors",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "patients", "{{patient_id}}", "doctors"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctors retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Khaled\",\n            \"last_name\": \"Suleiman\",\n            \"email\": \"doctor@example.com\",\n            \"specialization\": \"cardiology\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Assign Patient to Doctor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    console.log('Patient assigned:', json.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"patient_id\": \"{{patient_id}}\",\n    \"notes\": \"Regular follow-up patient\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/doctors/{{doctor_id}}/patients",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "doctors", "{{doctor_id}}", "patients"]
+						}
+					},
+					"response": [
+						{
+							"name": "Created",
+							"status": "Created",
+							"code": 201,
+							"body": "{\n    \"status\": 201,\n    \"message\": \"Patient assigned to doctor successfully\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Remove Patient from Doctor",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/doctors/{{doctor_id}}/patients/{{patient_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "doctors", "{{doctor_id}}", "patients", "{{patient_id}}"]
+						}
+					},
+					"response": [
+						{
+							"name": "No Content",
+							"status": "No Content",
+							"code": 204
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var token = pm.collectionVariables.get('access_token');",
+							"if (token) {",
 							"    pm.request.headers.add({",
 							"        key: 'Authorization',",
 							"        value: 'Bearer ' + token",
