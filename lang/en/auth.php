@@ -25,4 +25,16 @@ return [
     'account_deleted' => 'Account deleted successfully.',
     'password_changed' => 'Password changed successfully.',
 
+    'device_blocked' => 'This device is blocked due to multiple failed login attempts. Please try again later.',
+    'device_temporarily_blocked' => 'Too many attempts from this device. Please try again in an hour.',
+    'ip_blocked' => 'This IP address is temporarily blocked due to suspicious activity.',
+    'ip_temporarily_blocked' => 'Too many attempts from this IP address. Please try again later.',
+    'suspicious_activity_detected' => 'Suspicious login activity detected from your account.',
+
+    'new_device_login_subject' => 'New device login detected',
+    'new_device_login_body' => 'Your account was accessed from a new device. If this was you, you can ignore this message.',
+
+    'suspicious_activity_subject' => 'Suspicious login attempts detected',
+    'suspicious_activity_recommendation' => 'Someone may be trying to access your account. We recommend changing your password immediately.',
+
 ];

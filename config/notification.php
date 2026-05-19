@@ -36,5 +36,8 @@ return [
         'appointment.cancelled' => ['log', 'database', 'firebase', 'websocket', 'socketio'],
         'appointment.completed' => ['log', 'database', 'firebase', 'websocket', 'socketio'],
         'appointment.alternative_suggested' => ['log', 'database', 'firebase', 'websocket', 'socketio'],
+
+        'login.new_device' => ['log', 'database', 'firebase', 'websocket', 'socketio'],
+        'login.suspicious_activity' => ['log', 'database', 'firebase', 'websocket', 'socketio'],
     ],
 ];

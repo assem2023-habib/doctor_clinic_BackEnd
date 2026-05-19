@@ -9,6 +9,8 @@ class LoginData
     private function __construct(
         public readonly string $email,
         public readonly string $password,
+        public readonly ?string $deviceFingerprint = null,
+        public readonly ?string $userAgent = null,
     ) {}
 
     public static function fromRequest(LoginRequest $request): self
@@ -16,6 +18,8 @@ class LoginData
         return new self(
             email: $request->email,
             password: $request->password,
+            deviceFingerprint: $request->device_fingerprint,
+            userAgent: $request->userAgent(),
         );
     }
 

@@ -11,6 +11,7 @@ class LoginRequest extends FormRequest
         return [
             'email' => ['required', 'email', 'exists:users,email'],
             'password' => ['required', 'string'],
+            'device_fingerprint' => ['nullable', 'string', 'max:64'],
         ];
     }
 
