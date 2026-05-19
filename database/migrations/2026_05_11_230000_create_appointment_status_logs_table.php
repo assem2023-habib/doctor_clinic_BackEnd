@@ -14,7 +14,7 @@ return new class extends Migration
             $table->foreignUuid('appointment_id')->constrained('appointments')->cascadeOnDelete();
             $table->enum('old_status', AppointmentStatusEnum::values());
             $table->enum('new_status', AppointmentStatusEnum::values());
-            $table->foreignUuid('changed_by')->constrained('users');
+            $table->string('changed_by', 500);
             $table->timestamp('created_at')->nullable();
         });
     }

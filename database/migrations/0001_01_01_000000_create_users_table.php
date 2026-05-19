@@ -22,6 +22,7 @@ return new class extends Migration
             $table->date('birthday_date')->nullable();
             $table->enum('role', RoleEnum::values());
             $table->boolean('is_active')->default(true);
+            $table->json('device_tokens')->nullable();
             $table->foreignUuid('country_id')->nullable()->constrained('countries')->nullOnDelete();
             $table->foreignUuid('city_id')->nullable()->constrained('cities')->nullOnDelete();
             $table->timestamp('email_verified_at')->nullable();
