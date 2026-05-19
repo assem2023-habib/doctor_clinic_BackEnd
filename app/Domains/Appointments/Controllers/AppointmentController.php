@@ -47,11 +47,35 @@ class AppointmentController
 
     public function availableSlots(Request $request, Doctor $doctor): JsonResponse
     {
-        $request->validate(['date' => 'required|date|after_or_equal:today']);
+        $request->validate([
+            'date' => 'required|date|after_or_equal:today',
+            'limit' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'page' => ['nullable', 'integer', 'min:1'],
+        ]);
 
-        $slots = $this->slotsService->getAvailableSlots($doctor, $request->date);
+        $allSlots = $this->slotsService->getAvailableSlots($doctor, $request->date);
 
-        return ApiResponse::success($slots, __('Available slots retrieved successfully'));
+        $page = (int) $request->integer('page', 1);
+        $limit = (int) $request->integer('limit', count($allSlots) ?: 20);
+
+        $total = count($allSlots);
+        $offset = ($page - 1) * $limit;
+        $slots = array_slice($allSlots, $offset, $limit);
+
+        $pagination = [
+            'current_page' => $page,
+            'last_page' => max(1, (int) ceil($total / $limit)),
+            'limit' => $limit,
+            'total' => $total,
+            'hasNextPage' => ($offset + $limit) < $total,
+            'hasPreviousPage' => $page > 1,
+        ];
+
+        return ApiResponse::success(
+            $slots,
+            __('Available slots retrieved successfully'),
+            pagination: $pagination
+        );
     }
 
     public function index(ListAppointmentsRequest $request): JsonResponse

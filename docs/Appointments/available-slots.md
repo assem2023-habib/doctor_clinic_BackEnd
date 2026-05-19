@@ -10,15 +10,17 @@
 
 ## Request
 
-| Parameter | Type | Constraints | Description |
-|-----------|------|-------------|-------------|
-| `date` | string (query) | required, date, after_or_equal:today | Target date (Y-m-d) |
-| `doctor` | string (route) | UUID v7 | Doctor ID |
+| Parameter | Type | Default | Constraints | Description |
+|-----------|------|---------|-------------|-------------|
+| `date` | string (query) | — | required, date, after_or_equal:today | Target date (Y-m-d) |
+| `limit` | integer (query) | all (or 20) | 1–100 | Items per page |
+| `page` | integer (query) | 1 | min 1 | Page number |
+| `doctor` | string (route) | — | UUID v7 | Doctor ID |
 
 ### Example
 
 ```
-GET /v1/doctors/0194f1e2-3a7b-7f80-9c6d-8e5f4a3b2c1d/available-slots?date=2026-06-01
+GET /v1/doctors/0194f1e2-3a7b-7f80-9c6d-8e5f4a3b2c1d/available-slots?date=2026-06-01&limit=2&page=1
 ```
 
 ## Service: `AvailableSlotsService`
@@ -34,6 +36,17 @@ public function getAvailableSlots(Doctor $doctor, string $date, int $slotDuratio
 5. Filters out slots that overlap with existing appointments
 6. Returns array of `['start_time' => 'H:i', 'end_time' => 'H:i']`
 
+## Controller Logic
+
+```php
+$allSlots = $this->slotsService->getAvailableSlots($doctor, $request->date);
+// Manual pagination on the slots array
+$page = $request->integer('page', 1);
+$limit = $request->integer('limit', count($allSlots) ?: 20);
+$offset = ($page - 1) * $limit;
+$slots = array_slice($allSlots, $offset, $limit);
+```
+
 ## Response
 
 ```json
@@ -42,9 +55,18 @@ public function getAvailableSlots(Doctor $doctor, string $date, int $slotDuratio
   "message": "Available slots retrieved successfully",
   "data": [
     { "start_time": "09:00", "end_time": "11:00" },
-    { "start_time": "11:00", "end_time": "13:00" },
-    { "start_time": "14:00", "end_time": "16:00" }
-  ]
+    { "start_time": "11:00", "end_time": "13:00" }
+  ],
+  "meta": {
+    "pagination": {
+      "current_page": 1,
+      "last_page": 2,
+      "limit": 2,
+      "total": 4,
+      "hasNextPage": true,
+      "hasPreviousPage": false
+    }
+  }
 }
 ```
 

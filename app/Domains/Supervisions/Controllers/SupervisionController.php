@@ -32,18 +32,26 @@ class SupervisionController
             return ApiResponse::forbidden(__('Unauthorized to view these patients'));
         }
 
+        $limit = (int) $request->integer('limit', 20);
+
         $patients = User::whereHas('patient', fn ($q) => $q->whereIn('id', $doctor->patients()->pluck('patient_id')))
             ->with(['patient', 'image'])
-            ->get();
+            ->when($request->search, fn ($q, $v) => $q->where(function ($q) use ($v) {
+                $q->where('first_name', 'like', "%{$v}%")
+                  ->orWhere('last_name', 'like', "%{$v}%")
+                  ->orWhere('email', 'like', "%{$v}%");
+            }))
+            ->paginate(min($limit, 100));
 
-        $patients->each(function ($user) use ($doctor) {
+        $patients->getCollection()->each(function ($user) use ($doctor) {
             $pivot = $doctor->patients()->find($user->patient->id)?->pivot;
             $user->setRelation('pivot', $pivot);
         });
 
         return ApiResponse::success(
             SupervisionPatientResource::collection($patients),
-            __('Patients retrieved successfully')
+            __('Patients retrieved successfully'),
+            pagination: ApiResponse::pagination($patients)
         );
     }
 
@@ -57,18 +65,26 @@ class SupervisionController
             return ApiResponse::forbidden(__('Unauthorized to view these doctors'));
         }
 
+        $limit = (int) $request->integer('limit', 20);
+
         $doctors = User::whereHas('doctor', fn ($q) => $q->whereIn('id', $patient->doctors()->pluck('doctor_id')))
             ->with(['doctor', 'image'])
-            ->get();
+            ->when($request->search, fn ($q, $v) => $q->where(function ($q) use ($v) {
+                $q->where('first_name', 'like', "%{$v}%")
+                  ->orWhere('last_name', 'like', "%{$v}%")
+                  ->orWhere('email', 'like', "%{$v}%");
+            }))
+            ->paginate(min($limit, 100));
 
-        $doctors->each(function ($user) use ($patient) {
+        $doctors->getCollection()->each(function ($user) use ($patient) {
             $pivot = $patient->doctors()->find($user->doctor->id)?->pivot;
             $user->setRelation('pivot', $pivot);
         });
 
         return ApiResponse::success(
             SupervisionDoctorResource::collection($doctors),
-            __('Doctors retrieved successfully')
+            __('Doctors retrieved successfully'),
+            pagination: ApiResponse::pagination($doctors)
         );
     }
 
