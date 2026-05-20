@@ -4,33 +4,22 @@ namespace App\Domains\Notifications\Channels;
 
 use App\Domains\Notifications\Contracts\NotificationChannelInterface;
 use App\Domains\Notifications\DTOs\NotificationData;
+use App\Domains\Notifications\Services\FirebaseService;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Kreait\Firebase\Exception\FirebaseException;
-use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\Notification;
 
 class FirebaseChannel implements NotificationChannelInterface
 {
-    private ?Factory $factory;
-
-    public function __construct()
-    {
-        $credentials = config('notification.channels.firebase.credentials');
-
-        if (empty($credentials) || !file_exists($credentials)) {
-            $this->factory = null;
-            Log::warning('Firebase credentials file not found');
-            return;
-        }
-
-        $this->factory = (new Factory)->withServiceAccount($credentials);
-    }
+    public function __construct(
+        private readonly FirebaseService $firebase,
+    ) {}
 
     public function send(NotificationData $data): void
     {
-        if ($this->factory === null) {
+        if (!$this->firebase->isAvailable()) {
             return;
         }
 
@@ -50,9 +39,13 @@ class FirebaseChannel implements NotificationChannelInterface
             return;
         }
 
-        try {
-            $messaging = $this->factory->createMessaging();
+        $messaging = $this->firebase->messaging();
 
+        if ($messaging === null) {
+            return;
+        }
+
+        try {
             $notification = Notification::create($data->title, $data->body['message'] ?? $data->title);
 
             $message = CloudMessage::new()
