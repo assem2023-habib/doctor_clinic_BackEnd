@@ -27,3 +27,6 @@ Homestead.yaml
 Thumbs.db
 
 # OpenSSL random seed.rnd
+
+# Firebase service account
+/storage/app/firebase/

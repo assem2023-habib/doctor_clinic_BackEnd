@@ -1,6 +1,7 @@
 <?php
 
 use App\Domains\Shared\Responses\ApiResponse;
+use App\Http\Middleware\AuthorizeByAttribute;
 use App\Http\Middleware\CheckAdminRole;
 use App\Http\Middleware\CheckStaffRole;
 use App\Http\Middleware\LogApiBearerAndRequestDetails;
@@ -40,6 +41,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => CheckAdminRole::class,
             'staff' => CheckStaffRole::class,
             'image.content' => ValidateImageContent::class,
+            'role.authorize' => AuthorizeByAttribute::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

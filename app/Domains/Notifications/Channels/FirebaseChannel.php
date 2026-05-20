@@ -5,22 +5,32 @@ namespace App\Domains\Notifications\Channels;
 use App\Domains\Notifications\Contracts\NotificationChannelInterface;
 use App\Domains\Notifications\DTOs\NotificationData;
 use App\Models\User;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Kreait\Firebase\Exception\FirebaseException;
+use Kreait\Firebase\Factory;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Notification;
 
 class FirebaseChannel implements NotificationChannelInterface
 {
-    private ?string $serverKey;
+    private ?Factory $factory;
 
     public function __construct()
     {
-        $this->serverKey = config('notification.channels.firebase.server_key');
+        $credentials = config('notification.channels.firebase.credentials');
+
+        if (empty($credentials) || !file_exists($credentials)) {
+            $this->factory = null;
+            Log::warning('Firebase credentials file not found');
+            return;
+        }
+
+        $this->factory = (new Factory)->withServiceAccount($credentials);
     }
 
     public function send(NotificationData $data): void
     {
-        if (empty($this->serverKey)) {
-            Log::warning('FCM server key not configured');
+        if ($this->factory === null) {
             return;
         }
 
@@ -40,30 +50,30 @@ class FirebaseChannel implements NotificationChannelInterface
             return;
         }
 
-        $payload = [
-            'registration_ids' => $tokens,
-            'notification' => [
-                'title' => $data->title,
-                'body' => $data->body['message'] ?? $data->title,
-            ],
-            'data' => array_merge($data->body, [
-                'topic' => $data->topic,
-                'type' => $data->type ?? $data->topic,
-            ]),
-        ];
-
         try {
-            $response = Http::withHeaders([
-                'Authorization' => "key={$this->serverKey}",
-                'Content-Type' => 'application/json',
-            ])->post('https://fcm.googleapis.com/fcm/send', $payload);
+            $messaging = $this->factory->createMessaging();
 
-            if (!$response->successful()) {
-                Log::error('FCM send failed', [
-                    'status' => $response->status(),
-                    'body' => $response->body(),
-                ]);
+            $notification = Notification::create($data->title, $data->body['message'] ?? $data->title);
+
+            $message = CloudMessage::new()
+                ->withNotification($notification)
+                ->withData(array_merge($data->body, [
+                    'topic' => $data->topic,
+                    'type' => $data->type ?? $data->topic,
+                ]));
+
+            $report = $messaging->sendMulticast($message, $tokens);
+
+            if ($report->hasFailures()) {
+                foreach ($report->failures()->getItems() as $failure) {
+                    Log::error('FCM send failed', [
+                        'token' => $failure->target()->value(),
+                        'error' => $failure->error()->getMessage(),
+                    ]);
+                }
             }
+        } catch (FirebaseException $e) {
+            Log::error('FCM FirebaseException', ['message' => $e->getMessage()]);
         } catch (\Exception $e) {
             Log::error('FCM exception', ['message' => $e->getMessage()]);
         }

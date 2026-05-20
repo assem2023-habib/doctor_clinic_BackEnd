@@ -9,6 +9,7 @@
         "php": "^8.3",
         "darkaonline/l5-swagger": "*",
         "intervention/image-laravel": "*",
+        "kreait/firebase-php": "*",
         "laravel/framework": "^13.7",
         "laravel/passport": "^13.7",
         "laravel/tinker": "^3.0"

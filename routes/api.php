@@ -1,6 +1,9 @@
 <?php
 
 use App\Domains\Appointments\Controllers\AppointmentController;
+use App\Domains\RBAC\Controllers\PermissionController;
+use App\Domains\RBAC\Controllers\RoleController;
+use App\Domains\RBAC\Controllers\UserRoleController;
 use App\Domains\Supervisions\Controllers\SupervisionController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Doctor\DoctorController;
@@ -8,6 +11,7 @@ use App\Http\Controllers\Api\V1\Image\ImageController;
 use App\Http\Controllers\Api\V1\Patient\PatientController;
 use App\Http\Controllers\Api\V1\Location\CityController;
 use App\Http\Controllers\Api\V1\Location\CountryController;
+use App\Http\Controllers\Api\V1\DeviceTokenController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -61,6 +65,22 @@ Route::middleware('auth:api')->group(function () {
         Route::delete('/v1/doctors/{doctor}/patients/{patient}', [SupervisionController::class, 'remove']);
     });
 
+    Route::post('/v1/device-tokens', [DeviceTokenController::class, 'update']);
+
+    Route::prefix('v1/roles')->group(function () {
+        Route::get('/', [RoleController::class, 'index']);
+        Route::get('/{role}', [RoleController::class, 'show']);
+    });
+
+    Route::prefix('v1/permissions')->group(function () {
+        Route::get('/', [PermissionController::class, 'index']);
+        Route::get('/{permission}', [PermissionController::class, 'show']);
+    });
+
+    Route::prefix('v1/users/{user}/roles')->group(function () {
+        Route::get('/', [UserRoleController::class, 'getUserRoles']);
+    });
+
     Route::middleware('admin')->group(function () {
         Route::prefix('v1/countries')->group(function () {
             Route::post('/', [CountryController::class, 'store']);
@@ -93,7 +113,24 @@ Route::middleware('auth:api')->group(function () {
         Route::delete('/{image}', [ImageController::class, 'destroy']);
     });
 
-    Route::prefix('v1/appointments')->group(function () {
+        Route::prefix('v1/roles')->group(function () {
+            Route::post('/', [RoleController::class, 'store']);
+            Route::put('/{role}', [RoleController::class, 'update']);
+            Route::delete('/{role}', [RoleController::class, 'destroy']);
+            Route::post('/{role}/permissions', [RoleController::class, 'syncPermissions']);
+        });
+
+        Route::prefix('v1/permissions')->group(function () {
+            Route::post('/', [PermissionController::class, 'store']);
+            Route::put('/{permission}', [PermissionController::class, 'update']);
+            Route::delete('/{permission}', [PermissionController::class, 'destroy']);
+        });
+
+        Route::prefix('v1/users/{user}/roles')->group(function () {
+            Route::post('/', [UserRoleController::class, 'syncUserRoles']);
+        });
+
+        Route::prefix('v1/appointments')->group(function () {
         Route::get('/', [AppointmentController::class, 'index']);
         Route::get('/{appointment}', [AppointmentController::class, 'show']);
         Route::post('/', [AppointmentController::class, 'store']);

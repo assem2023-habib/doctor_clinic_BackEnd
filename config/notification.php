@@ -10,8 +10,7 @@ return [
         ],
         'firebase' => [
             'enabled' => env('FCM_ENABLED', false),
-            'server_key' => env('FCM_SERVER_KEY'),
-            'sender_id' => env('FCM_SENDER_ID'),
+            'credentials' => env('FIREBASE_CREDENTIALS', storage_path('app/firebase/service-account.json')),
         ],
         'websocket' => [
             'enabled' => env('REVERB_ENABLED', false),

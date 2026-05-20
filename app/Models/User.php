@@ -10,11 +10,14 @@ use App\Domains\Locations\Models\Country;
 use App\Domains\Notifications\Models\Notification;
 use App\Domains\Patients\Models\Patient;
 use App\Domains\Ratings\Models\Rating;
+use App\Domains\RBAC\Models\Role;
+use App\Domains\RBAC\Services\PermissionService;
 use App\Domains\Receptionists\Models\Receptionist;
 use App\Enums\GenderEnum;
 use App\Enums\RoleEnum;
 use App\Traits\HasUuidV7;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -38,6 +41,7 @@ use Laravel\Passport\HasApiTokens;
     'password',
     'country_id',
     'city_id',
+    'device_tokens',
 ])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
@@ -54,6 +58,7 @@ class User extends Authenticatable
             'birthday_date' => 'date',
             'gender' => GenderEnum::class,
             'role' => RoleEnum::class,
+            'device_tokens' => 'array',
         ];
     }
 
@@ -107,5 +112,25 @@ class User extends Authenticatable
     public function image()
     {
         return $this->morphOne(Image::class, 'imageable');
+    }
+
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class, 'role_user');
+    }
+
+    public function hasRole(string $slug): bool
+    {
+        return PermissionService::hasRole($this, $slug);
+    }
+
+    public function hasAnyRole(array $slugs): bool
+    {
+        return PermissionService::hasAnyRole($this, $slugs);
+    }
+
+    public function hasPermission(string $slug): bool
+    {
+        return PermissionService::hasPermission($this, $slug);
     }
 }
