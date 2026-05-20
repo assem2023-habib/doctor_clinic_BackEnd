@@ -12,6 +12,314 @@
         }
     ],
     "paths": {
+        "/api/v1/doctors/{doctor}/available-slots": {
+            "get": {
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Get available slots for a doctor",
+                "operationId": "e87db7f17d918700cbd436b5f051dd07",
+                "parameters": [
+                    {
+                        "name": "doctor",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "date",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 20
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Available slots retrieved successfully"
+                    }
+                }
+            }
+        },
+        "/api/v1/appointments": {
+            "get": {
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "List appointments (role-scoped)",
+                "operationId": "725bf2cf951ebf479026ea18dc2064ee",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 20
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "date",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Appointments retrieved successfully"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Request a new appointment",
+                "operationId": "e6b1849ddd4d5b9e447db0d2ad20fc8b",
+                "responses": {
+                    "201": {
+                        "description": "Appointment requested successfully"
+                    },
+                    "403": {
+                        "description": "Only patients can request appointments"
+                    }
+                }
+            }
+        },
+        "/api/v1/appointments/{id}": {
+            "get": {
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Get a single appointment",
+                "operationId": "1f3bb5c606076b70ae1e305e1cfaebe2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Appointment retrieved successfully"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/api/v1/appointments/{id}/set-time": {
+            "post": {
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Set appointment time",
+                "operationId": "6a857f58b8b96b3fe168d48fccb6c54a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Appointment time set successfully"
+                    },
+                    "400": {
+                        "description": "Appointment is not in requested status"
+                    }
+                }
+            }
+        },
+        "/api/v1/appointments/{id}/respond": {
+            "post": {
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Patient accepts or rejects appointment time",
+                "operationId": "22f476b498b2a5a446dda9b420b86eb5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Appointment accepted/rejected"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/api/v1/appointments/{id}/start": {
+            "post": {
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Start an accepted appointment",
+                "description": "Transition appointment from accepted to in_progress. Staff/doctor only.",
+                "operationId": "266deb5d3a46862458573be6c4f10d3c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Appointment started successfully"
+                    },
+                    "400": {
+                        "description": "Appointment is not in accepted status"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/api/v1/appointments/{id}/complete": {
+            "post": {
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Complete an in-progress appointment",
+                "description": "Transition appointment from in_progress to completed. Staff/doctor only.",
+                "operationId": "8b59cd1433196c2f1be0740d422f373e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Appointment completed successfully"
+                    },
+                    "400": {
+                        "description": "Appointment is not in in_progress status"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/api/v1/appointments/{id}/cancel": {
+            "post": {
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Cancel an appointment",
+                "operationId": "8cbadb112837d820be672169c2362e85",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Appointment cancelled successfully"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/api/v1/appointments/{id}/suggest-alternative": {
+            "post": {
+                "tags": [
+                    "Appointments"
+                ],
+                "summary": "Suggest an alternative time",
+                "operationId": "7d77fe1458a958ead188b1244b11e91c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Alternative suggested successfully"
+                    },
+                    "400": {
+                        "description": "Can only suggest alternatives for requested appointments"
+                    }
+                }
+            }
+        },
         "/api/v1/auth/register/patient": {
             "post": {
                 "tags": [
@@ -132,14 +440,13 @@
                                                     "format": "email",
                                                     "example": "patient@example.com"
                                                 },
-                                                "role": {
-                                                    "type": "string",
-                                                    "example": "patient",
-                                                    "enum": [
-                                                        "admin",
-                                                        "doctor",
-                                                        "patient",
-                                                        "receptionist"
+                                                "roles": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "example": [
+                                                        "patient"
                                                     ]
                                                 },
                                                 "phone": {
@@ -325,14 +632,13 @@
                                                     "format": "email",
                                                     "example": "doctor@example.com"
                                                 },
-                                                "role": {
-                                                    "type": "string",
-                                                    "example": "doctor",
-                                                    "enum": [
-                                                        "admin",
-                                                        "doctor",
-                                                        "patient",
-                                                        "receptionist"
+                                                "roles": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "example": [
+                                                        "doctor"
                                                     ]
                                                 },
                                                 "phone": {
@@ -530,13 +836,12 @@
                                                     "format": "email",
                                                     "example": "receptionist@example.com"
                                                 },
-                                                "role": {
-                                                    "type": "string",
-                                                    "example": "receptionist",
-                                                    "enum": [
-                                                        "admin",
-                                                        "doctor",
-                                                        "patient",
+                                                "roles": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "example": [
                                                         "receptionist"
                                                     ]
                                                 },
@@ -693,14 +998,13 @@
                                                     "format": "email",
                                                     "example": "admin@gmail.com"
                                                 },
-                                                "role": {
-                                                    "type": "string",
-                                                    "example": "admin",
-                                                    "enum": [
-                                                        "admin",
-                                                        "doctor",
-                                                        "patient",
-                                                        "receptionist"
+                                                "roles": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "example": [
+                                                        "admin"
                                                     ]
                                                 },
                                                 "phone": {
@@ -1108,14 +1412,13 @@
                                             "format": "email",
                                             "example": "admin@gmail.com"
                                         },
-                                        "role": {
-                                            "type": "string",
-                                            "example": "admin",
-                                            "enum": [
-                                                "admin",
-                                                "doctor",
-                                                "patient",
-                                                "receptionist"
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            },
+                                            "example": [
+                                                "admin"
                                             ]
                                         },
                                         "phone": {
@@ -1304,10 +1607,580 @@
                     }
                 }
             }
+        },
+        "/api/v1/images": {
+            "post": {
+                "tags": [
+                    "Images"
+                ],
+                "summary": "Upload an image",
+                "operationId": "b41fc5e0179e9a679c1ed5fb636757f4",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "user",
+                                            "country"
+                                        ]
+                                    },
+                                    "imageable_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Image uploaded successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 201
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/ImageResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/images/{image}": {
+            "delete": {
+                "tags": [
+                    "Images"
+                ],
+                "summary": "Delete an image",
+                "operationId": "55ebf92d44cfe26aae460ae85f241509",
+                "parameters": [
+                    {
+                        "name": "image",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Image deleted successfully"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/cities": {
+            "get": {
+                "tags": [
+                    "Cities"
+                ],
+                "summary": "List all cities",
+                "operationId": "dc0cc244f4eb83752fbcd73f957a9f57",
+                "parameters": [
+                    {
+                        "name": "country_id",
+                        "in": "query",
+                        "description": "Filter by country",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Cities retrieved successfully"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Cities"
+                ],
+                "summary": "Create a new city",
+                "operationId": "7b5aaa3fcc9ebeda8797273b8be0259c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name_ar": {
+                                        "type": "string",
+                                        "example": "الرياض"
+                                    },
+                                    "name_en": {
+                                        "type": "string",
+                                        "example": "Riyadh"
+                                    },
+                                    "country_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "City created successfully"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/v1/cities/{city}": {
+            "get": {
+                "tags": [
+                    "Cities"
+                ],
+                "summary": "Get a single city",
+                "operationId": "4d4a2b2d779c86cb3c85c6856b872f64",
+                "parameters": [
+                    {
+                        "name": "city",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "City retrieved successfully"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Cities"
+                ],
+                "summary": "Update a city",
+                "operationId": "06bee343dc521807ac4d9a375e58d9fc",
+                "parameters": [
+                    {
+                        "name": "city",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name_ar": {
+                                        "type": "string"
+                                    },
+                                    "name_en": {
+                                        "type": "string"
+                                    },
+                                    "country_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "City updated successfully"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Cities"
+                ],
+                "summary": "Delete a city",
+                "operationId": "be01450a3b919ac195ad11cff2bbecca",
+                "parameters": [
+                    {
+                        "name": "city",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "City deleted successfully"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/api/v1/countries": {
+            "get": {
+                "tags": [
+                    "Countries"
+                ],
+                "summary": "List all countries",
+                "operationId": "a9af534189667133f4ffd4c7ccdae9e0",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Countries retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/CountryResource"
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Countries"
+                ],
+                "summary": "Create a new country",
+                "operationId": "38a9dee680c9f5b64a8a3a99acde206e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name_ar": {
+                                        "type": "string",
+                                        "example": "السعودية"
+                                    },
+                                    "name_en": {
+                                        "type": "string",
+                                        "example": "Saudi Arabia"
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "example": "SA"
+                                    },
+                                    "flag": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Country created successfully"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/v1/countries/{country}": {
+            "get": {
+                "tags": [
+                    "Countries"
+                ],
+                "summary": "Get a single country with cities",
+                "operationId": "f31a98828442d8784de18729cf91372d",
+                "parameters": [
+                    {
+                        "name": "country",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Country retrieved successfully"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Countries"
+                ],
+                "summary": "Update a country",
+                "operationId": "3f0da6161e9e272cfafdb92ff3e087f1",
+                "parameters": [
+                    {
+                        "name": "country",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name_ar": {
+                                        "type": "string"
+                                    },
+                                    "name_en": {
+                                        "type": "string"
+                                    },
+                                    "code": {
+                                        "type": "string"
+                                    },
+                                    "flag": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Country updated successfully"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Countries"
+                ],
+                "summary": "Delete a country",
+                "operationId": "ceaff62353eddc3b4097cb99456f4d18",
+                "parameters": [
+                    {
+                        "name": "country",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Country deleted successfully"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
         }
     },
     "components": {
         "schemas": {
+            "CityResource": {
+                "description": "City resource",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "properties": {
+                            "ar": {
+                                "type": "string"
+                            },
+                            "en": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "country_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "CountryResource": {
+                "description": "Country resource",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "properties": {
+                            "ar": {
+                                "type": "string"
+                            },
+                            "en": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "code": {
+                        "type": "string",
+                        "example": "SA"
+                    },
+                    "flag": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "cities": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CityResource"
+                        }
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
             "DoctorResource": {
                 "description": "Doctor resource",
                 "properties": {
@@ -1363,14 +2236,13 @@
                         "format": "date",
                         "example": "1985-05-15"
                     },
-                    "role": {
-                        "type": "string",
-                        "example": "doctor",
-                        "enum": [
-                            "admin",
-                            "doctor",
-                            "patient",
-                            "receptionist"
+                    "roles": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "doctor"
                         ]
                     },
                     "is_active": {
@@ -1418,6 +2290,36 @@
                     }
                 },
                 "type": "object"
+            },
+            "ImageResource": {
+                "description": "Image resource",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "url": {
+                        "description": "Full URL to the image",
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "user",
+                            "country"
+                        ]
+                    },
+                    "imageable_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
             }
         },
         "securitySchemes": {
@@ -1430,12 +2332,28 @@
     },
     "tags": [
         {
+            "name": "Appointments",
+            "description": "Appointments"
+        },
+        {
             "name": "Auth",
             "description": "Auth"
         },
         {
             "name": "Doctors",
             "description": "Doctors"
+        },
+        {
+            "name": "Images",
+            "description": "Images"
+        },
+        {
+            "name": "Cities",
+            "description": "Cities"
+        },
+        {
+            "name": "Countries",
+            "description": "Countries"
         }
     ]
 }

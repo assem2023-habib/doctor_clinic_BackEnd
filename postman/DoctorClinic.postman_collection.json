@@ -2057,6 +2057,31 @@
 					]
 				},
 				{
+					"name": "Start Appointment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/appointments/{{appointment_id}}/start",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "appointments", "{{appointment_id}}", "start"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Appointment started successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"status\": \"in_progress\"\n    }\n}"
+						}
+					]
+				},
+				{
 					"name": "Complete Appointment",
 					"request": {
 						"method": "POST",

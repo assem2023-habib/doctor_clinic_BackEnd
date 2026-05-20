@@ -5,8 +5,10 @@
 ## Lifecycle
 
 ```
-Requested → Set (by staff) → Accepted|Rejected (by patient) → Completed (by staff)
+Requested → Set (by staff) → Accepted (by patient) → InProgress → Completed
                                                                    
+Rejected (by patient) ──→ Cancelled
+
 Alternative Suggested → (loops back to Set with new time)
 Requested → Cancelled (by staff at any point)
 Set → Auto-Confirmed (after response window expires via Job)
@@ -22,8 +24,9 @@ Set → Auto-Confirmed (after response window expires via Job)
 | POST | `/v1/appointments` | `auth:api` | Request a new appointment (patient only) |
 | POST | `/v1/appointments/{appointment}/set-time` | `auth:api` | Set appointment time (staff/doctor) |
 | POST | `/v1/appointments/{appointment}/respond` | `auth:api` | Patient accepts/rejects set time |
+| POST | `/v1/appointments/{appointment}/start` | `auth:api` | Start appointment (staff/doctor — Accepted → InProgress) |
 | POST | `/v1/appointments/{appointment}/cancel` | `auth:api` | Cancel appointment (staff/doctor) |
-| POST | `/v1/appointments/{appointment}/complete` | `auth:api` | Complete appointment (staff/doctor) |
+| POST | `/v1/appointments/{appointment}/complete` | `auth:api` | Complete appointment (staff/doctor — InProgress → Completed) |
 | POST | `/v1/appointments/{appointment}/suggest-alternative` | `auth:api` | Suggest alternative (staff/doctor) |
 
 ## Architecture
@@ -36,6 +39,7 @@ AppointmentController
  ├── store()          → RequestAppointmentAction → NotificationManager
  ├── setTime()        → SetAppointmentTimeAction → AutoConfirmAppointment Job → NotificationManager
  ├── respond()        → PatientRespondAction → NotificationManager
+ ├── start()          → StartAppointmentAction → NotificationManager
  ├── cancel()         → CancelAppointmentAction → NotificationManager
  ├── complete()       → CompleteAppointmentAction → NotificationManager
  └── suggestAlternative() → SuggestAlternativeAction → NotificationManager
@@ -48,9 +52,9 @@ AppointmentController
 
 ## Keys
 
-- **Status Engine:** `AppointmentStatusEnum` (8 states: pending, requested, set, accepted, rejected, confirmed, cancelled, completed)
+- **Status Engine:** `AppointmentStatusEnum` (9 states: pending, requested, set, accepted, rejected, in_progress, confirmed, cancelled, completed)
 - **Overlap Prevention:** `NoOverlappingAppointment` rule → `AppointmentRepositoryInterface::hasOverlap()` → `EloquentAppointmentRepository`
 - **Auto-Confirm:** `AutoConfirmAppointment` job dispatched with `(config:appointment.response_window_hours)` delay when staff sets a time
-- **Notifications:** Each state transition fires a notification via `NotificationManager` (appointment.requested, .time_set, .accepted, .rejected, .cancelled, .completed, .alternative_suggested)
-- **Slot Service:** `AvailableSlotsService` generates 2-hour slots from doctor schedules, excluding overlapping existing appointments
-- **Actions:** 6 actions (RequestAppointment, SetAppointmentTime, PatientRespond, CancelAppointment, CompleteAppointment, SuggestAlternative) — each is a single-class use case
+- **Notifications:** Each state transition fires a notification via `NotificationManager` (appointment.requested, .time_set, .accepted, .rejected, .in_progress, .cancelled, .completed, .alternative_suggested)
+- **Slot Service:** `AvailableSlotsService` generates 2-hour slots from doctor schedules, excluding overlapping existing appointments (including in_progress)
+- **Actions:** 7 actions (RequestAppointment, SetAppointmentTime, PatientRespond, StartAppointment, CancelAppointment, CompleteAppointment, SuggestAlternative) — each is a single-class use case
