@@ -11,7 +11,6 @@ use App\Domains\Auth\Models\DeviceFingerprint;
 use App\Domains\Auth\Models\LoginAttempt;
 use App\Domains\Auth\Models\KnownUserDevice;
 use App\Domains\Auth\Services\LoginSecurityManager;
-use App\Enums\RoleEnum;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -55,7 +54,8 @@ class LoginSecurityTest extends TestCase
 
     public function test_records_successful_login_attempt(): void
     {
-        $user = User::factory()->create(['role' => RoleEnum::Patient]);
+        $user = User::factory()->create();
+        $user->assignRole('patient');
 
         $context = new LoginSecurityContext(
             email: $user->email,
@@ -77,7 +77,8 @@ class LoginSecurityTest extends TestCase
 
     public function test_tracks_known_device_on_successful_login(): void
     {
-        $user = User::factory()->create(['role' => RoleEnum::Patient]);
+        $user = User::factory()->create();
+        $user->assignRole('patient');
 
         $context = new LoginSecurityContext(
             email: $user->email,
@@ -99,7 +100,8 @@ class LoginSecurityTest extends TestCase
     {
         Event::fake();
 
-        $user = User::factory()->create(['role' => RoleEnum::Patient]);
+        $user = User::factory()->create();
+        $user->assignRole('patient');
 
         $context = new LoginSecurityContext(
             email: $user->email,
@@ -123,7 +125,8 @@ class LoginSecurityTest extends TestCase
     {
         Event::fake();
 
-        $user = User::factory()->create(['role' => RoleEnum::Patient]);
+        $user = User::factory()->create();
+        $user->assignRole('patient');
 
         $knownDevice = KnownUserDevice::create([
             'user_id' => $user->id,
@@ -149,7 +152,8 @@ class LoginSecurityTest extends TestCase
     {
         Event::fake();
 
-        $user = User::factory()->create(['role' => RoleEnum::Patient]);
+        $user = User::factory()->create();
+        $user->assignRole('patient');
 
         for ($i = 0; $i < 5; $i++) {
             $context = new LoginSecurityContext(
@@ -250,7 +254,8 @@ class LoginSecurityTest extends TestCase
 
     public function test_successful_login_clears_no_block(): void
     {
-        $user = User::factory()->create(['role' => RoleEnum::Patient]);
+        $user = User::factory()->create();
+        $user->assignRole('patient');
 
         $context = new LoginSecurityContext(
             email: $user->email,

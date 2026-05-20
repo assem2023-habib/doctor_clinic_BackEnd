@@ -27,7 +27,6 @@ use App\Domains\Notifications\Services\NotificationManager;
 use App\Domains\Shared\Responses\ApiResponse;
 use App\Enums\AppointmentStatusEnum;
 use App\Enums\HttpStatusEnum;
-use App\Enums\RoleEnum;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -85,13 +84,13 @@ class AppointmentController
 
         $query = Appointment::with(['patient.user.image', 'doctor.user.image', 'doctor.schedules']);
 
-        if ($user->role === RoleEnum::Patient) {
+        if ($user->hasRole('patient')) {
             $patient = $user->patient;
             $query->where('patient_id', $patient?->id);
-        } elseif ($user->role === RoleEnum::Doctor) {
+        } elseif ($user->hasRole('doctor')) {
             $doctor = $user->doctor;
             $query->where('doctor_id', $doctor?->id);
-        } elseif (!in_array($user->role->value, [RoleEnum::Admin->value, RoleEnum::Receptionist->value])) {
+        } elseif (!$user->hasAnyRole(['admin', 'receptionist'])) {
             return ApiResponse::forbidden(__('Unauthorized'));
         }
 
@@ -133,7 +132,7 @@ class AppointmentController
     {
         $user = $request->user();
 
-        if ($user->role !== RoleEnum::Patient) {
+        if (!$user->hasRole('patient')) {
             return ApiResponse::forbidden(__('Only patients can request appointments'));
         }
 
@@ -171,8 +170,8 @@ class AppointmentController
     {
         $user = $request->user();
 
-        if (!in_array($user->role->value, [RoleEnum::Admin->value, RoleEnum::Receptionist->value])
-            && !($user->role === RoleEnum::Doctor && $user->doctor?->id === $appointment->doctor_id)) {
+        if (!$user->hasAnyRole(['admin', 'receptionist'])
+            && !($user->hasRole('doctor') && $user->doctor?->id === $appointment->doctor_id)) {
             return ApiResponse::forbidden(__('Unauthorized'));
         }
 
@@ -268,8 +267,8 @@ class AppointmentController
     {
         $user = $request->user();
 
-        $isStaff = in_array($user->role->value, [RoleEnum::Admin->value, RoleEnum::Receptionist->value]);
-        $isDoctor = $user->role === RoleEnum::Doctor && $user->doctor?->id === $appointment->doctor_id;
+        $isStaff = $user->hasAnyRole(['admin', 'receptionist']);
+        $isDoctor = $user->hasRole('doctor') && $user->doctor?->id === $appointment->doctor_id;
 
         if (!$isStaff && !$isDoctor) {
             return ApiResponse::forbidden(__('Only staff can cancel appointments'));
@@ -303,8 +302,8 @@ class AppointmentController
     {
         $user = $request->user();
 
-        $isStaff = in_array($user->role->value, [RoleEnum::Admin->value, RoleEnum::Receptionist->value]);
-        $isDoctor = $user->role === RoleEnum::Doctor && $user->doctor?->id === $appointment->doctor_id;
+        $isStaff = $user->hasAnyRole(['admin', 'receptionist']);
+        $isDoctor = $user->hasRole('doctor') && $user->doctor?->id === $appointment->doctor_id;
 
         if (!$isStaff && !$isDoctor) {
             return ApiResponse::forbidden(__('Unauthorized'));
@@ -341,8 +340,8 @@ class AppointmentController
     {
         $user = $request->user();
 
-        $isStaff = in_array($user->role->value, [RoleEnum::Admin->value, RoleEnum::Receptionist->value]);
-        $isDoctor = $user->role === RoleEnum::Doctor && $user->doctor?->id === $appointment->doctor_id;
+        $isStaff = $user->hasAnyRole(['admin', 'receptionist']);
+        $isDoctor = $user->hasRole('doctor') && $user->doctor?->id === $appointment->doctor_id;
 
         if (!$isStaff && !$isDoctor) {
             return ApiResponse::forbidden(__('Unauthorized'));
@@ -382,15 +381,15 @@ class AppointmentController
 
     private function canAccess($user, Appointment $appointment): bool
     {
-        if (in_array($user->role->value, [RoleEnum::Admin->value, RoleEnum::Receptionist->value])) {
+        if ($user->hasAnyRole(['admin', 'receptionist'])) {
             return true;
         }
 
-        if ($user->role === RoleEnum::Patient && $user->patient?->id === $appointment->patient_id) {
+        if ($user->hasRole('patient') && $user->patient?->id === $appointment->patient_id) {
             return true;
         }
 
-        if ($user->role === RoleEnum::Doctor && $user->doctor?->id === $appointment->doctor_id) {
+        if ($user->hasRole('doctor') && $user->doctor?->id === $appointment->doctor_id) {
             return true;
         }
 

@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Enums\RoleEnum;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Telescope\IncomingEntry;
@@ -58,7 +57,7 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
     protected function gate(): void
     {
         Gate::define('viewTelescope', function (User $user) {
-            return $user->role === RoleEnum::Admin;
+            return $user->hasRole('admin');
         });
     }
 }

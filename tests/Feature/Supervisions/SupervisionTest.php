@@ -4,7 +4,6 @@ namespace Tests\Feature\Supervisions;
 
 use App\Domains\Patients\Models\Patient;
 use App\Enums\GenderEnum;
-use App\Enums\RoleEnum;
 use App\Enums\SpecializationEnum;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -49,21 +48,20 @@ class SupervisionTest extends TestCase
         ]);
 
         config(['passport.password_client_id' => $client->id]);
-        config(['passport.password_client_secret' => $client->secret]);
+        config(['passport.password_client_secret' => $client->plainSecret]);
     }
 
     private function createAdmin(): User
     {
-        return User::factory()->create([
-            'role' => RoleEnum::Admin,
-        ]);
+        $user = User::factory()->create();
+        $user->assignRole('admin');
+        return $user;
     }
 
     private function createDoctor(): User
     {
-        $user = User::factory()->create([
-            'role' => RoleEnum::Doctor,
-        ]);
+        $user = User::factory()->create();
+        $user->assignRole('doctor');
         $user->doctor()->create([
             'specialization' => SpecializationEnum::Cardiology,
             'experience_months' => 60,
@@ -73,18 +71,16 @@ class SupervisionTest extends TestCase
 
     private function createPatient(): User
     {
-        $user = User::factory()->create([
-            'role' => RoleEnum::Patient,
-        ]);
+        $user = User::factory()->create();
+        $user->assignRole('patient');
         $user->patient()->create([]);
         return $user;
     }
 
     private function createReceptionist(): User
     {
-        $user = User::factory()->create([
-            'role' => RoleEnum::Receptionist,
-        ]);
+        $user = User::factory()->create();
+        $user->assignRole('receptionist');
         $user->receptionist()->create([
             'shift_start' => '09:00',
             'shift_end' => '17:00',

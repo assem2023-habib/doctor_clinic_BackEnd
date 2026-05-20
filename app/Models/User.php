@@ -14,7 +14,6 @@ use App\Domains\RBAC\Models\Role;
 use App\Domains\RBAC\Services\PermissionService;
 use App\Domains\Receptionists\Models\Receptionist;
 use App\Enums\GenderEnum;
-use App\Enums\RoleEnum;
 use App\Traits\HasUuidV7;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -36,12 +35,11 @@ use Laravel\Passport\HasApiTokens;
     'address',
     'gender',
     'birthday_date',
-    'role',
     'is_active',
     'password',
     'country_id',
     'city_id',
-    'device_tokens',
+    'fcm_tokens',
 ])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
@@ -57,8 +55,7 @@ class User extends Authenticatable
             'is_active' => 'boolean',
             'birthday_date' => 'date',
             'gender' => GenderEnum::class,
-            'role' => RoleEnum::class,
-            'device_tokens' => 'array',
+            'fcm_tokens' => 'array',
         ];
     }
 
@@ -132,5 +129,15 @@ class User extends Authenticatable
     public function hasPermission(string $slug): bool
     {
         return PermissionService::hasPermission($this, $slug);
+    }
+
+    public function assignRole(string $slug): void
+    {
+        PermissionService::assignRole($this, $slug);
+    }
+
+    public function syncRoles(array $slugs): void
+    {
+        PermissionService::syncRoles($this, $slugs);
     }
 }

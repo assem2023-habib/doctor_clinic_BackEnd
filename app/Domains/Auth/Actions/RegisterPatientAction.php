@@ -7,7 +7,6 @@ use App\Domains\Images\Actions\UploadImageAction;
 use App\Domains\Images\DTOs\UploadImageData;
 use App\Domains\Patients\Models\Patient;
 use App\Enums\ImageTypeEnum;
-use App\Enums\RoleEnum;
 use App\Models\User;
 
 class RegisterPatientAction
@@ -27,10 +26,11 @@ class RegisterPatientAction
             'address' => $data->address,
             'gender' => $data->gender,
             'birthday_date' => $data->birthdayDate,
-            'role' => RoleEnum::Patient,
             'is_active' => true,
             'password' => bcrypt($data->password),
         ]);
+
+        $user->assignRole('patient');
 
         $user->patient()->create([]);
 

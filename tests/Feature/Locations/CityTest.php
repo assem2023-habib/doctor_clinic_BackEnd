@@ -4,7 +4,6 @@ namespace Tests\Feature\Locations;
 
 use App\Domains\Locations\Models\City;
 use App\Domains\Locations\Models\Country;
-use App\Enums\RoleEnum;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
@@ -61,7 +60,7 @@ class CityTest extends TestCase
         ]);
 
         config(['passport.password_client_id' => $client->id]);
-        config(['passport.password_client_secret' => $client->secret]);
+        config(['passport.password_client_secret' => $client->plainSecret]);
     }
 
     public function test_can_list_cities(): void
@@ -128,7 +127,8 @@ class CityTest extends TestCase
 
     public function test_non_admin_user_cannot_create_city(): void
     {
-        $user = \App\Models\User::factory()->create(['role' => RoleEnum::Doctor]);
+        $user = \App\Models\User::factory()->create();
+        $user->assignRole('doctor');
         Passport::actingAs($user);
 
         $response = $this->postJson('/api/v1/cities', $this->validPayload);
@@ -138,7 +138,8 @@ class CityTest extends TestCase
 
     public function test_can_create_city(): void
     {
-        $user = \App\Models\User::factory()->create(['role' => RoleEnum::Admin]);
+        $user = \App\Models\User::factory()->create();
+        $user->assignRole('admin');
         Passport::actingAs($user);
 
         $response = $this->postJson('/api/v1/cities', $this->validPayload);
@@ -157,7 +158,8 @@ class CityTest extends TestCase
 
     public function test_create_city_fails_with_invalid_country(): void
     {
-        $user = \App\Models\User::factory()->create(['role' => RoleEnum::Admin]);
+        $user = \App\Models\User::factory()->create();
+        $user->assignRole('admin');
         Passport::actingAs($user);
 
         $response = $this->postJson('/api/v1/cities', [
@@ -180,7 +182,8 @@ class CityTest extends TestCase
 
     public function test_can_update_city(): void
     {
-        $user = \App\Models\User::factory()->create(['role' => RoleEnum::Admin]);
+        $user = \App\Models\User::factory()->create();
+        $user->assignRole('admin');
         Passport::actingAs($user);
 
         $city = City::create(['name' => ['ar' => 'دمشق', 'en' => 'Damascus'], 'country_id' => $this->country->id]);
@@ -210,7 +213,8 @@ class CityTest extends TestCase
 
     public function test_non_admin_user_cannot_delete_city(): void
     {
-        $user = \App\Models\User::factory()->create(['role' => RoleEnum::Doctor]);
+        $user = \App\Models\User::factory()->create();
+        $user->assignRole('doctor');
         Passport::actingAs($user);
 
         $city = City::create(['name' => ['ar' => 'دمشق', 'en' => 'Damascus'], 'country_id' => $this->country->id]);
@@ -222,7 +226,8 @@ class CityTest extends TestCase
 
     public function test_can_delete_city(): void
     {
-        $user = \App\Models\User::factory()->create(['role' => RoleEnum::Admin]);
+        $user = \App\Models\User::factory()->create();
+        $user->assignRole('admin');
         Passport::actingAs($user);
 
         $city = City::create(['name' => ['ar' => 'دمشق', 'en' => 'Damascus'], 'country_id' => $this->country->id]);

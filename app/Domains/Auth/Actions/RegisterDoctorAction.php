@@ -6,7 +6,6 @@ use App\Domains\Auth\DTOs\RegisterDoctorData;
 use App\Domains\Images\Actions\UploadImageAction;
 use App\Domains\Images\DTOs\UploadImageData;
 use App\Enums\ImageTypeEnum;
-use App\Enums\RoleEnum;
 use App\Models\User;
 
 class RegisterDoctorAction
@@ -26,10 +25,11 @@ class RegisterDoctorAction
             'address' => $data->address,
             'gender' => $data->gender,
             'birthday_date' => $data->birthdayDate,
-            'role' => RoleEnum::Doctor,
             'is_active' => true,
             'password' => bcrypt($data->password),
         ]);
+
+        $user->assignRole('doctor');
 
         $user->doctor()->create([
             'specialization' => $data->specialization,

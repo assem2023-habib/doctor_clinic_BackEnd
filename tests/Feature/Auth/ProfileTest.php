@@ -3,7 +3,6 @@
 namespace Tests\Feature\Auth;
 
 use App\Enums\GenderEnum;
-use App\Enums\RoleEnum;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Passport\Passport;
@@ -47,19 +46,19 @@ class ProfileTest extends TestCase
         ]);
 
         config(['passport.password_client_id' => $client->id]);
-        config(['passport.password_client_secret' => $client->secret]);
+        config(['passport.password_client_secret' => $client->plainSecret]);
     }
 
     public function test_authenticated_user_can_update_profile(): void
     {
         $user = User::factory()->create([
-            'role' => RoleEnum::Patient,
             'first_name' => 'John',
             'last_name' => 'Doe',
             'email' => 'john@example.com',
             'username' => 'johndoe',
             'phone' => '+963911111111',
         ]);
+        $user->assignRole('patient');
         Passport::actingAs($user);
 
         $response = $this->putJson('/api/v1/auth/me', [
@@ -96,13 +95,13 @@ class ProfileTest extends TestCase
     public function test_user_can_partially_update_profile(): void
     {
         $user = User::factory()->create([
-            'role' => RoleEnum::Patient,
             'first_name' => 'John',
             'last_name' => 'Doe',
             'email' => 'john@example.com',
             'username' => 'johndoe',
             'phone' => '+963911111111',
         ]);
+        $user->assignRole('patient');
         Passport::actingAs($user);
 
         $response = $this->putJson('/api/v1/auth/me', [

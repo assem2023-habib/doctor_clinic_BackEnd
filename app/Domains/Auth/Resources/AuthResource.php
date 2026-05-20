@@ -6,7 +6,6 @@ use App\Domains\Doctors\Resources\DoctorResource;
 use App\Domains\Patients\Resources\PatientResource;
 use App\Domains\Receptionists\Resources\ReceptionistResource;
 use App\Domains\Shared\Resources\UserResource;
-use App\Enums\RoleEnum;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class AuthResource extends JsonResource
@@ -15,10 +14,10 @@ class AuthResource extends JsonResource
     {
         $user = $this->user;
 
-        $userResource = match ($user->role) {
-            RoleEnum::Patient => new PatientResource($user),
-            RoleEnum::Doctor => new DoctorResource($user),
-            RoleEnum::Receptionist => new ReceptionistResource($user),
+        $userResource = match (true) {
+            $user->hasRole('patient') => new PatientResource($user),
+            $user->hasRole('doctor') => new DoctorResource($user),
+            $user->hasRole('receptionist') => new ReceptionistResource($user),
             default => new UserResource($user),
         };
 

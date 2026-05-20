@@ -10,9 +10,8 @@ class UploadImageRequest extends FormRequest
 {
     public function rules(): array
     {
-        $maxSize = $this->input('type')
-            ? ImageTypeEnum::from($this->input('type'))->maxSize()
-            : 2048;
+        $type = $this->input('type') ? ImageTypeEnum::tryFrom($this->input('type')) : null;
+        $maxSize = $type ? $type->maxSize() : 2048;
 
         return [
             'file' => ['required', 'image', "max:{$maxSize}", 'mimes:jpg,jpeg,png,webp'],

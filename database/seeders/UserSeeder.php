@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Domains\Doctors\Models\Doctor;
 use App\Domains\Patients\Models\Patient;
 use App\Domains\Receptionists\Models\Receptionist;
-use App\Enums\RoleEnum;
 use App\Enums\SpecializationEnum;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -15,73 +14,76 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $password = 'password';
-        $users = [
-            [
-                'first_name' => 'Admin',
-                'last_name' => 'User',
-                'username' => 'admin',
-                'email' => 'admin@gmail.com',
-                'role' => RoleEnum::Admin,
-            ],
-            [
-                'first_name' => 'Doctor',
-                'last_name' => 'User',
-                'username' => 'doctor',
-                'email' => 'doctor@gmail.com',
-                'role' => RoleEnum::Doctor,
-                'specialization' => SpecializationEnum::Cardiology,
-                'experience_months' => 60,
-            ],
-            [
-                'first_name' => 'Ahmed',
-                'last_name' => 'Ali',
-                'username' => 'doctor2',
-                'email' => 'doctor2@gmail.com',
-                'role' => RoleEnum::Doctor,
-                'specialization' => SpecializationEnum::Dermatology,
-                'experience_months' => 36,
-            ],
-            [
-                'first_name' => 'Patient',
-                'last_name' => 'User',
-                'username' => 'patient',
-                'email' => 'patient@gmail.com',
-                'role' => RoleEnum::Patient,
-            ],
-            [
-                'first_name' => 'Receptionist',
-                'last_name' => 'User',
-                'username' => 'receptionist',
-                'email' => 'receptionist@gmail.com',
-                'role' => RoleEnum::Receptionist,
-            ],
-        ];
 
-        foreach ($users as $data) {
-            $user = User::create([
-                'first_name' => $data['first_name'],
-                'last_name' => $data['last_name'],
-                'username' => $data['username'],
-                'email' => $data['email'],
-                'password' => $password,
-                'role' => $data['role'],
-                'is_active' => true,
-            ]);
+        // Admin
+        $admin = User::create([
+            'first_name' => 'Admin',
+            'last_name' => 'User',
+            'username' => 'admin',
+            'email' => 'admin@gmail.com',
+            'password' => $password,
+            'is_active' => true,
+        ]);
+        $admin->assignRole('admin');
 
-            match ($data['role']) {
-                RoleEnum::Doctor => Doctor::create([
-                    'user_id' => $user->id,
-                    'specialization' => $data['specialization'],
-                    'experience_months' => $data['experience_months'],
-                ]),
-                RoleEnum::Patient => Patient::create(['user_id' => $user->id]),
-                RoleEnum::Receptionist => Receptionist::create([
-                    'user_id' => $user->id,
-                    'shift_start' => '09:00',
-                    'shift_end' => '17:00',
-                ]),
-                default => null,
-            };
-        }
+        // Doctor 1
+        $doctor1 = User::create([
+            'first_name' => 'Doctor',
+            'last_name' => 'User',
+            'username' => 'doctor',
+            'email' => 'doctor@gmail.com',
+            'password' => $password,
+            'is_active' => true,
+        ]);
+        $doctor1->assignRole('doctor');
+        Doctor::create([
+            'user_id' => $doctor1->id,
+            'specialization' => SpecializationEnum::Cardiology,
+            'experience_months' => 60,
+        ]);
+
+        // Doctor 2
+        $doctor2 = User::create([
+            'first_name' => 'Ahmed',
+            'last_name' => 'Ali',
+            'username' => 'doctor2',
+            'email' => 'doctor2@gmail.com',
+            'password' => $password,
+            'is_active' => true,
+        ]);
+        $doctor2->assignRole('doctor');
+        Doctor::create([
+            'user_id' => $doctor2->id,
+            'specialization' => SpecializationEnum::Dermatology,
+            'experience_months' => 36,
+        ]);
+
+        // Patient
+        $patient = User::create([
+            'first_name' => 'Patient',
+            'last_name' => 'User',
+            'username' => 'patient',
+            'email' => 'patient@gmail.com',
+            'password' => $password,
+            'is_active' => true,
+        ]);
+        $patient->assignRole('patient');
+        Patient::create(['user_id' => $patient->id]);
+
+        // Receptionist
+        $receptionist = User::create([
+            'first_name' => 'Receptionist',
+            'last_name' => 'User',
+            'username' => 'receptionist',
+            'email' => 'receptionist@gmail.com',
+            'password' => $password,
+            'is_active' => true,
+        ]);
+        $receptionist->assignRole('receptionist');
+        Receptionist::create([
+            'user_id' => $receptionist->id,
+            'shift_start' => '09:00',
+            'shift_end' => '17:00',
+        ]);
     }
 }

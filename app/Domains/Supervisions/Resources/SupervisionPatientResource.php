@@ -19,7 +19,7 @@ class SupervisionPatientResource extends JsonResource
             'address' => $this->address,
             'gender' => $this->gender?->value,
             'birthday_date' => $this->birthday_date?->format('Y-m-d'),
-            'role' => $this->role?->value,
+            'roles' => $this->whenLoaded('roles')?->pluck('slug'),
             'is_active' => $this->is_active,
             'image' => new ImageResource($this->image),
             'supervision' => [

@@ -30,7 +30,6 @@ use App\Domains\Patients\Resources\PatientResource;
 use App\Domains\Receptionists\Resources\ReceptionistResource;
 use App\Domains\Shared\Resources\UserResource;
 use App\Domains\Shared\Responses\ApiResponse;
-use App\Enums\RoleEnum;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -52,6 +51,7 @@ class AuthController
     {
         $dto = RegisterPatientData::fromRequest($request);
         $user = $this->registerPatientAction->execute($dto);
+        $user->load('roles');
         $tokenData = $this->loginAction->execute(LoginData::fromCredentials($dto->email, $dto->password));
 
         return ApiResponse::created(
@@ -64,6 +64,7 @@ class AuthController
     {
         $dto = RegisterDoctorData::fromRequest($request);
         $user = $this->registerDoctorAction->execute($dto);
+        $user->load('roles');
         $tokenData = $this->loginAction->execute(LoginData::fromCredentials($dto->email, $dto->password));
 
         return ApiResponse::created(
@@ -76,6 +77,7 @@ class AuthController
     {
         $dto = RegisterReceptionistData::fromRequest($request);
         $user = $this->registerReceptionistAction->execute($dto);
+        $user->load('roles');
         $tokenData = $this->loginAction->execute(LoginData::fromCredentials($dto->email, $dto->password));
 
         return ApiResponse::created(
@@ -89,7 +91,7 @@ class AuthController
         try {
             $dto = LoginData::fromRequest($request);
             $tokenData = $this->loginAction->execute($dto);
-            $user = User::where('email', $dto->email)->firstOrFail();
+            $user = User::where('email', $dto->email)->with('roles')->firstOrFail();
 
             return ApiResponse::success(
                 new AuthResource((object) compact('user', 'tokenData')),
@@ -144,12 +146,12 @@ class AuthController
 
     public function me(Request $request): JsonResponse
     {
-        $user = $request->user();
+        $user = $request->user()->load('roles');
 
-        $resource = match ($user->role) {
-            RoleEnum::Patient => new PatientResource($user),
-            RoleEnum::Doctor => new DoctorResource($user),
-            RoleEnum::Receptionist => new ReceptionistResource($user),
+        $resource = match (true) {
+            $user->hasRole('patient') => new PatientResource($user),
+            $user->hasRole('doctor') => new DoctorResource($user),
+            $user->hasRole('receptionist') => new ReceptionistResource($user),
             default => new UserResource($user),
         };
 
@@ -160,12 +162,12 @@ class AuthController
     {
         $user = $request->user();
         $dto = UpdateProfileData::fromRequest($request);
-        $user = $this->updateProfileAction->execute($user, $dto);
+        $user = $this->updateProfileAction->execute($user, $dto)->load('roles');
 
-        $resource = match ($user->role) {
-            RoleEnum::Patient => new PatientResource($user),
-            RoleEnum::Doctor => new DoctorResource($user),
-            RoleEnum::Receptionist => new ReceptionistResource($user),
+        $resource = match (true) {
+            $user->hasRole('patient') => new PatientResource($user),
+            $user->hasRole('doctor') => new DoctorResource($user),
+            $user->hasRole('receptionist') => new ReceptionistResource($user),
             default => new UserResource($user),
         };
 

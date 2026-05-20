@@ -39,8 +39,8 @@ class FirebaseChannel implements NotificationChannelInterface
         }
 
         $tokens = User::whereIn('id', $data->userIds)
-            ->whereNotNull('device_tokens')
-            ->pluck('device_tokens')
+            ->whereNotNull('fcm_tokens')
+            ->pluck('fcm_tokens')
             ->flatten()
             ->unique()
             ->values()

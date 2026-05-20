@@ -8,7 +8,6 @@ use App\Enums\AppointmentStatusEnum;
 use App\Enums\DayOfWeekEnum;
 use App\Enums\GenderEnum;
 use App\Domains\Appointments\Enums\PatientResponseEnum;
-use App\Enums\RoleEnum;
 use App\Enums\SpecializationEnum;
 use App\Models\User;
 use Carbon\Carbon;
@@ -55,19 +54,21 @@ class AppointmentTest extends TestCase
         ]);
 
         config(['passport.password_client_id' => $client->id]);
-        config(['passport.password_client_secret' => $client->secret]);
+        config(['passport.password_client_secret' => $client->plainSecret]);
     }
 
     private function createPatientUser(): User
     {
-        $user = User::factory()->create(['role' => RoleEnum::Patient]);
+        $user = User::factory()->create();
+        $user->assignRole('patient');
         $user->patient()->create([]);
         return $user;
     }
 
     private function createDoctorUser(): User
     {
-        $user = User::factory()->create(['role' => RoleEnum::Doctor]);
+        $user = User::factory()->create();
+        $user->assignRole('doctor');
         $user->doctor()->create([
             'specialization' => SpecializationEnum::GeneralPractitioner,
             'experience_months' => 24,
@@ -77,12 +78,16 @@ class AppointmentTest extends TestCase
 
     private function createAdminUser(): User
     {
-        return User::factory()->create(['role' => RoleEnum::Admin]);
+        $user = User::factory()->create();
+        $user->assignRole('admin');
+        return $user;
     }
 
     private function createReceptionistUser(): User
     {
-        return User::factory()->create(['role' => RoleEnum::Receptionist]);
+        $user = User::factory()->create();
+        $user->assignRole('receptionist');
+        return $user;
     }
 
     private function createSchedule($doctor, array $overrides = []): void

@@ -6,7 +6,6 @@ use App\Domains\Appointments\Models\Appointment;
 use App\Domains\Patients\Models\Patient;
 use App\Enums\AppointmentStatusEnum;
 use App\Enums\GenderEnum;
-use App\Enums\RoleEnum;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Passport\Passport;
@@ -50,21 +49,20 @@ class PatientTest extends TestCase
         ]);
 
         config(['passport.password_client_id' => $client->id]);
-        config(['passport.password_client_secret' => $client->secret]);
+        config(['passport.password_client_secret' => $client->plainSecret]);
     }
 
     private function createAdmin(): User
     {
-        return User::factory()->create([
-            'role' => RoleEnum::Admin,
-        ]);
+        $user = User::factory()->create();
+        $user->assignRole('admin');
+        return $user;
     }
 
     private function createReceptionist(): User
     {
-        $user = User::factory()->create([
-            'role' => RoleEnum::Receptionist,
-        ]);
+        $user = User::factory()->create();
+        $user->assignRole('receptionist');
         $user->receptionist()->create([
             'shift_start' => '09:00',
             'shift_end' => '17:00',
@@ -74,10 +72,8 @@ class PatientTest extends TestCase
 
     private function createPatient(array $overrides = []): User
     {
-        $user = User::factory()->create(array_merge([
-            'role' => RoleEnum::Patient,
-        ], $overrides));
-
+        $user = User::factory()->create($overrides);
+        $user->assignRole('patient');
         $user->patient()->create([]);
 
         return $user;
@@ -152,13 +148,13 @@ class PatientTest extends TestCase
             ->assertJsonStructure([
                 'status',
                 'message',
-                'data' => ['id', 'first_name', 'last_name', 'email', 'role'],
+                'data' => ['id', 'first_name', 'last_name', 'email', 'roles'],
             ]);
 
         $json = $response->json();
         $this->assertEquals(200, $json['status']);
         $this->assertEquals('john@example.com', $json['data']['email']);
-        $this->assertEquals(RoleEnum::Patient->value, $json['data']['role']);
+        $this->assertEquals('patient', $json['data']['roles'][0]['slug']);
     }
 
     public function test_show_returns_404_for_nonexistent_patient(): void
@@ -178,10 +174,8 @@ class PatientTest extends TestCase
 
         $this->createPatient(['email' => 'patient@example.com']);
 
-        User::factory()->create([
-            'role' => RoleEnum::Doctor,
-            'email' => 'doctor@example.com',
-        ]);
+        $doctorUser = User::factory()->create(['email' => 'doctor@example.com']);
+        $doctorUser->assignRole('doctor');
 
         $response = $this->getJson('/api/v1/patients');
 
@@ -336,7 +330,8 @@ class PatientTest extends TestCase
         Passport::actingAs($admin);
 
         $patientUser = $this->createPatient();
-        $doctorUser = User::factory()->create(['role' => RoleEnum::Doctor]);
+        $doctorUser = User::factory()->create();
+        $doctorUser->assignRole('doctor');
         $doctorUser->doctor()->create([]);
 
         Appointment::create([

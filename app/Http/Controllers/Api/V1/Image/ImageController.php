@@ -9,7 +9,6 @@ use App\Domains\Images\Models\Image;
 use App\Domains\Images\Requests\UploadImageRequest;
 use App\Domains\Images\Resources\ImageResource;
 use App\Domains\Shared\Responses\ApiResponse;
-use App\Enums\RoleEnum;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 
@@ -35,7 +34,7 @@ class ImageController
     {
         $user = auth()->user();
 
-        if ($user->role !== RoleEnum::Admin && !$image->isOwnedBy($user)) {
+        if (!$user->hasRole('admin') && !$image->isOwnedBy($user)) {
             return ApiResponse::forbidden(__('You do not own this image'));
         }
 

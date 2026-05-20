@@ -50,7 +50,7 @@ class ImageTest extends TestCase
         ]);
 
         config(['passport.password_client_id' => $client->id]);
-        config(['passport.password_client_secret' => $client->secret]);
+        config(['passport.password_client_secret' => $client->plainSecret]);
     }
 
     public function test_unauthenticated_user_cannot_upload_image(): void

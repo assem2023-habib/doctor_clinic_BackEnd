@@ -17,7 +17,7 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'address', type: 'string', nullable: true, example: 'Damascus, Syria'),
         new OA\Property(property: 'gender', type: 'string', enum: ['male', 'female'], example: 'female'),
         new OA\Property(property: 'birthday_date', type: 'string', format: 'date', nullable: true, example: '1985-05-15'),
-        new OA\Property(property: 'role', type: 'string', enum: ['admin', 'doctor', 'patient', 'receptionist'], example: 'doctor'),
+        new OA\Property(property: 'roles', type: 'array', items: new OA\Items(type: 'string'), example: ['doctor']),
         new OA\Property(property: 'is_active', type: 'boolean', example: true),
         new OA\Property(
             property: 'schedules',

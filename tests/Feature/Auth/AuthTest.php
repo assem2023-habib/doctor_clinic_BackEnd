@@ -3,7 +3,6 @@
 namespace Tests\Feature\Auth;
 
 use App\Enums\GenderEnum;
-use App\Enums\RoleEnum;
 use App\Enums\SpecializationEnum;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -93,7 +92,7 @@ class AuthTest extends TestCase
         ]);
 
         config(['passport.password_client_id' => $client->id]);
-        config(['passport.password_client_secret' => $client->secret]);
+        config(['passport.password_client_secret' => $client->plainSecret]);
     }
 
     private function assertApiResponseStructure(array $json, array $keys = ['data']): void
@@ -123,7 +122,7 @@ class AuthTest extends TestCase
         $this->assertEquals(201, $json['status']);
         $this->assertEquals(__('auth.register_success'), $json['message']);
         $this->assertEquals('john@example.com', $json['data']['user']['email']);
-        $this->assertEquals(RoleEnum::Patient->value, $json['data']['user']['role']);
+        $this->assertEquals('patient', $json['data']['user']['roles'][0]['slug']);
 
         $this->assertDatabaseHas('users', ['email' => 'john@example.com']);
         $this->assertDatabaseHas('patients', ['user_id' => User::where('email', 'john@example.com')->first()->id]);
@@ -144,7 +143,7 @@ class AuthTest extends TestCase
         $this->assertEquals(201, $json['status']);
         $this->assertEquals(__('auth.register_success'), $json['message']);
         $this->assertEquals('jane@example.com', $json['data']['user']['email']);
-        $this->assertEquals(RoleEnum::Doctor->value, $json['data']['user']['role']);
+        $this->assertEquals('doctor', $json['data']['user']['roles'][0]['slug']);
 
         $this->assertDatabaseHas('users', ['email' => 'jane@example.com']);
     }
@@ -164,7 +163,7 @@ class AuthTest extends TestCase
         $this->assertEquals(201, $json['status']);
         $this->assertEquals(__('auth.register_success'), $json['message']);
         $this->assertEquals('bob@example.com', $json['data']['user']['email']);
-        $this->assertEquals(RoleEnum::Receptionist->value, $json['data']['user']['role']);
+        $this->assertEquals('receptionist', $json['data']['user']['roles'][0]['slug']);
         $this->assertEquals('09:00', $json['data']['user']['shift_start']);
         $this->assertEquals('17:00', $json['data']['user']['shift_end']);
 
@@ -196,11 +195,11 @@ class AuthTest extends TestCase
 
     public function test_can_login(): void
     {
-        User::factory()->create([
+        $user = User::factory()->create([
             'email' => 'test@example.com',
             'password' => Hash::make('Password1!'),
-            'role' => RoleEnum::Patient,
         ]);
+        $user->assignRole('patient');
 
         $response = $this->postJson('/api/v1/auth/login', [
             'email' => 'test@example.com',
@@ -251,8 +250,12 @@ class AuthTest extends TestCase
 
     public function test_can_refresh_token(): void
     {
+        $registerResponse = $this->postJson('/api/v1/auth/register/patient', $this->validPatientData);
+        $registerResponse->assertStatus(201);
+        $refreshToken = $registerResponse->json()['data']['refresh_token'];
+
         $response = $this->postJson('/api/v1/auth/refresh', [
-            'refresh_token' => 'valid-refresh-token',
+            'refresh_token' => $refreshToken,
         ]);
 
         $response->assertStatus(200)
@@ -278,7 +281,8 @@ class AuthTest extends TestCase
 
     public function test_can_get_profile(): void
     {
-        $user = User::factory()->create(['role' => RoleEnum::Patient]);
+        $user = User::factory()->create();
+        $user->assignRole('patient');
         $user->patient()->create([]);
         Passport::actingAs($user);
 
@@ -293,7 +297,8 @@ class AuthTest extends TestCase
 
     public function test_profile_returns_correct_resource_by_role(): void
     {
-        $user = User::factory()->create(['role' => RoleEnum::Receptionist]);
+        $user = User::factory()->create();
+        $user->assignRole('receptionist');
         $user->receptionist()->create(['shift_start' => '09:00', 'shift_end' => '17:00']);
         Passport::actingAs($user);
 

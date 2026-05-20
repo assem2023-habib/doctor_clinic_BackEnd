@@ -9,7 +9,6 @@ use App\Domains\Doctors\Requests\PatchDoctorRequest;
 use App\Domains\Doctors\Requests\UpdateDoctorRequest;
 use App\Domains\Doctors\Resources\DoctorResource;
 use App\Domains\Shared\Responses\ApiResponse;
-use App\Enums\RoleEnum;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -24,8 +23,8 @@ class DoctorController
     public function index(Request $request): JsonResponse
     {
         $limit = (int) $request->integer('limit', 20);
-        $doctors = User::where('role', RoleEnum::Doctor)
-            ->with('doctor.schedules')
+        $doctors = User::whereHas('roles', fn($q) => $q->where('slug', 'doctor'))
+            ->with(['doctor.schedules', 'roles'])
             ->when($request->search, fn ($q, $v) => $q->where(function ($q) use ($v) {
                 $q->where('first_name', 'like', "%{$v}%")
                   ->orWhere('last_name', 'like', "%{$v}%")
@@ -42,7 +41,7 @@ class DoctorController
 
     public function show(Doctor $doctor): JsonResponse
     {
-        $doctor->load('user', 'schedules');
+        $doctor->load('user.roles', 'schedules');
         $user = $doctor->user;
         $user->setRelation('doctor', $doctor);
 

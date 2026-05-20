@@ -6,7 +6,6 @@ use App\Domains\Auth\DTOs\RegisterReceptionistData;
 use App\Domains\Images\Actions\UploadImageAction;
 use App\Domains\Images\DTOs\UploadImageData;
 use App\Enums\ImageTypeEnum;
-use App\Enums\RoleEnum;
 use App\Models\User;
 
 class RegisterReceptionistAction
@@ -26,10 +25,11 @@ class RegisterReceptionistAction
             'address' => $data->address,
             'gender' => $data->gender,
             'birthday_date' => $data->birthdayDate,
-            'role' => RoleEnum::Receptionist,
             'is_active' => true,
             'password' => bcrypt($data->password),
         ]);
+
+        $user->assignRole('receptionist');
 
         $user->receptionist()->create([
             'shift_start' => $data->shiftStart,

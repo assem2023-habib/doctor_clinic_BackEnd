@@ -8,7 +8,6 @@ use App\Domains\Patients\Models\Patient;
 use App\Enums\AppointmentStatusEnum;
 use App\Enums\DayOfWeekEnum;
 use App\Enums\GenderEnum;
-use App\Enums\RoleEnum;
 use App\Enums\SpecializationEnum;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -53,22 +52,20 @@ class DoctorTest extends TestCase
         ]);
 
         config(['passport.password_client_id' => $client->id]);
-        config(['passport.password_client_secret' => $client->secret]);
+        config(['passport.password_client_secret' => $client->plainSecret]);
     }
 
     private function createAdmin(): User
     {
-        return User::factory()->create([
-            'role' => RoleEnum::Admin,
-        ]);
+        $user = User::factory()->create();
+        $user->assignRole('admin');
+        return $user;
     }
 
     private function createDoctor(array $overrides = []): User
     {
-        $user = User::factory()->create(array_merge([
-            'role' => RoleEnum::Doctor,
-        ], $overrides));
-
+        $user = User::factory()->create($overrides);
+        $user->assignRole('doctor');
         $user->doctor()->create([
             'specialization' => SpecializationEnum::GeneralPractitioner,
             'experience_months' => 24,
@@ -134,13 +131,13 @@ class DoctorTest extends TestCase
             ->assertJsonStructure([
                 'status',
                 'message',
-                'data' => ['id', 'first_name', 'last_name', 'email', 'role', 'schedules'],
+                'data' => ['id', 'first_name', 'last_name', 'email', 'roles', 'schedules'],
             ]);
 
         $json = $response->json();
         $this->assertEquals(200, $json['status']);
         $this->assertEquals('john@example.com', $json['data']['email']);
-        $this->assertEquals(RoleEnum::Doctor->value, $json['data']['role']);
+        $this->assertEquals('doctor', $json['data']['roles'][0]['slug']);
         $this->assertCount(1, $json['data']['schedules']);
         $this->assertEquals('monday', $json['data']['schedules'][0]['day_of_week']);
     }
@@ -156,10 +153,8 @@ class DoctorTest extends TestCase
     {
         $this->createDoctor(['email' => 'doctor@example.com']);
 
-        User::factory()->create([
-            'role' => RoleEnum::Patient,
-            'email' => 'patient@example.com',
-        ]);
+        $patientUser = User::factory()->create(['email' => 'patient@example.com']);
+        $patientUser->assignRole('patient');
 
         $response = $this->getJson('/api/v1/doctors');
 
@@ -228,7 +223,8 @@ class DoctorTest extends TestCase
 
     public function test_non_admin_cannot_update_doctor(): void
     {
-        $patient = User::factory()->create(['role' => RoleEnum::Patient]);
+        $patient = User::factory()->create();
+        $patient->assignRole('patient');
         Passport::actingAs($patient);
 
         $doctor = $this->createDoctor();
@@ -252,7 +248,8 @@ class DoctorTest extends TestCase
         Passport::actingAs($admin);
 
         $doctor = $this->createDoctor();
-        $patient = User::factory()->create(['role' => RoleEnum::Patient]);
+        $patient = User::factory()->create();
+        $patient->assignRole('patient');
         $patient->patient()->create([]);
 
         $appointment = Appointment::create([
@@ -280,7 +277,8 @@ class DoctorTest extends TestCase
         Passport::actingAs($admin);
 
         $doctor = $this->createDoctor();
-        $patient = User::factory()->create(['role' => RoleEnum::Patient]);
+        $patient = User::factory()->create();
+        $patient->assignRole('patient');
         $patient->patient()->create([]);
 
         Appointment::create([

@@ -16,16 +16,16 @@ class DeviceTokenController
 
         $user = $request->user();
 
-        $tokens = collect($user->device_tokens ?? [])
+        $tokens = collect($user->fcm_tokens ?? [])
             ->push($validated['token'])
             ->unique()
             ->values()
             ->toArray();
 
-        $user->update(['device_tokens' => $tokens]);
+        $user->update(['fcm_tokens' => $tokens]);
 
         return ApiResponse::success(
-            ['device_tokens' => $tokens],
+            ['fcm_tokens' => $tokens],
             __('Device token updated successfully')
         );
     }

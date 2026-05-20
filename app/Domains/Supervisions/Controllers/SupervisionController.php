@@ -10,7 +10,6 @@ use App\Domains\Supervisions\Actions\RemovePatientFromDoctorAction;
 use App\Domains\Supervisions\Requests\AssignPatientRequest;
 use App\Domains\Supervisions\Resources\SupervisionDoctorResource;
 use App\Domains\Supervisions\Resources\SupervisionPatientResource;
-use App\Enums\RoleEnum;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -26,7 +25,7 @@ class SupervisionController
     {
         $user = $request->user();
         $isDoctor = $user->id === $doctor->user_id;
-        $isStaff = in_array($user->role->value, [RoleEnum::Admin->value, RoleEnum::Receptionist->value]);
+        $isStaff = $user->hasAnyRole(['admin', 'receptionist']);
 
         if (!$isDoctor && !$isStaff) {
             return ApiResponse::forbidden(__('Unauthorized to view these patients'));
@@ -35,7 +34,7 @@ class SupervisionController
         $limit = (int) $request->integer('limit', 20);
 
         $patients = User::whereHas('patient', fn ($q) => $q->whereIn('id', $doctor->patients()->pluck('patient_id')))
-            ->with(['patient', 'image'])
+            ->with(['patient', 'image', 'roles'])
             ->when($request->search, fn ($q, $v) => $q->where(function ($q) use ($v) {
                 $q->where('first_name', 'like', "%{$v}%")
                   ->orWhere('last_name', 'like', "%{$v}%")
@@ -59,7 +58,7 @@ class SupervisionController
     {
         $user = $request->user();
         $isPatient = $user->id === $patient->user_id;
-        $isStaff = in_array($user->role->value, [RoleEnum::Admin->value, RoleEnum::Receptionist->value]);
+        $isStaff = $user->hasAnyRole(['admin', 'receptionist']);
 
         if (!$isPatient && !$isStaff) {
             return ApiResponse::forbidden(__('Unauthorized to view these doctors'));
@@ -68,7 +67,7 @@ class SupervisionController
         $limit = (int) $request->integer('limit', 20);
 
         $doctors = User::whereHas('doctor', fn ($q) => $q->whereIn('id', $patient->doctors()->pluck('doctor_id')))
-            ->with(['doctor', 'image'])
+            ->with(['doctor', 'image', 'roles'])
             ->when($request->search, fn ($q, $v) => $q->where(function ($q) use ($v) {
                 $q->where('first_name', 'like', "%{$v}%")
                   ->orWhere('last_name', 'like', "%{$v}%")
@@ -91,7 +90,7 @@ class SupervisionController
     public function assign(AssignPatientRequest $request, Doctor $doctor): JsonResponse
     {
         $user = $request->user();
-        $isStaff = in_array($user->role->value, [RoleEnum::Admin->value, RoleEnum::Receptionist->value]);
+        $isStaff = $user->hasAnyRole(['admin', 'receptionist']);
 
         if (!$isStaff) {
             return ApiResponse::forbidden(__('Unauthorized to assign patients'));
@@ -107,7 +106,7 @@ class SupervisionController
     public function remove(Request $request, Doctor $doctor, Patient $patient): JsonResponse
     {
         $user = $request->user();
-        $isStaff = in_array($user->role->value, [RoleEnum::Admin->value, RoleEnum::Receptionist->value]);
+        $isStaff = $user->hasAnyRole(['admin', 'receptionist']);
 
         if (!$isStaff) {
             return ApiResponse::forbidden(__('Unauthorized to remove patients'));

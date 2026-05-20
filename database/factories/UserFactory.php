@@ -27,7 +27,6 @@ class UserFactory extends Factory
             'address' => fake()->address(),
             'gender' => fake()->randomElement(['male', 'female']),
             'birthday_date' => fake()->date(),
-            'role' => 'patient',
             'is_active' => true,
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),

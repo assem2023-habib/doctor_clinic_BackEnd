@@ -1,7 +1,6 @@
 <?php
 
 use App\Enums\GenderEnum;
-use App\Enums\RoleEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -20,9 +19,8 @@ return new class extends Migration
             $table->text('address')->nullable();
             $table->enum('gender', GenderEnum::values());
             $table->date('birthday_date')->nullable();
-            $table->enum('role', RoleEnum::values());
             $table->boolean('is_active')->default(true);
-            $table->json('device_tokens')->nullable();
+            $table->json('fcm_tokens')->nullable();
             $table->foreignUuid('country_id')->nullable()->constrained('countries')->nullOnDelete();
             $table->foreignUuid('city_id')->nullable()->constrained('cities')->nullOnDelete();
             $table->timestamp('email_verified_at')->nullable();

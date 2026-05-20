@@ -6,7 +6,6 @@ use App\Domains\Appointments\Models\Appointment;
 use App\Domains\Appointments\Models\AppointmentStatusLog;
 use App\Domains\Doctors\Services\DoctorDeletionService;
 use App\Domains\Patients\Services\PatientDeletionService;
-use App\Enums\RoleEnum;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
@@ -19,12 +18,12 @@ class DeleteAccountAction
 
     public function execute(User $user): void
     {
-        if ($user->role === RoleEnum::Doctor && $user->doctor) {
+        if ($user->hasRole('doctor') && $user->doctor) {
             $this->doctorDeletionService->deleteDoctor($user->doctor, $user);
             return;
         }
 
-        if ($user->role === RoleEnum::Patient && $user->patient) {
+        if ($user->hasRole('patient') && $user->patient) {
             $this->patientDeletionService->deletePatient($user->patient, $user);
             return;
         }

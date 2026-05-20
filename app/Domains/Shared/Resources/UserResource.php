@@ -3,6 +3,7 @@
 namespace App\Domains\Shared\Resources;
 
 use App\Domains\Images\Resources\ImageResource;
+use App\Domains\RBAC\Resources\RoleResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserResource extends JsonResource
@@ -19,7 +20,7 @@ class UserResource extends JsonResource
             'address' => $this->address,
             'gender' => $this->gender?->value,
             'birthday_date' => $this->birthday_date?->format('Y-m-d'),
-            'role' => $this->role?->value,
+            'roles' => RoleResource::collection($this->whenLoaded('roles')),
             'is_active' => $this->is_active,
             'image' => new ImageResource($this->image),
         ];

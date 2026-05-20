@@ -7,7 +7,6 @@ use App\Domains\Notifications\Channels\LogChannel;
 use App\Domains\Notifications\DTOs\NotificationData;
 use App\Domains\Notifications\Models\Notification;
 use App\Domains\Notifications\Services\NotificationManager;
-use App\Enums\RoleEnum;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
@@ -36,7 +35,8 @@ class NotificationTest extends TestCase
 
     public function test_database_channel_creates_notification_record(): void
     {
-        $user = User::factory()->create(['role' => RoleEnum::Patient]);
+        $user = User::factory()->create();
+        $user->assignRole('patient');
 
         $channel = new DatabaseChannel();
         $channel->send(new NotificationData(
@@ -77,7 +77,8 @@ class NotificationTest extends TestCase
 
     public function test_notification_manager_sends_to_enabled_channels(): void
     {
-        $user = User::factory()->create(['role' => RoleEnum::Patient]);
+        $user = User::factory()->create();
+        $user->assignRole('patient');
 
         $manager = app(NotificationManager::class);
 
