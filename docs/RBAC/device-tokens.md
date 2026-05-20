@@ -26,12 +26,12 @@
     "success": true,
     "message": "Device token updated successfully",
     "data": {
-        "device_tokens": ["token1", "token2"]
+        "fcm_tokens": ["token1", "token2"]
     }
 }
 ```
 
 ## ملاحظات
-- التوكين يضاف إلى مصفوفة `device_tokens` في جدول `users`
+- التوكين يضاف إلى مصفوفة `fcm_tokens` في جدول `users`
 - إذا كان التوكين موجوداً مسبقاً، لا يتم تكراره (unique per user)
-- يستخدم هذا التوكين لإرسال الإشعارات عبر FCM
+- يستخدم هذا التوكين لإرسال الإشعارات عبر Firebase Admin SDK (FCM v1)

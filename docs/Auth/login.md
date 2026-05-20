@@ -155,7 +155,7 @@ public function login(LoginRequest $request): JsonResponse
     try {
         $dto = LoginData::fromRequest($request);
         $tokenData = $this->loginAction->execute($dto);
-        $user = User::where('email', $dto->email)->firstOrFail();
+        $user = User::where('email', $dto->email)->with('roles')->firstOrFail();
 
         return ApiResponse::success(
             new AuthResource((object) compact('user', 'tokenData')),
@@ -188,7 +188,18 @@ public function login(LoginRequest $request): JsonResponse
             "last_name": "محمد",
             "username": "ahmed_m",
             "email": "ahmed@example.com",
-            "role": "patient",
+            "roles": [
+                {
+                    "id": "...",
+                    "name": "Patient",
+                    "slug": "patient",
+                    "description": null,
+                    "guard_name": "api",
+                    "is_system": true,
+                    "created_at": "...",
+                    "updated_at": "..."
+                }
+            ],
             "is_active": true,
             "patient": { "id": "..." },
             "image": null

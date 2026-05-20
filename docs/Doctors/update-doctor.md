@@ -95,7 +95,18 @@ execute(Doctor $doctor, UpdateDoctorData $data):
         "last_name": "Suleiman",
         "username": "drkhaled",
         "email": "doctor@example.com",
-        "role": "doctor",
+        "roles": [
+            {
+                "id": "...",
+                "name": "Doctor",
+                "slug": "doctor",
+                "description": null,
+                "guard_name": "api",
+                "is_system": true,
+                "created_at": "...",
+                "updated_at": "..."
+            }
+        ],
         "specialization": "cardiology",
         "experience_months": 72,
         "schedules": []

@@ -16,11 +16,6 @@
 male, female
 ```
 
-### `RoleEnum`
-```
-admin, doctor, patient, receptionist
-```
-
 ### `DayOfWeekEnum`
 ```
 sunday, monday, tuesday, wednesday, thursday, friday, saturday
@@ -79,7 +74,7 @@ user, country
 | address | text | nullable |
 | gender | enum (GenderEnum) | |
 | birthday_date | date | nullable |
-| role | enum (RoleEnum) | |
+| fcm_tokens | json | nullable |
 | is_active | boolean | default true |
 | country_id | uuid | FK → countries, nullable |
 | city_id | uuid | FK → cities, nullable |
@@ -89,7 +84,42 @@ user, country
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 2. `password_reset_tokens`
+### 2. `roles`
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | uuid | PK |
+| name | string | unique |
+| slug | string | unique |
+| description | text | nullable |
+| guard_name | string | default 'api' |
+| is_system | boolean | default false |
+| created_at | timestamp | |
+| updated_at | timestamp | |
+
+### 3. `permissions`
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | uuid | PK |
+| name | string | unique |
+| slug | string | unique |
+| description | text | nullable |
+| guard_name | string | default 'api' |
+| created_at | timestamp | |
+| updated_at | timestamp | |
+
+### 4. `role_permission` (pivot)
+| Column | Type | Constraints |
+|--------|------|-------------|
+| role_id | uuid | FK → roles, PK |
+| permission_id | uuid | FK → permissions, PK |
+
+### 5. `role_user` (pivot)
+| Column | Type | Constraints |
+|--------|------|-------------|
+| role_id | uuid | FK → roles, PK |
+| user_id | uuid | FK → users, PK |
+
+### 6. `password_reset_tokens`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | email | string | PK |
@@ -350,6 +380,9 @@ users 1──N ratings (rateable — morph, type = user only)
 rating.type enum: user, service, center, appointment_system
     └── when type ≠ user → rateable_id + rateable_type are NULL
 
+users N──M roles  (pivot: role_user)
+roles N──M permissions  (pivot: role_permission)
+
 users 1──1 images (morph — imageable)
 countries 1──1 images (morph — imageable)
     └── polymorphic: (imageable_type, imageable_id) UNIQUE
@@ -363,7 +396,7 @@ countries 1──1 images (morph — imageable)
 
 ---
 
-> Total custom tables: 20
+> Total custom tables: 24
 
 ## Laravel Default Tables
 

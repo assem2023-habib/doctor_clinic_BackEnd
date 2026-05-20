@@ -56,21 +56,26 @@ public function rules(): array
 ```php
 public function execute(User $user): void
 {
-    if ($user->role === RoleEnum::Doctor && $user->doctor) {
+    if ($user->hasRole('doctor') && $user->doctor) {
         $this->doctorDeletionService->deleteDoctor($user->doctor, $user);
         return;
     }
 
-    if ($user->role === RoleEnum::Patient && $user->patient) {
+    if ($user->hasRole('patient') && $user->patient) {
         $this->patientDeletionService->deletePatient($user->patient, $user);
         return;
     }
 
     // Admin / Receptionist
     DB::transaction(function () use ($user) {
+        $userLabel = $user->id . ': ' . $user->first_name . ' ' . $user->last_name;
+
         AppointmentStatusLog::where('changed_by', 'like', $user->id . ':%')->delete();
+
         Appointment::where('created_by', 'like', $user->id . ':%')->delete();
+
         $user->tokens()->delete();
+
         $user->delete();
     });
 }
@@ -81,13 +86,13 @@ public function execute(User $user): void
 ```
 DeleteAccountAction::execute(User $user)
 │
-├── if role = Doctor
+├── if hasRole('doctor')
 │     └── DoctorDeletionService::deleteDoctor()
 │           ├── حذف المواعيف المرتبطة
 │           ├── حذف سجلات الطبيب
 │           └── حذف المستخدم
 │
-├── if role = Patient
+├── if hasRole('patient')
 │     └── PatientDeletionService::deletePatient()
 │           ├── حذف المواعيف المرتبطة
 │           ├── حذف سجلات المريض

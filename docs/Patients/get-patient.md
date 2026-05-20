@@ -51,7 +51,18 @@ The route uses implicit model binding — Laravel automatically resolves the `Pa
     "address": "123 Main St",
     "gender": "male",
     "birthday_date": "1990-01-15",
-    "role": "patient",
+    "roles": [
+      {
+        "id": "...",
+        "name": "Patient",
+        "slug": "patient",
+        "description": null,
+        "guard_name": "api",
+        "is_system": true,
+        "created_at": "...",
+        "updated_at": "..."
+      }
+    ],
     "is_active": true,
     "image": {
       "id": "0194f1e2-4a8b-7f90-9d7e-8f6a5b4c3d2e",

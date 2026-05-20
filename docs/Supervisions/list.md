@@ -28,7 +28,7 @@ GET /v1/doctors/{{doctor_id}}/patients?search=Ali&limit=10&page=1
 
 ```php
 $isDoctor = $user->id === $doctor->user_id;
-$isStaff = in_array($user->role, [Admin, Receptionist]);
+$isStaff = $user->hasAnyRole(['admin', 'receptionist']);
 
 if (!$isDoctor && !$isStaff) {
     return ApiResponse::forbidden();
@@ -72,7 +72,18 @@ Same pattern — queries `User::whereHas('doctor')` with patient's doctor IDs, a
       "address": "123 Main St",
       "gender": "male",
       "birthday_date": "1990-01-15",
-      "role": "patient",
+      "roles": [
+        {
+          "id": "...",
+          "name": "Patient",
+          "slug": "patient",
+          "description": null,
+          "guard_name": "api",
+          "is_system": true,
+          "created_at": "...",
+          "updated_at": "..."
+        }
+      ],
       "is_active": true,
       "image": { ... },
       "supervision": {

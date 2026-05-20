@@ -169,11 +169,13 @@ public function updateProfile(UpdateProfileRequest $request): JsonResponse
     $dto = UpdateProfileData::fromRequest($request);
     $user = $this->updateProfileAction->execute($user, $dto);
 
-    $resource = match ($user->role) {
-        RoleEnum::Patient      => new PatientResource($user),
-        RoleEnum::Doctor       => new DoctorResource($user),
-        RoleEnum::Receptionist => new ReceptionistResource($user),
-        default                => new UserResource($user),
+    $user = $this->updateProfileAction->execute($user, $dto)->load('roles');
+
+    $resource = match (true) {
+        $user->hasRole('patient')      => new PatientResource($user),
+        $user->hasRole('doctor')       => new DoctorResource($user),
+        $user->hasRole('receptionist') => new ReceptionistResource($user),
+        default                        => new UserResource($user),
     };
 
     return ApiResponse::success($resource, __('Profile updated successfully'));
@@ -200,7 +202,18 @@ public function updateProfile(UpdateProfileRequest $request): JsonResponse
         "address": "الرياض، المملكة العربية السعودية",
         "gender": "male",
         "birthday_date": "1990-01-15",
-        "role": "patient",
+        "roles": [
+            {
+                "id": "...",
+                "name": "Patient",
+                "slug": "patient",
+                "description": null,
+                "guard_name": "api",
+                "is_system": true,
+                "created_at": "...",
+                "updated_at": "..."
+            }
+        ],
         "is_active": true,
         "patient": {
             "id": "0196f0a0-5678-7def-abcd-987654321abc"

@@ -29,8 +29,8 @@ No DTO — query parameters used directly via `$request->integer()` and `$reques
 
 ```php
 $limit = (int) $request->integer('limit', 20);
-$patients = User::where('role', RoleEnum::Patient)
-    ->with('patient')
+$patients = User::whereHas('roles', fn ($q) => $q->where('slug', 'patient'))
+    ->with('patient', 'roles')
     ->when($request->search, fn ($q, $v) => $q->where(function ($q) use ($v) {
         $q->where('first_name', 'like', "%{$v}%")
           ->orWhere('last_name', 'like', "%{$v}%")
@@ -56,7 +56,18 @@ $patients = User::where('role', RoleEnum::Patient)
       "address": "123 Main St",
       "gender": "male",
       "birthday_date": "1990-01-15",
-      "role": "patient",
+      "roles": [
+        {
+          "id": "...",
+          "name": "Patient",
+          "slug": "patient",
+          "description": null,
+          "guard_name": "api",
+          "is_system": true,
+          "created_at": "...",
+          "updated_at": "..."
+        }
+      ],
       "is_active": true,
       "image": {
         "id": "0194f1e2-4a8b-7f90-9d7e-8f6a5b4c3d2e",
@@ -85,7 +96,7 @@ Client          StaffMiddleware      PatientController          User Model
   │                    │                     │                     │
   │── GET /patients ──>│                     │                     │
   │                    │── pass (staff) ────>│                     │
-  │                    │                     │── query(role=Patient, with=patient) ──>│
+  │                    │                     │── query(hasRole=patient, with=patient,roles) ──>│
   │                    │                     │<──── paginated results ───────────────│
   │                    │                     │── PatientResource::collection()       │
   │                    │<── JSON response ───│                                     │

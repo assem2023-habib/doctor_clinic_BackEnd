@@ -100,17 +100,19 @@ class RegisterDoctorData
 RegisterDoctorAction::execute(RegisterDoctorData $data)
 │
 ├── 1. User::create([...])
-│     ├── نفس حقول Patient لكن role = RoleEnum::Doctor
+│     └── نفس حقول Patient
 │
-├── 2. $user->doctor()->create([
+├── 2. $user->assignRole('doctor')
+│
+├── 3. $user->doctor()->create([
 │     ├── specialization => $data->specialization,
 │     └── experience_months => $data->experienceMonths
 │     ])
 │
-├── 3. if ($data->file)
+├── 4. if ($data->file)
 │     └── UploadImageAction::execute()
 │
-└── 4. return $user
+└── 5. return $user
 ```
 
 > **الفرق الجوهري عن Patient:** ينشئ سجل `Doctor` مع `specialization` و `experience_months`.
@@ -169,7 +171,18 @@ public function registerDoctor(RegisterDoctorRequest $request): JsonResponse
             "address": "جدة، المملكة العربية السعودية",
             "gender": "female",
             "birthday_date": "1985-06-20",
-            "role": "doctor",
+            "roles": [
+                {
+                    "id": "...",
+                    "name": "Doctor",
+                    "slug": "doctor",
+                    "description": null,
+                    "guard_name": "api",
+                    "is_system": true,
+                    "created_at": "...",
+                    "updated_at": "..."
+                }
+            ],
             "is_active": true,
             "doctor": {
                 "id": "0196f0a0-yyyy-7abc-def0-yyyyyyyyyyyy",
@@ -204,6 +217,7 @@ public function registerDoctor(RegisterDoctorRequest $request): JsonResponse
 ```
 Client → Controller → RegisterDoctorAction
                          ├── User::create()
+                         ├── assignRole('doctor')
                          ├── $user->doctor()->create({specialization, experience_months})
                          ├── UploadImage (optional)
                          └── return $user

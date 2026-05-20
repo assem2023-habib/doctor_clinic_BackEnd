@@ -104,17 +104,18 @@ class RegisterReceptionistData
 RegisterReceptionistAction::execute(RegisterReceptionistData $data)
 │
 ├── 1. User::create([...])
-│     ├── role = RoleEnum::Receptionist
 │
-├── 2. $user->receptionist()->create([
+├── 2. $user->assignRole('receptionist')
+│
+├── 3. $user->receptionist()->create([
 │     ├── shift_start => $data->shiftStart,
 │     └── shift_end => $data->shiftEnd
 │     ])
 │
-├── 3. if ($data->file)
+├── 4. if ($data->file)
 │     └── UploadImageAction::execute()
 │
-└── 4. return $user
+└── 5. return $user
 ```
 
 > **الفرق الجوهري:** ينشئ سجل `Receptionist` مع `shift_start` و `shift_end`.
@@ -173,7 +174,18 @@ public function registerReceptionist(RegisterReceptionistRequest $request): Json
             "address": "الدمام، المملكة العربية السعودية",
             "gender": "male",
             "birthday_date": "1995-03-10",
-            "role": "receptionist",
+            "roles": [
+                {
+                    "id": "...",
+                    "name": "Receptionist",
+                    "slug": "receptionist",
+                    "description": null,
+                    "guard_name": "api",
+                    "is_system": true,
+                    "created_at": "...",
+                    "updated_at": "..."
+                }
+            ],
             "is_active": true,
             "receptionist": {
                 "id": "0196f0a0-wwww-7abc-def0-wwwwwwwwwwww",

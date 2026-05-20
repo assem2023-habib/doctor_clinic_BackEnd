@@ -64,7 +64,18 @@ public function show(Doctor $doctor): JsonResponse
         "address": "Aleppo, Syria",
         "gender": "male",
         "birthday_date": "1985-03-20",
-        "role": "doctor",
+        "roles": [
+            {
+                "id": "...",
+                "name": "Doctor",
+                "slug": "doctor",
+                "description": null,
+                "guard_name": "api",
+                "is_system": true,
+                "created_at": "...",
+                "updated_at": "..."
+            }
+        ],
         "is_active": true,
         "image": null,
         "specialization": "cardiology",

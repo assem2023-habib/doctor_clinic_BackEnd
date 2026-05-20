@@ -98,20 +98,21 @@ RegisterPatientAction::execute(RegisterPatientData $data)
 ├── 1. User::create([...])
 │     ├── first_name, last_name, username, email
 │     ├── phone, address, gender, birthday_date
-│     ├── role = RoleEnum::Patient
 │     ├── is_active = true
 │     └── password = bcrypt($data->password)
 │
-├── 2. $user->patient()->create([])
+├── 2. $user->assignRole('patient')
+│
+├── 3. $user->patient()->create([])
 │     └── ينشئ سجل Patient مرتبط بالمستخدم
 │
-├── 3. if ($data->file)
+├── 4. if ($data->file)
 │     └── UploadImageAction::execute()
 │           ├── file = $data->file
 │           ├── type = ImageTypeEnum::User
 │           └── imageable_id = $user->id
 │
-└── 4. return $user
+└── 5. return $user
 ```
 
 ### Dependencies:
@@ -170,7 +171,18 @@ public function registerPatient(RegisterPatientRequest $request): JsonResponse
             "address": "الرياض، المملكة العربية السعودية",
             "gender": "male",
             "birthday_date": "1990-01-15",
-            "role": "patient",
+            "roles": [
+                {
+                    "id": "...",
+                    "name": "Patient",
+                    "slug": "patient",
+                    "description": null,
+                    "guard_name": "api",
+                    "is_system": true,
+                    "created_at": "...",
+                    "updated_at": "..."
+                }
+            ],
             "is_active": true,
             "patient": {
                 "id": "0196f0a0-5678-7def-abcd-987654321abc"
@@ -210,11 +222,11 @@ class AuthResource extends JsonResource
             'refresh_token' => $this->tokenData->refreshToken,
             'expires_in'    => $this->tokenData->expiresIn,
             'token_type'    => 'Bearer',
-            'user'          => match ($user->role) {
-                RoleEnum::Patient       => new PatientResource($user),
-                RoleEnum::Doctor        => new DoctorResource($user),
-                RoleEnum::Receptionist  => new ReceptionistResource($user),
-                default                 => new UserResource($user),
+            'user'          => match (true) {
+                $user->hasRole('patient')      => new PatientResource($user),
+                $user->hasRole('doctor')       => new DoctorResource($user),
+                $user->hasRole('receptionist') => new ReceptionistResource($user),
+                default                        => new UserResource($user),
             },
         ];
     }
@@ -239,9 +251,10 @@ Client                     Controller              RegisterPatientAction       L
   │                            │── RegisterPatientData    │                       │                  │
   │                            │── ::fromRequest() ───────│── $dto                │                  │
   │                            │                          │                       │                  │
-  │                            │                          │── User::create() ─────│── User ──────────│
-  │                            │                          │── patient()->create() │                  │
-  │                            │                          │── UploadImage (optional)                  │
+│                            │                          │── User::create() ─────│── User ──────────│
+│                            │                          │── assignRole('patient')                   │
+│                            │                          │── patient()->create() │                  │
+│                            │                          │── UploadImage (optional)                  │
   │                            │                          │                       │                  │
   │                            │◄── return $user ─────────│                       │                  │
   │                            │                          │                       │                  │

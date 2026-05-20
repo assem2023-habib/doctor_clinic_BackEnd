@@ -31,8 +31,8 @@
 ```php
 public function index(Request $request): JsonResponse
 {
-    $doctors = User::where('role', RoleEnum::Doctor)
-        ->with('doctor.schedules')
+    $doctors = User::whereHas('roles', fn ($q) => $q->where('slug', 'doctor'))
+        ->with('doctor.schedules', 'roles')
         ->when($request->search, fn ($q, $v) => $q->where(function ($q) use ($v) {
             $q->where('first_name', 'like', "%{$v}%")
               ->orWhere('last_name', 'like', "%{$v}%")
@@ -50,8 +50,8 @@ public function index(Request $request): JsonResponse
 
 **التدفق:**
 ```
-1. User::where('role', RoleEnum::Doctor)
-2. with('doctor.schedules') — eager load
+1. User::whereHas('roles', slug=doctor)
+2. with('doctor.schedules', 'roles') — eager load
 3. if search → filter by first_name, last_name, email
 4. paginate(min(limit, 100))
 5. DoctorResource::collection()
@@ -84,7 +84,7 @@ class DoctorResource extends UserResource
 }
 ```
 
-يمتد من `UserResource` (id, first_name, last_name, username, email, phone, address, gender, birthday_date, role, is_active, image).
+يمتد من `UserResource` (id, first_name, last_name, username, email, phone, address, gender, birthday_date, roles, is_active, image).
 
 ---
 
@@ -107,7 +107,18 @@ class DoctorResource extends UserResource
             "address": "Aleppo, Syria",
             "gender": "male",
             "birthday_date": "1985-03-20",
-            "role": "doctor",
+            "roles": [
+                {
+                    "id": "...",
+                    "name": "Doctor",
+                    "slug": "doctor",
+                    "description": null,
+                    "guard_name": "api",
+                    "is_system": true,
+                    "created_at": "...",
+                    "updated_at": "..."
+                }
+            ],
             "is_active": true,
             "image": null,
             "specialization": "cardiology",

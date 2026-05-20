@@ -16,8 +16,8 @@
 
 ```
 PatientController
- └── index()          → PatientResource::collection(User::where(role=Patient))
- └── show()           → PatientResource (loads user relation)
+ └── index()          → PatientResource::collection(User::whereHas('roles', slug=patient))
+ └── show()           → PatientResource (loads user.roles relation)
  └── update()         → UpdatePatientAction → UpdatePatientData (fromRequest)
  └── updatePartial()  → UpdatePatientAction → UpdatePatientData (fromRequestPartial)
  └── destroy()        → DeletePatientAction → PatientDeletionService
@@ -25,7 +25,7 @@ PatientController
 
 - **Model:** `Patient` (UUID v7, `HasUuidV7`, `user_id` FK)
 - **Relations:** `user` (BelongsTo User), `appointments` (HasMany), `doctors` (BelongsToMany via `doctor_patient`)
-- **Resource:** `PatientResource` extends `UserResource` → returns `id, first_name, last_name, username, email, phone, address, gender, birthday_date, role, is_active, image`
+- **Resource:** `PatientResource` extends `UserResource` → returns `id, first_name, last_name, username, email, phone, address, gender, birthday_date, roles, is_active, image`
 - **DTO:** `UpdatePatientData` — built from either full PUT request or partial PATCH request; supports optional file upload
 - **Action:** `UpdatePatientAction` → updates User model, optionally uploads image via `UploadImageAction`
 - **Service:** `PatientDeletionService` — blocks deletion if patient has active (confirmed/completed) appointments; cascade deletes image file + user record in transaction

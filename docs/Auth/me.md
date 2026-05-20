@@ -35,13 +35,13 @@ Authorization: Bearer eyJ0eXAiOiJKV1Qi...
 ```php
 public function me(Request $request): JsonResponse
 {
-    $user = $request->user();
+    $user = $request->user()->load('roles');
 
-    $resource = match ($user->role) {
-        RoleEnum::Patient      => new PatientResource($user),
-        RoleEnum::Doctor       => new DoctorResource($user),
-        RoleEnum::Receptionist => new ReceptionistResource($user),
-        default                => new UserResource($user),
+    $resource = match (true) {
+        $user->hasRole('patient')      => new PatientResource($user),
+        $user->hasRole('doctor')       => new DoctorResource($user),
+        $user->hasRole('receptionist') => new ReceptionistResource($user),
+        default                        => new UserResource($user),
     };
 
     return ApiResponse::success($resource, __('auth.profile_retrieved'));
@@ -68,7 +68,18 @@ public function me(Request $request): JsonResponse
         "address": "الرياض، المملكة العربية السعودية",
         "gender": "male",
         "birthday_date": "1990-01-15",
-        "role": "patient",
+        "roles": [
+            {
+                "id": "...",
+                "name": "Patient",
+                "slug": "patient",
+                "description": null,
+                "guard_name": "api",
+                "is_system": true,
+                "created_at": "...",
+                "updated_at": "..."
+            }
+        ],
         "is_active": true,
         "patient": {
             "id": "0196f0a0-..."
@@ -89,7 +100,24 @@ public function me(Request $request): JsonResponse
         "first_name": "سارة",
         "last_name": "العلي",
         "username": "dr_sara",
-        "role": "doctor",
+        "email": "sara@clinic.com",
+        "phone": "0555987654",
+        "address": "جدة، المملكة العربية السعودية",
+        "gender": "female",
+        "birthday_date": "1985-06-20",
+        "roles": [
+            {
+                "id": "...",
+                "name": "Doctor",
+                "slug": "doctor",
+                "description": null,
+                "guard_name": "api",
+                "is_system": true,
+                "created_at": "...",
+                "updated_at": "..."
+            }
+        ],
+        "is_active": true,
         "doctor": {
             "id": "0196f0a0-...",
             "specialization": "cardiology",
@@ -111,7 +139,24 @@ public function me(Request $request): JsonResponse
         "first_name": "خالد",
         "last_name": "عمر",
         "username": "khaled_r",
-        "role": "receptionist",
+        "email": "khaled@clinic.com",
+        "phone": "0555777888",
+        "address": "الدمام، المملكة العربية السعودية",
+        "gender": "male",
+        "birthday_date": "1995-03-10",
+        "roles": [
+            {
+                "id": "...",
+                "name": "Receptionist",
+                "slug": "receptionist",
+                "description": null,
+                "guard_name": "api",
+                "is_system": true,
+                "created_at": "...",
+                "updated_at": "..."
+            }
+        ],
+        "is_active": true,
         "receptionist": {
             "id": "0196f0a0-...",
             "shift_start": "08:00",
@@ -138,7 +183,18 @@ public function me(Request $request): JsonResponse
         "address": null,
         "gender": "male",
         "birthday_date": null,
-        "role": "admin",
+        "roles": [
+            {
+                "id": "...",
+                "name": "Admin",
+                "slug": "admin",
+                "description": null,
+                "guard_name": "api",
+                "is_system": true,
+                "created_at": "...",
+                "updated_at": "..."
+            }
+        ],
         "is_active": true,
         "image": null
     }
@@ -160,7 +216,7 @@ public function me(Request $request): JsonResponse
 | `address` | `string?` | العنوان |
 | `gender` | `string` | الجنس (`male`/`female`) |
 | `birthday_date` | `string?` | تاريخ الميلاد |
-| `role` | `string` | الدور (`patient`/`doctor`/`receptionist`/`admin`) |
+| `roles` | `array` | قائمة الأدوار (`patient`/`doctor`/`receptionist`/`admin`) |
 | `is_active` | `boolean` | هل الحساب مفعّل |
 | `image` | `array?` | صورة المستخدم (إن وجدت) |
 

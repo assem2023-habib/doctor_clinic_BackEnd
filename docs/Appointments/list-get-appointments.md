@@ -26,11 +26,11 @@ GET /v1/appointments?status=requested&date=2026-06-01&limit=10
 ## Role-Based Scoping (`index`)
 
 ```php
-if ($user->role === RoleEnum::Patient) {
+if ($user->hasRole('patient')) {
     $query->where('patient_id', $patient->id);
-} elseif ($user->role === RoleEnum::Doctor) {
+} elseif ($user->hasRole('doctor')) {
     $query->where('doctor_id', $doctor->id);
-} elseif (!in_array($user->role->value, [Admin, Receptionist])) {
+} elseif (!$user->hasAnyRole(['admin', 'receptionist'])) {
     return ApiResponse::forbidden(__('Unauthorized'));
 }
 ```
