@@ -150,7 +150,7 @@
 							"name": "Created",
 							"status": "Created",
 							"code": 201,
-							"body": "{\n    \"status\": 201,\n    \"message\": \"Registered successfully\",\n    \"data\": {\n        \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n        \"refresh_token\": \"def50200...\",\n        \"expires_in\": 31536000,\n        \"token_type\": \"Bearer\",\n        \"user\": {\n            \"id\": \"019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009\",\n            \"first_name\": \"Ahmed\",\n            \"last_name\": \"Ali\",\n            \"email\": \"patient@example.com\",\n            \"role\": \"patient\",\n            \"phone\": \"+963912345678\",\n            \"address\": \"Damascus, Syria\",\n            \"gender\": \"male\",\n            \"birthday_date\": \"1995-06-15\",\n            \"is_active\": true\n        }\n    }\n}"
+							"body": "{\n    \"status\": 201,\n    \"message\": \"Registered successfully\",\n    \"data\": {\n        \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n        \"refresh_token\": \"def50200...\",\n        \"expires_in\": 31536000,\n        \"token_type\": \"Bearer\",\n        \"user\": {\n            \"id\": \"019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009\",\n            \"first_name\": \"Ahmed\",\n            \"last_name\": \"Ali\",\n            \"email\": \"patient@example.com\",\n            \"roles\": [\"patient\"],\n            \"phone\": \"+963912345678\",\n            \"address\": \"Damascus, Syria\",\n            \"gender\": \"male\",\n            \"birthday_date\": \"1995-06-15\",\n            \"is_active\": true\n        }\n    }\n}"
 						}
 					]
 				},
@@ -259,7 +259,7 @@
 							"name": "Created",
 							"status": "Created",
 							"code": 201,
-							"body": "{\n    \"status\": 201,\n    \"message\": \"Registered successfully\",\n    \"data\": {\n        \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n        \"refresh_token\": \"def50200...\",\n        \"expires_in\": 31536000,\n        \"token_type\": \"Bearer\",\n        \"user\": {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Khaled\",\n            \"last_name\": \"Suleiman\",\n            \"email\": \"doctor@example.com\",\n            \"role\": \"doctor\",\n            \"phone\": \"+963912345679\",\n            \"gender\": \"male\",\n            \"birthday_date\": \"1985-03-20\",\n            \"is_active\": true,\n            \"specialization\": \"cardiology\",\n            \"experience_months\": 60\n        }\n    }\n}"
+							"body": "{\n    \"status\": 201,\n    \"message\": \"Registered successfully\",\n    \"data\": {\n        \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n        \"refresh_token\": \"def50200...\",\n        \"expires_in\": 31536000,\n        \"token_type\": \"Bearer\",\n        \"user\": {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Khaled\",\n            \"last_name\": \"Suleiman\",\n            \"email\": \"doctor@example.com\",\n            \"roles\": [\"doctor\"],\n            \"phone\": \"+963912345679\",\n            \"gender\": \"male\",\n            \"birthday_date\": \"1985-03-20\",\n            \"is_active\": true,\n            \"specialization\": \"cardiology\",\n            \"experience_months\": 60\n        }\n    }\n}"
 						}
 					]
 				},
@@ -366,7 +366,7 @@
 							"name": "Created",
 							"status": "Created",
 							"code": 201,
-							"body": "{\n    \"status\": 201,\n    \"message\": \"Registered successfully\",\n    \"data\": {\n        \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n        \"refresh_token\": \"def50200...\",\n        \"expires_in\": 31536000,\n        \"token_type\": \"Bearer\",\n        \"user\": {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Layla\",\n            \"last_name\": \"Hassan\",\n            \"email\": \"receptionist@example.com\",\n            \"role\": \"receptionist\",\n            \"shift_start\": \"09:00\",\n            \"shift_end\": \"17:00\",\n            \"phone\": \"+963912345680\",\n            \"gender\": \"female\",\n            \"birthday_date\": \"1998-11-05\",\n            \"is_active\": true\n        }\n    }\n}"
+							"body": "{\n    \"status\": 201,\n    \"message\": \"Registered successfully\",\n    \"data\": {\n        \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n        \"refresh_token\": \"def50200...\",\n        \"expires_in\": 31536000,\n        \"token_type\": \"Bearer\",\n        \"user\": {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Layla\",\n            \"last_name\": \"Hassan\",\n            \"email\": \"receptionist@example.com\",\n            \"roles\": [\"receptionist\"],\n            \"shift_start\": \"09:00\",\n            \"shift_end\": \"17:00\",\n            \"phone\": \"+963912345680\",\n            \"gender\": \"female\",\n            \"birthday_date\": \"1998-11-05\",\n            \"is_active\": true\n        }\n    }\n}"
 						}
 					]
 				},
@@ -417,7 +417,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Login successful\",\n    \"data\": {\n        \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n        \"refresh_token\": \"def50200...\",\n        \"expires_in\": 31536000,\n        \"token_type\": \"Bearer\",\n        \"user\": {\n            \"id\": \"019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009\",\n            \"first_name\": \"Admin\",\n            \"last_name\": \"User\",\n            \"email\": \"admin@gmail.com\",\n            \"role\": \"admin\",\n            \"is_active\": true\n        }\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Login successful\",\n    \"data\": {\n        \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n        \"refresh_token\": \"def50200...\",\n        \"expires_in\": 31536000,\n        \"token_type\": \"Bearer\",\n        \"user\": {\n            \"id\": \"019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009\",\n            \"first_name\": \"Admin\",\n            \"last_name\": \"User\",\n            \"email\": \"admin@gmail.com\",\n            \"roles\": [\"admin\"],\n            \"is_active\": true\n        }\n    }\n}"
 						}
 					]
 				},
@@ -662,7 +662,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Profile updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"John Updated\",\n        \"last_name\": \"Doe\",\n        \"username\": \"johndoe\",\n        \"email\": \"john.updated@example.com\",\n        \"phone\": \"+963911111111\",\n        \"address\": \"Damascus, Syria\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1995-06-15\",\n        \"role\": \"patient\",\n        \"is_active\": true,\n        \"image\": null\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Profile updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"John Updated\",\n        \"last_name\": \"Doe\",\n        \"username\": \"johndoe\",\n        \"email\": \"john.updated@example.com\",\n        \"phone\": \"+963911111111\",\n        \"address\": \"Damascus, Syria\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1995-06-15\",\n        \"roles\": [\"patient\"],\n        \"is_active\": true,\n        \"image\": null\n    }\n}"
 						},
 						{
 							"name": "Unauthenticated",
@@ -696,25 +696,25 @@
 							"name": "Success (Admin)",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"User retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009\",\n        \"first_name\": \"Admin\",\n        \"last_name\": \"User\",\n        \"email\": \"admin@gmail.com\",\n        \"role\": \"admin\",\n        \"is_active\": true\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"User retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009\",\n        \"first_name\": \"Admin\",\n        \"last_name\": \"User\",\n        \"email\": \"admin@gmail.com\",\n        \"roles\": [\"admin\"],\n        \"is_active\": true\n    }\n}"
 						},
 						{
 							"name": "Success (Patient)",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"User retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Ahmed\",\n        \"last_name\": \"Ali\",\n        \"email\": \"patient@example.com\",\n        \"role\": \"patient\",\n        \"phone\": \"+963912345678\",\n        \"address\": \"Damascus, Syria\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1995-06-15\",\n        \"is_active\": true\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"User retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Ahmed\",\n        \"last_name\": \"Ali\",\n        \"email\": \"patient@example.com\",\n        \"roles\": [\"patient\"],\n        \"phone\": \"+963912345678\",\n        \"address\": \"Damascus, Syria\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1995-06-15\",\n        \"is_active\": true\n    }\n}"
 						},
 						{
 							"name": "Success (Doctor)",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"User retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor@example.com\",\n        \"role\": \"doctor\",\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"specialization\": \"cardiology\",\n        \"experience_months\": 60\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"User retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor@example.com\",\n        \"roles\": [\"doctor\"],\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"specialization\": \"cardiology\",\n        \"experience_months\": 60\n    }\n}"
 						},
 						{
 							"name": "Success (Receptionist)",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"User retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Layla\",\n        \"last_name\": \"Hassan\",\n        \"email\": \"receptionist@example.com\",\n        \"role\": \"receptionist\",\n        \"shift_start\": \"09:00\",\n        \"shift_end\": \"17:00\",\n        \"phone\": \"+963912345680\",\n        \"gender\": \"female\",\n        \"birthday_date\": \"1998-11-05\",\n        \"is_active\": true\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"User retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Layla\",\n        \"last_name\": \"Hassan\",\n        \"email\": \"receptionist@example.com\",\n        \"roles\": [\"receptionist\"],\n        \"shift_start\": \"09:00\",\n        \"shift_end\": \"17:00\",\n        \"phone\": \"+963912345680\",\n        \"gender\": \"female\",\n        \"birthday_date\": \"1998-11-05\",\n        \"is_active\": true\n    }\n}"
 						}
 					]
 				}
@@ -1397,7 +1397,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctors retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Khaled\",\n            \"last_name\": \"Suleiman\",\n            \"email\": \"doctor@example.com\",\n            \"role\": \"doctor\",\n            \"phone\": \"+963912345679\",\n            \"gender\": \"male\",\n            \"birthday_date\": \"1985-03-20\",\n            \"is_active\": true,\n            \"specialization\": \"cardiology\",\n            \"experience_months\": 60,\n            \"schedules\": []\n        }\n    ],\n    \"meta\": {\n        \"pagination\": {\n            \"current_page\": 1,\n            \"last_page\": 1,\n            \"per_page\": 20,\n            \"total\": 1,\n            \"from\": 1,\n            \"to\": 1,\n            \"limit\": 20\n        }\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctors retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Khaled\",\n            \"last_name\": \"Suleiman\",\n            \"email\": \"doctor@example.com\",\n            \"roles\": [\"doctor\"],\n            \"phone\": \"+963912345679\",\n            \"gender\": \"male\",\n            \"birthday_date\": \"1985-03-20\",\n            \"is_active\": true,\n            \"specialization\": \"cardiology\",\n            \"experience_months\": 60,\n            \"schedules\": []\n        }\n    ],\n    \"meta\": {\n        \"pagination\": {\n            \"current_page\": 1,\n            \"last_page\": 1,\n            \"per_page\": 20,\n            \"total\": 1,\n            \"from\": 1,\n            \"to\": 1,\n            \"limit\": 20\n        }\n    }\n}"
 						}
 					]
 				},
@@ -1444,7 +1444,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctor retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor@example.com\",\n        \"role\": \"doctor\",\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"specialization\": \"cardiology\",\n        \"experience_months\": 60,\n        \"schedules\": []\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctor retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor@example.com\",\n        \"roles\": [\"doctor\"],\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"specialization\": \"cardiology\",\n        \"experience_months\": 60,\n        \"schedules\": []\n    }\n}"
 						}
 					]
 				},
@@ -1563,7 +1563,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctor updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman Updated\",\n        \"email\": \"doctor@example.com\",\n        \"role\": \"doctor\",\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"specialization\": \"cardiology\",\n        \"experience_months\": 60,\n        \"schedules\": []\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctor updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman Updated\",\n        \"email\": \"doctor@example.com\",\n        \"roles\": [\"doctor\"],\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"specialization\": \"cardiology\",\n        \"experience_months\": 60,\n        \"schedules\": []\n    }\n}"
 						},
 						{
 							"name": "Forbidden",
@@ -1646,7 +1646,7 @@
                             "name": "Success",
                             "status": "OK",
                             "code": 200,
-                            "body": "{\n    \"status\": 200,\n    \"message\": \"Doctor updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor.new@example.com\",\n        \"role\": \"doctor\",\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"schedules\": []\n    }\n}"
+                            "body": "{\n    \"status\": 200,\n    \"message\": \"Doctor updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor.new@example.com\",\n        \"roles\": [\"doctor\"],\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"schedules\": []\n    }\n}"
                         },
                         {
                             "name": "Forbidden",
@@ -2400,7 +2400,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Patients retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Patient\",\n            \"last_name\": \"User\",\n            \"email\": \"patient@example.com\",\n            \"role\": \"patient\",\n            \"phone\": \"+963912345678\",\n            \"gender\": \"male\",\n            \"birthday_date\": \"1995-06-15\",\n            \"is_active\": true\n        }\n    ],\n    \"meta\": {\n        \"pagination\": {\n            \"current_page\": 1,\n            \"last_page\": 1,\n            \"per_page\": 20,\n            \"total\": 1,\n            \"from\": 1,\n            \"to\": 1,\n            \"limit\": 20\n        }\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Patients retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Patient\",\n            \"last_name\": \"User\",\n            \"email\": \"patient@example.com\",\n            \"roles\": [\"patient\"],\n            \"phone\": \"+963912345678\",\n            \"gender\": \"male\",\n            \"birthday_date\": \"1995-06-15\",\n            \"is_active\": true\n        }\n    ],\n    \"meta\": {\n        \"pagination\": {\n            \"current_page\": 1,\n            \"last_page\": 1,\n            \"per_page\": 20,\n            \"total\": 1,\n            \"from\": 1,\n            \"to\": 1,\n            \"limit\": 20\n        }\n    }\n}"
 						}
 					]
 				},
@@ -2450,7 +2450,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Patient retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Patient\",\n        \"last_name\": \"User\",\n        \"email\": \"patient@example.com\",\n        \"role\": \"patient\",\n        \"phone\": \"+963912345678\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1995-06-15\",\n        \"is_active\": true\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Patient retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Patient\",\n        \"last_name\": \"User\",\n        \"email\": \"patient@example.com\",\n        \"roles\": [\"patient\"],\n        \"phone\": \"+963912345678\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1995-06-15\",\n        \"is_active\": true\n    }\n}"
 						}
 					]
 				},
@@ -2550,7 +2550,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Patient updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Patient\",\n        \"last_name\": \"Updated\",\n        \"email\": \"patient@example.com\",\n        \"role\": \"patient\",\n        \"phone\": \"+963912345678\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1995-06-15\",\n        \"is_active\": true\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Patient updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Patient\",\n        \"last_name\": \"Updated\",\n        \"email\": \"patient@example.com\",\n        \"roles\": [\"patient\"],\n        \"phone\": \"+963912345678\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1995-06-15\",\n        \"is_active\": true\n    }\n}"
 						},
 						{
 							"name": "Forbidden",
@@ -2626,7 +2626,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Patient updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Patient\",\n        \"last_name\": \"User\",\n        \"email\": \"patient.new@example.com\",\n        \"role\": \"patient\",\n        \"phone\": \"+963912345678\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1995-06-15\",\n        \"is_active\": true\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Patient updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Patient\",\n        \"last_name\": \"User\",\n        \"email\": \"patient.new@example.com\",\n        \"roles\": [\"patient\"],\n        \"phone\": \"+963912345678\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1995-06-15\",\n        \"is_active\": true\n    }\n}"
 						},
 						{
 							"name": "Forbidden",
