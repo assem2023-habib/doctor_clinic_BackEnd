@@ -404,12 +404,44 @@ class AppointmentTest extends TestCase
         $response->assertStatus(403);
     }
 
-    public function test_staff_can_complete_accepted_appointment(): void
+    public function test_staff_can_start_appointment(): void
     {
         $admin = $this->createAdminUser();
         Passport::actingAs($admin);
 
         $appointment = $this->createAppointment(['status' => AppointmentStatusEnum::Accepted]);
+
+        $response = $this->postJson("/api/v1/appointments/{$appointment->id}/start");
+
+        $response->assertStatus(200);
+
+        $json = $response->json();
+        $this->assertEquals(AppointmentStatusEnum::InProgress->value, $json['data']['status']);
+
+        $this->assertDatabaseHas('appointment_status_logs', [
+            'appointment_id' => $appointment->id,
+            'new_status' => AppointmentStatusEnum::InProgress,
+        ]);
+    }
+
+    public function test_cannot_start_non_accepted_appointment(): void
+    {
+        $admin = $this->createAdminUser();
+        Passport::actingAs($admin);
+
+        $appointment = $this->createAppointment(['status' => AppointmentStatusEnum::Set]);
+
+        $response = $this->postJson("/api/v1/appointments/{$appointment->id}/start");
+
+        $response->assertStatus(400);
+    }
+
+    public function test_staff_can_complete_in_progress_appointment(): void
+    {
+        $admin = $this->createAdminUser();
+        Passport::actingAs($admin);
+
+        $appointment = $this->createAppointment(['status' => AppointmentStatusEnum::InProgress]);
 
         $response = $this->postJson("/api/v1/appointments/{$appointment->id}/complete");
 
@@ -419,12 +451,12 @@ class AppointmentTest extends TestCase
         $this->assertEquals(AppointmentStatusEnum::Completed->value, $json['data']['status']);
     }
 
-    public function test_cannot_complete_non_accepted_appointment(): void
+    public function test_cannot_complete_non_in_progress_appointment(): void
     {
         $admin = $this->createAdminUser();
         Passport::actingAs($admin);
 
-        $appointment = $this->createAppointment(['status' => AppointmentStatusEnum::Set]);
+        $appointment = $this->createAppointment(['status' => AppointmentStatusEnum::Accepted]);
 
         $response = $this->postJson("/api/v1/appointments/{$appointment->id}/complete");
 

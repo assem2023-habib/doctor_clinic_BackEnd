@@ -30,6 +30,7 @@ class AvailableSlotsService
                 AppointmentStatusEnum::Set,
                 AppointmentStatusEnum::Accepted,
                 AppointmentStatusEnum::Pending,
+                AppointmentStatusEnum::InProgress,
                 AppointmentStatusEnum::Confirmed,
             ])
             ->get(['start_time', 'end_time']);

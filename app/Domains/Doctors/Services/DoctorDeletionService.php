@@ -49,7 +49,7 @@ class DoctorDeletionService
                 });
 
             Appointment::where('doctor_id', $doctor->id)
-                ->where('status', AppointmentStatusEnum::Pending)
+                ->whereIn('status', [AppointmentStatusEnum::Pending, AppointmentStatusEnum::InProgress])
                 ->delete();
 
             Appointment::where('doctor_id', $doctor->id)->update(['doctor_id' => null]);

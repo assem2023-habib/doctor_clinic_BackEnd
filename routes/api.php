@@ -137,6 +137,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/{appointment}/respond', [AppointmentController::class, 'respond']);
         Route::post('/{appointment}/set-time', [AppointmentController::class, 'setTime']);
         Route::post('/{appointment}/cancel', [AppointmentController::class, 'cancel']);
+        Route::post('/{appointment}/start', [AppointmentController::class, 'start']);
         Route::post('/{appointment}/complete', [AppointmentController::class, 'complete']);
         Route::post('/{appointment}/suggest-alternative', [AppointmentController::class, 'suggestAlternative']);
     });

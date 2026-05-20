@@ -33,6 +33,7 @@ return [
         'appointment.accepted' => ['log', 'database', 'firebase', 'websocket', 'socketio'],
         'appointment.rejected' => ['log', 'database', 'firebase', 'websocket', 'socketio'],
         'appointment.cancelled' => ['log', 'database', 'firebase', 'websocket', 'socketio'],
+        'appointment.in_progress' => ['log', 'database', 'firebase', 'websocket', 'socketio'],
         'appointment.completed' => ['log', 'database', 'firebase', 'websocket', 'socketio'],
         'appointment.alternative_suggested' => ['log', 'database', 'firebase', 'websocket', 'socketio'],
 

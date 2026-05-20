@@ -7,6 +7,7 @@ use App\Domains\Appointments\Actions\CompleteAppointmentAction;
 use App\Domains\Appointments\Actions\PatientRespondAction;
 use App\Domains\Appointments\Actions\RequestAppointmentAction;
 use App\Domains\Appointments\Actions\SetAppointmentTimeAction;
+use App\Domains\Appointments\Actions\StartAppointmentAction;
 use App\Domains\Appointments\Actions\SuggestAlternativeAction;
 use App\Domains\Appointments\DTOs\RequestAppointmentData;
 use App\Domains\Appointments\DTOs\SetAppointmentTimeData;
@@ -39,6 +40,7 @@ class AppointmentController
         private readonly PatientRespondAction $respondAction,
         private readonly CancelAppointmentAction $cancelAction,
         private readonly CompleteAppointmentAction $completeAction,
+        private readonly StartAppointmentAction $startAction,
         private readonly SuggestAlternativeAction $suggestAction,
         private readonly AvailableSlotsService $slotsService,
         private readonly NotificationManager $notificationManager,
@@ -309,8 +311,8 @@ class AppointmentController
             return ApiResponse::forbidden(__('Unauthorized'));
         }
 
-        if ($appointment->status !== AppointmentStatusEnum::Accepted) {
-            return ApiResponse::error(__('Only accepted appointments can be completed'), HttpStatusEnum::BadRequest);
+        if ($appointment->status !== AppointmentStatusEnum::InProgress) {
+            return ApiResponse::error(__('Only in-progress appointments can be completed'), HttpStatusEnum::BadRequest);
         }
 
         $changedBy = "{$user->id}: {$user->first_name} {$user->last_name}";
@@ -333,6 +335,44 @@ class AppointmentController
         return ApiResponse::success(
             new AppointmentResource($appointment),
             __('Appointment completed successfully')
+        );
+    }
+
+    public function start(Request $request, Appointment $appointment): JsonResponse
+    {
+        $user = $request->user();
+
+        $isStaff = $user->hasAnyRole(['admin', 'receptionist']);
+        $isDoctor = $user->hasRole('doctor') && $user->doctor?->id === $appointment->doctor_id;
+
+        if (!$isStaff && !$isDoctor) {
+            return ApiResponse::forbidden(__('Unauthorized'));
+        }
+
+        if ($appointment->status !== AppointmentStatusEnum::Accepted) {
+            return ApiResponse::error(__('Only accepted appointments can be started'), HttpStatusEnum::BadRequest);
+        }
+
+        $changedBy = "{$user->id}: {$user->first_name} {$user->last_name}";
+        $appointment = $this->startAction->execute($appointment, $changedBy);
+
+        $appointment->load(['patient.user.image', 'doctor.user.image']);
+
+        $this->notificationManager->send('appointment.in_progress', new NotificationData(
+            topic: 'appointment.in_progress',
+            title: __('Appointment In Progress'),
+            body: [
+                'appointment_id' => $appointment->id,
+                'doctor_id' => $appointment->doctor_id,
+                'patient_id' => $appointment->patient_id,
+            ],
+            userIds: [$appointment->patient?->user_id],
+            type: 'appointment',
+        ));
+
+        return ApiResponse::success(
+            new AppointmentResource($appointment),
+            __('Appointment started successfully')
         );
     }
 

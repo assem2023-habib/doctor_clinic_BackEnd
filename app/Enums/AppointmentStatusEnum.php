@@ -9,6 +9,7 @@ enum AppointmentStatusEnum: string
     case Set = 'set';
     case Accepted = 'accepted';
     case Rejected = 'rejected';
+    case InProgress = 'in_progress';
     case Confirmed = 'confirmed';
     case Cancelled = 'cancelled';
     case Completed = 'completed';
