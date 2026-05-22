@@ -18,7 +18,7 @@ Set → Auto-Confirmed (after response window expires via Job)
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/v1/doctors/{doctor}/available-slots` | None | Get available slots for a doctor on a date |
+| GET | `/v1/doctors/{doctor}/booked-slots` | None | Get booked slots for a doctor (future only, optional date range) |
 | GET | `/v1/appointments` | `auth:api` | List appointments (role-scoped) |
 | GET | `/v1/appointments/{appointment}` | `auth:api` | Get a single appointment |
 | POST | `/v1/appointments` | `auth:api` | Request a new appointment (patient only) |
@@ -33,7 +33,7 @@ Set → Auto-Confirmed (after response window expires via Job)
 
 ```
 AppointmentController
- ├── availableSlots() → AvailableSlotsService
+ ├── bookedSlots()   → AvailableSlotsService::getBookedSlots()
  ├── index()          → AppointmentResource::collection (role-scoped query)
  ├── show()           → AppointmentResource (with canAccess guard)
  ├── store()          → RequestAppointmentAction → NotificationManager
@@ -56,5 +56,5 @@ AppointmentController
 - **Overlap Prevention:** `NoOverlappingAppointment` rule → `AppointmentRepositoryInterface::hasOverlap()` → `EloquentAppointmentRepository`
 - **Auto-Confirm:** `AutoConfirmAppointment` job dispatched with `(config:appointment.response_window_hours)` delay when staff sets a time
 - **Notifications:** Each state transition fires a notification via `NotificationManager` (appointment.requested, .time_set, .accepted, .rejected, .in_progress, .cancelled, .completed, .alternative_suggested)
-- **Slot Service:** `AvailableSlotsService` generates 2-hour slots from doctor schedules, excluding overlapping existing appointments (including in_progress)
+- **Slot Service:** `AvailableSlotsService::getBookedSlots()` returns future booked appointments (Set, Accepted, InProgress, Confirmed) with optional date/range filter. Always excludes past appointments.
 - **Actions:** 7 actions (RequestAppointment, SetAppointmentTime, PatientRespond, StartAppointment, CancelAppointment, CompleteAppointment, SuggestAlternative) — each is a single-class use case
