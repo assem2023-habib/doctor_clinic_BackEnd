@@ -5,75 +5,51 @@ namespace App\Domains\Appointments\Services;
 use App\Domains\Appointments\Models\Appointment;
 use App\Domains\Doctors\Models\Doctor;
 use App\Enums\AppointmentStatusEnum;
-use App\Enums\DayOfWeekEnum;
 use Carbon\Carbon;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class AvailableSlotsService
 {
-    public function getAvailableSlots(Doctor $doctor, string $date, int $slotDurationMinutes = 120): array
-    {
-        $dayOfWeek = Carbon::parse($date)->format('l');
-        $dayOfWeekEnum = DayOfWeekEnum::from(strtolower($dayOfWeek));
+    public function getBookedSlots(
+        Doctor $doctor,
+        int $perPage = 20,
+        ?string $date = null,
+        ?string $fromDate = null,
+        ?string $toDate = null,
+    ): LengthAwarePaginator {
+        $now = Carbon::now();
+        $today = $now->format('Y-m-d');
+        $currentTime = $now->format('H:i');
 
-        $schedules = $doctor->schedules()
-            ->where('day_of_week', $dayOfWeekEnum)
-            ->where('is_active', true)
-            ->get();
-
-        if ($schedules->isEmpty()) {
-            return [];
-        }
-
-        $existingAppointments = Appointment::where('doctor_id', $doctor->id)
-            ->whereDate('appointment_date', $date)
+        $query = Appointment::where('doctor_id', $doctor->id)
             ->whereIn('status', [
                 AppointmentStatusEnum::Set,
                 AppointmentStatusEnum::Accepted,
-                AppointmentStatusEnum::Pending,
                 AppointmentStatusEnum::InProgress,
                 AppointmentStatusEnum::Confirmed,
-            ])
-            ->get(['start_time', 'end_time']);
+            ]);
 
-        $slots = [];
+        $query->where(function ($q) use ($today, $currentTime) {
+            $q->where('appointment_date', '>', $today)
+              ->orWhere(function ($q) use ($today, $currentTime) {
+                  $q->where('appointment_date', '=', $today)
+                    ->where('start_time', '>', $currentTime);
+              });
+        });
 
-        foreach ($schedules as $schedule) {
-            $start = Carbon::parse($schedule->start_time->format('H:i'));
-            $end = Carbon::parse($schedule->end_time->format('H:i'));
-
-            while ($start->copy()->addMinutes($slotDurationMinutes)->lte($end)) {
-                $slotStart = $start->format('H:i');
-                $slotEnd = $start->copy()->addMinutes($slotDurationMinutes)->format('H:i');
-
-                if (!$this->isSlotOverlapping($slotStart, $slotEnd, $existingAppointments)) {
-                    $slots[] = [
-                        'start_time' => $slotStart,
-                        'end_time' => $slotEnd,
-                    ];
-                }
-
-                $start->addMinutes($slotDurationMinutes);
+        if ($date) {
+            $query->whereDate('appointment_date', $date);
+        } elseif ($fromDate || $toDate) {
+            if ($fromDate) {
+                $query->whereDate('appointment_date', '>=', $fromDate);
+            }
+            if ($toDate) {
+                $query->whereDate('appointment_date', '<=', $toDate);
             }
         }
 
-        return $slots;
-    }
+        $query->orderBy('appointment_date')->orderBy('start_time');
 
-    private function isSlotOverlapping(string $startTime, string $endTime, iterable $appointments): bool
-    {
-        foreach ($appointments as $appointment) {
-            $existingStart = Carbon::parse($appointment->start_time instanceof \DateTime
-                ? $appointment->start_time->format('H:i')
-                : $appointment->start_time);
-            $existingEnd = Carbon::parse($appointment->end_time instanceof \DateTime
-                ? $appointment->end_time->format('H:i')
-                : $appointment->end_time);
-
-            if ($existingStart->format('H:i') < $endTime && $existingEnd->format('H:i') > $startTime) {
-                return true;
-            }
-        }
-
-        return false;
+        return $query->paginate($perPage, ['appointment_date', 'start_time', 'end_time']);
     }
 }

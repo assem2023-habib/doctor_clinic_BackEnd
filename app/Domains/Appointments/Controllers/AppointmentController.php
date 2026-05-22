@@ -46,36 +46,36 @@ class AppointmentController
         private readonly NotificationManager $notificationManager,
     ) {}
 
-    public function availableSlots(Request $request, Doctor $doctor): JsonResponse
+    public function bookedSlots(Request $request, Doctor $doctor): JsonResponse
     {
-        $request->validate([
-            'date' => 'required|date|after_or_equal:today',
+        $validated = $request->validate([
+            'date' => ['nullable', 'date'],
+            'from_date' => ['nullable', 'date', 'required_with:to_date'],
+            'to_date' => ['nullable', 'date', 'required_with:from_date'],
             'limit' => ['nullable', 'integer', 'min:1', 'max:100'],
             'page' => ['nullable', 'integer', 'min:1'],
         ]);
 
-        $allSlots = $this->slotsService->getAvailableSlots($doctor, $request->date);
+        $limit = (int) $request->integer('limit', 20);
 
-        $page = (int) $request->integer('page', 1);
-        $limit = (int) $request->integer('limit', count($allSlots) ?: 20);
+        $paginator = $this->slotsService->getBookedSlots(
+            $doctor,
+            $limit,
+            $request->date,
+            $request->from_date,
+            $request->to_date,
+        );
 
-        $total = count($allSlots);
-        $offset = ($page - 1) * $limit;
-        $slots = array_slice($allSlots, $offset, $limit);
-
-        $pagination = [
-            'current_page' => $page,
-            'last_page' => max(1, (int) ceil($total / $limit)),
-            'limit' => $limit,
-            'total' => $total,
-            'hasNextPage' => ($offset + $limit) < $total,
-            'hasPreviousPage' => $page > 1,
-        ];
+        $slots = collect($paginator->items())->map(fn ($a) => [
+            'appointment_date' => $a->appointment_date?->format('Y-m-d'),
+            'start_time' => $a->start_time?->format('H:i'),
+            'end_time' => $a->end_time?->format('H:i'),
+        ]);
 
         return ApiResponse::success(
             $slots,
-            __('Available slots retrieved successfully'),
-            pagination: $pagination
+            __('Booked slots retrieved successfully'),
+            pagination: ApiResponse::pagination($paginator)
         );
     }
 

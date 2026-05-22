@@ -1736,10 +1736,10 @@
 		},
 		{
 			"name": "Appointments",
-			"description": "Full appointment lifecycle: request, set time, respond, cancel, complete, suggest alternative.\n\nAll endpoints require authentication (Bearer token). Available slots is public.",
+			"description": "Full appointment lifecycle: request, set time, respond, cancel, complete, suggest alternative.\n\nAll endpoints require authentication (Bearer token). Booked slots is public.",
 			"item": [
 				{
-					"name": "Get Available Slots",
+					"name": "Get Booked Slots",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -1749,14 +1749,24 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/v1/doctors/{{doctor_id}}/available-slots",
+							"raw": "{{base_url}}/api/v1/doctors/{{doctor_id}}/booked-slots",
 							"host": ["{{base_url}}"],
-							"path": ["api", "v1", "doctors", "{{doctor_id}}", "available-slots"],
+							"path": ["api", "v1", "doctors", "{{doctor_id}}", "booked-slots"],
 							"query": [
 								{
 									"key": "date",
-									"value": "2026-05-20",
-									"description": "Date (YYYY-MM-DD) - required"
+									"value": "",
+									"description": "Filter by exact date (Y-m-d)"
+								},
+								{
+									"key": "from_date",
+									"value": "",
+									"description": "Filter from date (Y-m-d)"
+								},
+								{
+									"key": "to_date",
+									"value": "",
+									"description": "Filter to date (Y-m-d)"
 								},
 								{
 									"key": "limit",
@@ -1776,7 +1786,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Available slots retrieved successfully\",\n    \"data\": [\n        {\n            \"start_time\": \"09:00\",\n            \"end_time\": \"09:30\"\n        },\n        {\n            \"start_time\": \"09:30\",\n            \"end_time\": \"10:00\"\n        }\n    ]\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Booked slots retrieved successfully\",\n    \"data\": [\n        {\n            \"appointment_date\": \"2026-06-01\",\n            \"start_time\": \"10:00\",\n            \"end_time\": \"11:00\"\n        },\n        {\n            \"appointment_date\": \"2026-06-01\",\n            \"start_time\": \"14:00\",\n            \"end_time\": \"15:30\"\n        }\n    ],\n    \"meta\": {\n        \"pagination\": {\n            \"current_page\": 1,\n            \"last_page\": 1,\n            \"limit\": 20,\n            \"total\": 2,\n            \"hasNextPage\": false,\n            \"hasPreviousPage\": false\n        }\n    }\n}"
 						}
 					]
 				},

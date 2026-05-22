@@ -7,21 +7,23 @@ use OpenApi\Attributes as OA;
 class AppointmentControllerDoc
 {
     #[OA\Get(
-        path: '/api/v1/doctors/{doctor}/available-slots',
-        summary: 'Get available slots for a doctor',
-        description: 'Public endpoint. No authentication required.',
+        path: '/api/v1/doctors/{doctor}/booked-slots',
+        summary: 'Get booked slots for a doctor',
+        description: 'Public endpoint. No authentication required. Returns future booked appointments only (from now onwards).',
         tags: ['Appointments'],
         parameters: [
             new OA\Parameter(name: 'doctor', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Doctor UUID'),
-            new OA\Parameter(name: 'date', in: 'query', required: true, schema: new OA\Schema(type: 'string', format: 'date'), description: 'Date (Y-m-d)'),
-            new OA\Parameter(name: 'limit', in: 'query', schema: new OA\Schema(type: 'integer', default: 20), description: 'Items per page'),
+            new OA\Parameter(name: 'date', in: 'query', schema: new OA\Schema(type: 'string', format: 'date'), description: 'Filter by exact date (Y-m-d)'),
+            new OA\Parameter(name: 'from_date', in: 'query', schema: new OA\Schema(type: 'string', format: 'date'), description: 'Filter from date (Y-m-d)'),
+            new OA\Parameter(name: 'to_date', in: 'query', schema: new OA\Schema(type: 'string', format: 'date'), description: 'Filter to date (Y-m-d)'),
+            new OA\Parameter(name: 'limit', in: 'query', schema: new OA\Schema(type: 'integer', default: 20, maximum: 100), description: 'Items per page (max 100)'),
             new OA\Parameter(name: 'page', in: 'query', schema: new OA\Schema(type: 'integer', default: 1), description: 'Page number'),
         ],
         responses: [
-            new OA\Response(response: 200, description: 'Available slots retrieved successfully'),
+            new OA\Response(response: 200, description: 'Booked slots retrieved successfully'),
         ]
     )]
-    public function availableSlots() {}
+    public function bookedSlots() {}
 
     #[OA\Get(
         path: '/api/v1/appointments',

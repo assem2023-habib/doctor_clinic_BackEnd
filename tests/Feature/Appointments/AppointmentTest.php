@@ -117,30 +117,45 @@ class AppointmentTest extends TestCase
         ], $overrides));
     }
 
-    public function test_patient_can_view_available_slots(): void
+    public function test_anyone_can_view_booked_slots(): void
     {
         $doctorUser = $this->createDoctorUser();
-        $this->createSchedule($doctorUser->doctor, ['day_of_week' => DayOfWeekEnum::Monday]);
+        $patient = $this->createPatientUser();
 
-        $monday = Carbon::now()->next(Carbon::MONDAY)->format('Y-m-d');
+        $futureDate = now()->addDays(5)->format('Y-m-d');
 
-        $response = $this->getJson("/api/v1/doctors/{$doctorUser->doctor->id}/available-slots?date={$monday}");
+        Appointment::create([
+            'doctor_id' => $doctorUser->doctor->id,
+            'patient_id' => $patient->patient->id,
+            'appointment_date' => $futureDate,
+            'start_time' => '10:00',
+            'end_time' => '11:00',
+            'status' => AppointmentStatusEnum::Set,
+            'created_by' => $patient->id . ': ' . $patient->first_name . ' ' . $patient->last_name,
+        ]);
+
+        $response = $this->getJson("/api/v1/doctors/{$doctorUser->doctor->id}/booked-slots?date={$futureDate}");
 
         $response->assertStatus(200)
             ->assertJsonStructure([
                 'status',
                 'message',
-                'data' => [['start_time', 'end_time']],
+                'data' => [['appointment_date', 'start_time', 'end_time']],
+                'meta' => ['pagination'],
             ]);
+
+        $json = $response->json();
+        $this->assertCount(1, $json['data']);
+        $this->assertEquals('10:00', $json['data'][0]['start_time']);
     }
 
-    public function test_available_slots_returns_empty_for_no_schedule(): void
+    public function test_booked_slots_returns_empty_when_no_appointments(): void
     {
         $doctorUser = $this->createDoctorUser();
 
         $monday = Carbon::now()->next(Carbon::MONDAY)->format('Y-m-d');
 
-        $response = $this->getJson("/api/v1/doctors/{$doctorUser->doctor->id}/available-slots?date={$monday}");
+        $response = $this->getJson("/api/v1/doctors/{$doctorUser->doctor->id}/booked-slots?date={$monday}");
 
         $response->assertStatus(200);
 
@@ -148,33 +163,32 @@ class AppointmentTest extends TestCase
         $this->assertEmpty($json['data']);
     }
 
-    public function test_available_slots_excludes_booked_slots(): void
+    public function test_booked_slots_includes_existing_appointments(): void
     {
         $doctorUser = $this->createDoctorUser();
-        $this->createSchedule($doctorUser->doctor, ['day_of_week' => DayOfWeekEnum::Monday]);
         $patient = $this->createPatientUser();
 
-        $monday = Carbon::now()->next(Carbon::MONDAY)->format('Y-m-d');
+        $futureDate = now()->addDays(5)->format('Y-m-d');
 
         Appointment::create([
             'doctor_id' => $doctorUser->doctor->id,
             'patient_id' => $patient->patient->id,
-            'appointment_date' => $monday,
+            'appointment_date' => $futureDate,
             'start_time' => '09:00',
             'end_time' => '11:00',
             'status' => AppointmentStatusEnum::Set,
             'created_by' => $patient->id . ': ' . $patient->first_name . ' ' . $patient->last_name,
         ]);
 
-        $response = $this->getJson("/api/v1/doctors/{$doctorUser->doctor->id}/available-slots?date={$monday}");
+        $response = $this->getJson("/api/v1/doctors/{$doctorUser->doctor->id}/booked-slots?date={$futureDate}");
 
         $response->assertStatus(200);
 
         $slots = $response->json()['data'];
-        foreach ($slots as $slot) {
-            $overlaps = !($slot['end_time'] <= '09:00' || $slot['start_time'] >= '11:00');
-            $this->assertFalse($overlaps, "Slot {$slot['start_time']}-{$slot['end_time']} overlaps with 09:00-11:00");
-        }
+        $this->assertCount(1, $slots);
+        $this->assertEquals('09:00', $slots[0]['start_time']);
+        $this->assertEquals('11:00', $slots[0]['end_time']);
+        $this->assertEquals($futureDate, $slots[0]['appointment_date']);
     }
 
     public function test_patient_can_request_appointment(): void

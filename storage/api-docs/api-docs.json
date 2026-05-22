@@ -12,14 +12,14 @@
         }
     ],
     "paths": {
-        "/api/v1/doctors/{doctor}/available-slots": {
+        "/api/v1/doctors/{doctor}/booked-slots": {
             "get": {
                 "tags": [
                     "Appointments"
                 ],
-                "summary": "Get available slots for a doctor",
-                "description": "Public endpoint. No authentication required.",
-                "operationId": "e87db7f17d918700cbd436b5f051dd07",
+                "summary": "Get booked slots for a doctor",
+                "description": "Public endpoint. No authentication required. Returns future booked appointments only (from now onwards).",
+                "operationId": "d4a2d2d2feb0dd8e1ca221a409e73eec",
                 "parameters": [
                     {
                         "name": "doctor",
@@ -34,8 +34,25 @@
                     {
                         "name": "date",
                         "in": "query",
-                        "description": "Date (Y-m-d)",
-                        "required": true,
+                        "description": "Filter by exact date (Y-m-d)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "from_date",
+                        "in": "query",
+                        "description": "Filter from date (Y-m-d)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to_date",
+                        "in": "query",
+                        "description": "Filter to date (Y-m-d)",
                         "schema": {
                             "type": "string",
                             "format": "date"
@@ -44,10 +61,11 @@
                     {
                         "name": "limit",
                         "in": "query",
-                        "description": "Items per page",
+                        "description": "Items per page (max 100)",
                         "schema": {
                             "type": "integer",
-                            "default": 20
+                            "default": 20,
+                            "maximum": 100
                         }
                     },
                     {
@@ -62,7 +80,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Available slots retrieved successfully"
+                        "description": "Booked slots retrieved successfully"
                     }
                 }
             }
