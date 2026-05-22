@@ -278,6 +278,30 @@ use OpenApi\Attributes as OA;
         ])),
     ]
 )]
+#[OA\Put(
+    path: '/api/v1/auth/me',
+    summary: 'Update authenticated user profile',
+    security: [['bearerAuth' => []]],
+    tags: ['Auth'],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(properties: [
+            new OA\Property(property: 'first_name', description: 'First name', type: 'string', example: 'John'),
+            new OA\Property(property: 'last_name', description: 'Last name', type: 'string', example: 'Updated'),
+            new OA\Property(property: 'username', description: 'Username (unique)', type: 'string', example: 'johnupdated'),
+            new OA\Property(property: 'email', description: 'Email (unique)', type: 'string', format: 'email', example: 'john.updated@example.com'),
+            new OA\Property(property: 'phone', description: 'Phone number', type: 'string', example: '+963911111111'),
+            new OA\Property(property: 'address', description: 'Address', type: 'string', example: 'Damascus, Syria'),
+            new OA\Property(property: 'gender', description: 'Gender', type: 'string', enum: ['male', 'female'], example: 'male'),
+            new OA\Property(property: 'birthday_date', description: 'Birthday date', type: 'string', format: 'date', example: '1995-06-15'),
+        ])
+    ),
+    responses: [
+        new OA\Response(response: 200, description: 'Profile updated successfully'),
+        new OA\Response(response: 401, description: 'Unauthenticated'),
+        new OA\Response(response: 422, description: 'Validation error'),
+    ]
+)]
 class AuthControllerDoc
 {
 }

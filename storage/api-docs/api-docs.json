@@ -18,11 +18,13 @@
                     "Appointments"
                 ],
                 "summary": "Get available slots for a doctor",
+                "description": "Public endpoint. No authentication required.",
                 "operationId": "e87db7f17d918700cbd436b5f051dd07",
                 "parameters": [
                     {
                         "name": "doctor",
                         "in": "path",
+                        "description": "Doctor UUID",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -32,6 +34,7 @@
                     {
                         "name": "date",
                         "in": "query",
+                        "description": "Date (Y-m-d)",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -41,6 +44,7 @@
                     {
                         "name": "limit",
                         "in": "query",
+                        "description": "Items per page",
                         "schema": {
                             "type": "integer",
                             "default": 20
@@ -49,6 +53,7 @@
                     {
                         "name": "page",
                         "in": "query",
+                        "description": "Page number",
                         "schema": {
                             "type": "integer",
                             "default": 1
@@ -68,19 +73,32 @@
                     "Appointments"
                 ],
                 "summary": "List appointments (role-scoped)",
+                "description": "Patients see own appointments, doctors see own, admins/receptionists see all.",
                 "operationId": "725bf2cf951ebf479026ea18dc2064ee",
                 "parameters": [
                     {
                         "name": "limit",
                         "in": "query",
+                        "description": "Items per page (max 100)",
                         "schema": {
                             "type": "integer",
-                            "default": 20
+                            "default": 20,
+                            "maximum": 100
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
                         }
                     },
                     {
                         "name": "status",
                         "in": "query",
+                        "description": "Filter by status",
                         "schema": {
                             "type": "string"
                         }
@@ -88,6 +106,7 @@
                     {
                         "name": "date",
                         "in": "query",
+                        "description": "Filter by date (Y-m-d)",
                         "schema": {
                             "type": "string",
                             "format": "date"
@@ -97,36 +116,93 @@
                 "responses": {
                     "200": {
                         "description": "Appointments retrieved successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             },
             "post": {
                 "tags": [
                     "Appointments"
                 ],
                 "summary": "Request a new appointment",
+                "description": "Patient only.",
                 "operationId": "e6b1849ddd4d5b9e447db0d2ad20fc8b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "doctor_id": {
+                                        "description": "Doctor UUID",
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "preferred_date": {
+                                        "description": "Preferred date (Y-m-d)",
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "date"
+                                    },
+                                    "reason": {
+                                        "description": "Reason for appointment",
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 2000
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "201": {
                         "description": "Appointment requested successfully"
                     },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
                     "403": {
                         "description": "Only patients can request appointments"
+                    },
+                    "422": {
+                        "description": "Validation error"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
-        "/api/v1/appointments/{id}": {
+        "/api/v1/appointments/{appointment}": {
             "get": {
                 "tags": [
                     "Appointments"
                 ],
                 "summary": "Get a single appointment",
-                "operationId": "1f3bb5c606076b70ae1e305e1cfaebe2",
+                "operationId": "9bac7570f283dcd224aff360839e4583",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "appointment",
                         "in": "path",
+                        "description": "Appointment UUID",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -136,25 +212,57 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Appointment retrieved successfully"
+                        "description": "Appointment retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/AppointmentResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
                     },
                     "404": {
                         "description": "Not found"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
-        "/api/v1/appointments/{id}/set-time": {
+        "/api/v1/appointments/{appointment}/set-time": {
             "post": {
                 "tags": [
                     "Appointments"
                 ],
-                "summary": "Set appointment time",
-                "operationId": "6a857f58b8b96b3fe168d48fccb6c54a",
+                "summary": "Set appointment date and time",
+                "description": "Staff or doctor only. Triggers auto-confirm job.",
+                "operationId": "69e2859858e90963559b49d7387f3e3b",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "appointment",
                         "in": "path",
+                        "description": "Appointment UUID",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -162,27 +270,71 @@
                         }
                     }
                 ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "appointment_date": {
+                                        "description": "Appointment date (Y-m-d)",
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "start_time": {
+                                        "description": "Start time (H:i)",
+                                        "type": "string",
+                                        "format": "time",
+                                        "example": "10:00"
+                                    },
+                                    "end_time": {
+                                        "description": "End time (H:i)",
+                                        "type": "string",
+                                        "format": "time",
+                                        "example": "11:00"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "Appointment time set successfully"
                     },
                     "400": {
                         "description": "Appointment is not in requested status"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Validation error"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
-        "/api/v1/appointments/{id}/respond": {
+        "/api/v1/appointments/{appointment}/respond": {
             "post": {
                 "tags": [
                     "Appointments"
                 ],
                 "summary": "Patient accepts or rejects appointment time",
-                "operationId": "22f476b498b2a5a446dda9b420b86eb5",
+                "operationId": "ce13bac28cdd144291defedc17635a90",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "appointment",
                         "in": "path",
+                        "description": "Appointment UUID",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -190,28 +342,63 @@
                         }
                     }
                 ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "response": {
+                                        "description": "Patient response",
+                                        "type": "string",
+                                        "enum": [
+                                            "accepted",
+                                            "rejected"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "Appointment accepted/rejected"
                     },
+                    "400": {
+                        "description": "Appointment is not in set status"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
                     "403": {
-                        "description": "Forbidden"
+                        "description": "Forbidden (not the appointment patient)"
+                    },
+                    "422": {
+                        "description": "Validation error"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
-        "/api/v1/appointments/{id}/start": {
+        "/api/v1/appointments/{appointment}/start": {
             "post": {
                 "tags": [
                     "Appointments"
                 ],
                 "summary": "Start an accepted appointment",
-                "description": "Transition appointment from accepted to in_progress. Staff/doctor only.",
-                "operationId": "266deb5d3a46862458573be6c4f10d3c",
+                "description": "Transition from accepted to in_progress. Staff/doctor only.",
+                "operationId": "848d3a34fa88ab48844d893a4742d805",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "appointment",
                         "in": "path",
+                        "description": "Appointment UUID",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -226,24 +413,33 @@
                     "400": {
                         "description": "Appointment is not in accepted status"
                     },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
                     "403": {
                         "description": "Forbidden"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
-        "/api/v1/appointments/{id}/complete": {
+        "/api/v1/appointments/{appointment}/complete": {
             "post": {
                 "tags": [
                     "Appointments"
                 ],
                 "summary": "Complete an in-progress appointment",
-                "description": "Transition appointment from in_progress to completed. Staff/doctor only.",
-                "operationId": "8b59cd1433196c2f1be0740d422f373e",
+                "description": "Transition from in_progress to completed. Staff/doctor only.",
+                "operationId": "ec37777419ac7afaa2327f7a690b063e",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "appointment",
                         "in": "path",
+                        "description": "Appointment UUID",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -258,23 +454,33 @@
                     "400": {
                         "description": "Appointment is not in in_progress status"
                     },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
                     "403": {
                         "description": "Forbidden"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
-        "/api/v1/appointments/{id}/cancel": {
+        "/api/v1/appointments/{appointment}/cancel": {
             "post": {
                 "tags": [
                     "Appointments"
                 ],
                 "summary": "Cancel an appointment",
-                "operationId": "8cbadb112837d820be672169c2362e85",
+                "description": "Staff/doctor only. Cancels from any status except completed.",
+                "operationId": "3f9d9735788e79e105f96716e32eb93b",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "appointment",
                         "in": "path",
+                        "description": "Appointment UUID",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -286,23 +492,33 @@
                     "200": {
                         "description": "Appointment cancelled successfully"
                     },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
                     "403": {
                         "description": "Forbidden"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
-        "/api/v1/appointments/{id}/suggest-alternative": {
+        "/api/v1/appointments/{appointment}/suggest-alternative": {
             "post": {
                 "tags": [
                     "Appointments"
                 ],
                 "summary": "Suggest an alternative time",
-                "operationId": "7d77fe1458a958ead188b1244b11e91c",
+                "description": "Staff/doctor only. Appends message to notes. Status stays requested.",
+                "operationId": "ccb7f60e56d0dc1a5685cb869d329a7d",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "appointment",
                         "in": "path",
+                        "description": "Appointment UUID",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -310,14 +526,45 @@
                         }
                     }
                 ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "message": {
+                                        "description": "Alternative suggestion message",
+                                        "type": "string",
+                                        "maxLength": 2000
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "Alternative suggested successfully"
                     },
                     "400": {
                         "description": "Can only suggest alternatives for requested appointments"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Validation error"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/v1/auth/register/patient": {
@@ -1472,6 +1719,130 @@
                         "bearerAuth": []
                     }
                 ]
+            },
+            "put": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Update authenticated user profile",
+                "operationId": "6a8a2ca41cf60cc5514041bbe10e1b9b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "first_name": {
+                                        "description": "First name",
+                                        "type": "string",
+                                        "example": "John"
+                                    },
+                                    "last_name": {
+                                        "description": "Last name",
+                                        "type": "string",
+                                        "example": "Updated"
+                                    },
+                                    "username": {
+                                        "description": "Username (unique)",
+                                        "type": "string",
+                                        "example": "johnupdated"
+                                    },
+                                    "email": {
+                                        "description": "Email (unique)",
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john.updated@example.com"
+                                    },
+                                    "phone": {
+                                        "description": "Phone number",
+                                        "type": "string",
+                                        "example": "+963911111111"
+                                    },
+                                    "address": {
+                                        "description": "Address",
+                                        "type": "string",
+                                        "example": "Damascus, Syria"
+                                    },
+                                    "gender": {
+                                        "description": "Gender",
+                                        "type": "string",
+                                        "example": "male",
+                                        "enum": [
+                                            "male",
+                                            "female"
+                                        ]
+                                    },
+                                    "birthday_date": {
+                                        "description": "Birthday date",
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1995-06-15"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Profile updated successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/device-tokens": {
+            "post": {
+                "tags": [
+                    "Device Tokens"
+                ],
+                "summary": "Update device FCM token",
+                "description": "Adds a new FCM token to the authenticated user's fcm_tokens array. Duplicates are ignored.",
+                "operationId": "0a82fb09db1eb7ff304848faefeb0fa8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "token": {
+                                        "description": "FCM device token",
+                                        "type": "string",
+                                        "maxLength": 500
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Device token updated successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/v1/doctors": {
@@ -1483,6 +1854,16 @@
                 "operationId": "7095aef1a637d9202f97d15b1c22afc2",
                 "parameters": [
                     {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page (max 100)",
+                        "schema": {
+                            "type": "integer",
+                            "default": 20,
+                            "maximum": 100
+                        }
+                    },
+                    {
                         "name": "page",
                         "in": "query",
                         "description": "Page number",
@@ -1492,12 +1873,11 @@
                         }
                     },
                     {
-                        "name": "per_page",
+                        "name": "search",
                         "in": "query",
-                        "description": "Items per page",
+                        "description": "Search by first name, last name, or email",
                         "schema": {
-                            "type": "integer",
-                            "default": 20
+                            "type": "string"
                         }
                     }
                 ],
@@ -1606,6 +1986,186 @@
                         "description": "Doctor not found"
                     }
                 }
+            },
+            "put": {
+                "tags": [
+                    "Doctors"
+                ],
+                "summary": "Update a doctor",
+                "operationId": "529ca877b09db40918d6ec5ff096ca48",
+                "parameters": [
+                    {
+                        "name": "doctor",
+                        "in": "path",
+                        "description": "Doctor UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string",
+                                        "example": "Khaled"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "example": "Suleiman Updated"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "doctor@example.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+963912345679"
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "example": "male",
+                                        "enum": [
+                                            "male",
+                                            "female"
+                                        ]
+                                    },
+                                    "birthday_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1985-03-20"
+                                    },
+                                    "specialization": {
+                                        "type": "string",
+                                        "example": "cardiology"
+                                    },
+                                    "experience_months": {
+                                        "type": "integer",
+                                        "example": 60
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Doctor updated successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden (admin only)"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Doctors"
+                ],
+                "summary": "Delete a doctor",
+                "operationId": "2afd3cca343a13c83a5f21ad7121cc63",
+                "parameters": [
+                    {
+                        "name": "doctor",
+                        "in": "path",
+                        "description": "Doctor UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Doctor deleted successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden (admin only)"
+                    },
+                    "409": {
+                        "description": "Doctor has active appointments"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Doctors"
+                ],
+                "summary": "Partially update a doctor",
+                "operationId": "c9f9a34183958f89dbad757b42e792d3",
+                "parameters": [
+                    {
+                        "name": "doctor",
+                        "in": "path",
+                        "description": "Doctor UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string",
+                                        "example": "Khaled"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Doctor updated successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden (admin only)"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/v1/images": {
@@ -2119,10 +2679,687 @@
                     }
                 }
             }
+        },
+        "/api/v1/patients": {
+            "get": {
+                "tags": [
+                    "Patients"
+                ],
+                "summary": "List all patients",
+                "operationId": "61486979a5362ea3976b4372af40ff02",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page (max 100)",
+                        "schema": {
+                            "type": "integer",
+                            "default": 20,
+                            "maximum": 100
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by first name, last name, or email",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Patients retrieved successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden (staff only)"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/patients/{patient}": {
+            "get": {
+                "tags": [
+                    "Patients"
+                ],
+                "summary": "Get a single patient",
+                "operationId": "14b99e11f4b281559beb0299cd12e92d",
+                "parameters": [
+                    {
+                        "name": "patient",
+                        "in": "path",
+                        "description": "Patient UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Patient retrieved successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden (staff only)"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Patients"
+                ],
+                "summary": "Update a patient",
+                "operationId": "dd716c22754a199d07a43112456b90d5",
+                "parameters": [
+                    {
+                        "name": "patient",
+                        "in": "path",
+                        "description": "Patient UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string",
+                                        "example": "Patient"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "example": "Updated"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "patient@example.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+963912345678"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "Damascus, Syria"
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "example": "male",
+                                        "enum": [
+                                            "male",
+                                            "female"
+                                        ]
+                                    },
+                                    "birthday_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1995-06-15"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Patient updated successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden (admin only)"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Patients"
+                ],
+                "summary": "Delete a patient",
+                "operationId": "03b6295424f675a1ad88556c28bd8d27",
+                "parameters": [
+                    {
+                        "name": "patient",
+                        "in": "path",
+                        "description": "Patient UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Patient deleted successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden (admin only)"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Patients"
+                ],
+                "summary": "Partially update a patient",
+                "operationId": "846db9b650d7ad095873a0f4268cb575",
+                "parameters": [
+                    {
+                        "name": "patient",
+                        "in": "path",
+                        "description": "Patient UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string",
+                                        "example": "Patient"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Patient updated successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden (admin only)"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/doctors/{doctor}/patients": {
+            "get": {
+                "tags": [
+                    "Supervisions"
+                ],
+                "summary": "List patients assigned to a doctor",
+                "operationId": "3ac0ae6dfba75544a532d1c23881535b",
+                "parameters": [
+                    {
+                        "name": "doctor",
+                        "in": "path",
+                        "description": "Doctor UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page (max 100)",
+                        "schema": {
+                            "type": "integer",
+                            "default": 20,
+                            "maximum": 100
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by name or email",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Patients retrieved successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Supervisions"
+                ],
+                "summary": "Assign a patient to a doctor",
+                "description": "Staff (admin/receptionist) only.",
+                "operationId": "8af35536ddb83df3cb504a70d9bcb26e",
+                "parameters": [
+                    {
+                        "name": "doctor",
+                        "in": "path",
+                        "description": "Doctor UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "patient_id": {
+                                        "description": "Patient UUID",
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "notes": {
+                                        "description": "Assignment notes",
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 1000
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Patient assigned to doctor successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden (staff only)"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/patients/{patient}/doctors": {
+            "get": {
+                "tags": [
+                    "Supervisions"
+                ],
+                "summary": "List doctors assigned to a patient",
+                "operationId": "852cd351c1264291b5b7f83ba156f8f5",
+                "parameters": [
+                    {
+                        "name": "patient",
+                        "in": "path",
+                        "description": "Patient UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page (max 100)",
+                        "schema": {
+                            "type": "integer",
+                            "default": 20,
+                            "maximum": 100
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by name or email",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Doctors retrieved successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/doctors/{doctor}/patients/{patient}": {
+            "delete": {
+                "tags": [
+                    "Supervisions"
+                ],
+                "summary": "Remove a patient from a doctor",
+                "description": "Staff (admin/receptionist) only.",
+                "operationId": "a730ca8aa3108d79152a1eac6bfc5121",
+                "parameters": [
+                    {
+                        "name": "doctor",
+                        "in": "path",
+                        "description": "Doctor UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "patient",
+                        "in": "path",
+                        "description": "Patient UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Patient removed from doctor successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden (staff only)"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
         "schemas": {
+            "AppointmentResource": {
+                "description": "Appointment resource",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "requested",
+                            "set",
+                            "accepted",
+                            "rejected",
+                            "in_progress",
+                            "completed",
+                            "cancelled"
+                        ]
+                    },
+                    "reason": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "notes": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "appointment_date": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date",
+                        "example": "2026-06-01"
+                    },
+                    "start_time": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "10:00"
+                    },
+                    "end_time": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "11:00"
+                    },
+                    "created_by": {
+                        "type": "string",
+                        "example": "019e1d0f-...: Admin User"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "patient": {
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            "first_name": {
+                                "type": "string"
+                            },
+                            "last_name": {
+                                "type": "string"
+                            },
+                            "email": {
+                                "type": "string",
+                                "format": "email"
+                            },
+                            "phone": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "gender": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "enum": [
+                                    "male",
+                                    "female"
+                                ]
+                            },
+                            "birthday_date": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "format": "date"
+                            },
+                            "image": {
+                                "oneOf": [
+                                    {
+                                        "$ref": "#/components/schemas/ImageResource"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            }
+                        },
+                        "type": [
+                            "object",
+                            "null"
+                        ]
+                    },
+                    "doctor": {
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            "first_name": {
+                                "type": "string"
+                            },
+                            "last_name": {
+                                "type": "string"
+                            },
+                            "email": {
+                                "type": "string",
+                                "format": "email"
+                            },
+                            "specialization": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "experience_months": {
+                                "type": [
+                                    "integer",
+                                    "null"
+                                ]
+                            },
+                            "image": {
+                                "oneOf": [
+                                    {
+                                        "$ref": "#/components/schemas/ImageResource"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            }
+                        },
+                        "type": [
+                            "object",
+                            "null"
+                        ]
+                    }
+                },
+                "type": "object"
+            },
             "CityResource": {
                 "description": "City resource",
                 "properties": {
@@ -2340,6 +3577,87 @@
                     }
                 },
                 "type": "object"
+            },
+            "PatientResource": {
+                "description": "Patient resource",
+                "properties": {
+                    "id": {
+                        "description": "User UUID",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "first_name": {
+                        "type": "string",
+                        "example": "Ahmed"
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "example": "Ali"
+                    },
+                    "username": {
+                        "type": "string",
+                        "example": "ahmedali"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "patient@example.com"
+                    },
+                    "phone": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "+963912345678"
+                    },
+                    "address": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "Damascus, Syria"
+                    },
+                    "gender": {
+                        "type": "string",
+                        "example": "male",
+                        "enum": [
+                            "male",
+                            "female"
+                        ]
+                    },
+                    "birthday_date": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date",
+                        "example": "1995-06-15"
+                    },
+                    "roles": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "patient"
+                        ]
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "image": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/ImageResource"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object"
             }
         },
         "securitySchemes": {
@@ -2360,6 +3678,10 @@
             "description": "Auth"
         },
         {
+            "name": "Device Tokens",
+            "description": "Device Tokens"
+        },
+        {
             "name": "Doctors",
             "description": "Doctors"
         },
@@ -2374,6 +3696,14 @@
         {
             "name": "Countries",
             "description": "Countries"
+        },
+        {
+            "name": "Patients",
+            "description": "Patients"
+        },
+        {
+            "name": "Supervisions",
+            "description": "Supervisions"
         }
     ]
 }
