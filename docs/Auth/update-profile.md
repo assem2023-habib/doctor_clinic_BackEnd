@@ -167,8 +167,6 @@ public function updateProfile(UpdateProfileRequest $request): JsonResponse
 {
     $user = $request->user();
     $dto = UpdateProfileData::fromRequest($request);
-    $user = $this->updateProfileAction->execute($user, $dto);
-
     $user = $this->updateProfileAction->execute($user, $dto)->load('roles');
 
     $resource = match (true) {
