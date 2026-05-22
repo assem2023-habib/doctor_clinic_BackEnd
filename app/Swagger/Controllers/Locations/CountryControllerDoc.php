@@ -12,14 +12,21 @@ class CountryControllerDoc
         tags: ['Countries'],
         parameters: [
             new OA\Parameter(
+                name: 'limit',
+                in: 'query',
+                schema: new OA\Schema(type: 'integer', default: 20, maximum: 100),
+                description: 'Items per page (max 100)'
+            ),
+            new OA\Parameter(
                 name: 'page',
                 in: 'query',
                 schema: new OA\Schema(type: 'integer', default: 1)
             ),
             new OA\Parameter(
-                name: 'per_page',
+                name: 'search',
                 in: 'query',
-                schema: new OA\Schema(type: 'integer', default: 20)
+                schema: new OA\Schema(type: 'string'),
+                description: 'Search by name (Arabic or English)'
             ),
         ],
         responses: [

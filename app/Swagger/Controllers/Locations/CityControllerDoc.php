@@ -11,9 +11,10 @@ class CityControllerDoc
         summary: 'List all cities',
         tags: ['Cities'],
         parameters: [
-            new OA\Parameter(name: 'country_id', in: 'query', schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Filter by country'),
+            new OA\Parameter(name: 'limit', in: 'query', schema: new OA\Schema(type: 'integer', default: 20, maximum: 100), description: 'Items per page (max 100)'),
             new OA\Parameter(name: 'page', in: 'query', schema: new OA\Schema(type: 'integer', default: 1)),
-            new OA\Parameter(name: 'per_page', in: 'query', schema: new OA\Schema(type: 'integer', default: 20)),
+            new OA\Parameter(name: 'search', in: 'query', schema: new OA\Schema(type: 'string'), description: 'Search by name (Arabic or English)'),
+            new OA\Parameter(name: 'country_id', in: 'query', schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Filter by country'),
         ],
         responses: [
             new OA\Response(response: 200, description: 'Cities retrieved successfully'),

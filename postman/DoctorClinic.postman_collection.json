@@ -761,9 +761,14 @@
 									"path": ["api", "v1", "countries"],
 									"query": [
 										{
-											"key": "per_page",
+											"key": "limit",
 											"value": "20",
 											"description": "Items per page (max 100)"
+										},
+										{
+											"key": "search",
+											"value": "",
+											"description": "Search by name (Arabic or English)"
 										}
 									]
 								}
@@ -961,9 +966,14 @@
 									"path": ["api", "v1", "cities"],
 									"query": [
 										{
-											"key": "per_page",
+											"key": "limit",
 											"value": "20",
 											"description": "Items per page (max 100)"
+										},
+										{
+											"key": "search",
+											"value": "",
+											"description": "Search by name (Arabic or English)"
 										},
 										{
 											"key": "country_id",

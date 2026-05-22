@@ -1718,12 +1718,13 @@
                 "operationId": "dc0cc244f4eb83752fbcd73f957a9f57",
                 "parameters": [
                     {
-                        "name": "country_id",
+                        "name": "limit",
                         "in": "query",
-                        "description": "Filter by country",
+                        "description": "Items per page (max 100)",
                         "schema": {
-                            "type": "string",
-                            "format": "uuid"
+                            "type": "integer",
+                            "default": 20,
+                            "maximum": 100
                         }
                     },
                     {
@@ -1735,11 +1736,20 @@
                         }
                     },
                     {
-                        "name": "per_page",
+                        "name": "search",
                         "in": "query",
+                        "description": "Search by name (Arabic or English)",
                         "schema": {
-                            "type": "integer",
-                            "default": 20
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "country_id",
+                        "in": "query",
+                        "description": "Filter by country",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
                         }
                     }
                 ],
@@ -1900,6 +1910,16 @@
                 "operationId": "a9af534189667133f4ffd4c7ccdae9e0",
                 "parameters": [
                     {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page (max 100)",
+                        "schema": {
+                            "type": "integer",
+                            "default": 20,
+                            "maximum": 100
+                        }
+                    },
+                    {
                         "name": "page",
                         "in": "query",
                         "schema": {
@@ -1908,11 +1928,11 @@
                         }
                     },
                     {
-                        "name": "per_page",
+                        "name": "search",
                         "in": "query",
+                        "description": "Search by name (Arabic or English)",
                         "schema": {
-                            "type": "integer",
-                            "default": 20
+                            "type": "string"
                         }
                     }
                 ],
