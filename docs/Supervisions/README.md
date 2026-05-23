@@ -50,8 +50,7 @@
 | `id` | uuid PK | |
 | `patient_id` | uuid FK→patients | |
 | `doctor_id` | uuid FK→doctors | |
-| `status` | string(20) | `pending`, `approved`, `rejected`, `cancelled` |
-| `notes` | text/nullable | Patient's note |
+| `status` | `SupervisionRequestStatusEnum` | `pending`, `approved`, `rejected`, `cancelled` |
 | `responded_at` | timestamp/nullable | When doctor responded or patient cancelled |
 | `created_at` | timestamp | |
 | `updated_at` | timestamp | |

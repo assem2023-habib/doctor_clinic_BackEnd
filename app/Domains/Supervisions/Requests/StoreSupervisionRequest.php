@@ -10,7 +10,6 @@ class StoreSupervisionRequest extends FormRequest
     {
         return [
             'doctor_id' => ['required', 'string', 'exists:doctors,id'],
-            'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }
 }

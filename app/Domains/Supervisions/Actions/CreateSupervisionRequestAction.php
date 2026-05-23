@@ -6,6 +6,7 @@ use App\Domains\Doctors\Models\Doctor;
 use App\Domains\Notifications\DTOs\NotificationData;
 use App\Domains\Notifications\Services\NotificationManager;
 use App\Domains\Patients\Models\Patient;
+use App\Domains\Supervisions\Enums\SupervisionRequestStatusEnum;
 use App\Domains\Supervisions\Models\SupervisionRequest;
 
 class CreateSupervisionRequestAction
@@ -14,7 +15,7 @@ class CreateSupervisionRequestAction
         private readonly NotificationManager $notificationManager,
     ) {}
 
-    public function execute(Patient $patient, Doctor $doctor, ?string $notes = null): SupervisionRequest
+    public function execute(Patient $patient, Doctor $doctor): SupervisionRequest
     {
         $patient->loadMissing('user');
 
@@ -29,7 +30,7 @@ class CreateSupervisionRequestAction
 
         $exists = SupervisionRequest::where('patient_id', $patient->id)
             ->where('doctor_id', $doctor->id)
-            ->where('status', 'pending')
+            ->where('status', SupervisionRequestStatusEnum::Pending)
             ->exists();
 
         if ($exists) {
@@ -39,7 +40,7 @@ class CreateSupervisionRequestAction
         $maxPendingRequests = 5;
 
         $pendingCount = SupervisionRequest::where('patient_id', $patient->id)
-            ->where('status', 'pending')
+            ->where('status', SupervisionRequestStatusEnum::Pending)
             ->count();
 
         if ($pendingCount >= $maxPendingRequests) {
@@ -49,8 +50,7 @@ class CreateSupervisionRequestAction
         $request = SupervisionRequest::create([
             'patient_id' => $patient->id,
             'doctor_id' => $doctor->id,
-            'status' => 'pending',
-            'notes' => $notes,
+            'status' => SupervisionRequestStatusEnum::Pending,
         ]);
 
         $doctor->loadMissing('user');

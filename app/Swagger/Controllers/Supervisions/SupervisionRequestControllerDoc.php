@@ -18,7 +18,6 @@ class SupervisionRequestControllerDoc
             required: true,
             content: new OA\JsonContent(properties: [
                 new OA\Property(property: 'doctor_id', type: 'string', format: 'uuid', description: 'Doctor UUID'),
-                new OA\Property(property: 'notes', type: 'string', maxLength: 1000, nullable: true, description: 'Request notes'),
             ])
         ),
         responses: [

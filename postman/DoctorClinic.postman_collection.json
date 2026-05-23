@@ -2734,7 +2734,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"doctor_id\": \"{{doctor_id}}\",\n    \"notes\": \"I would like to request supervision\"\n}",
+									"raw": "{\n    \"doctor_id\": \"{{doctor_id}}\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -2752,7 +2752,7 @@
 									"name": "Created",
 									"status": "Created",
 									"code": 201,
-									"body": "{\n    \"status\": 201,\n    \"message\": \"Supervision request created successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"patient_id\": \"{{patient_id}}\",\n        \"doctor_id\": \"{{doctor_id}}\",\n        \"status\": \"pending\",\n        \"notes\": \"I would like to request supervision\",\n        \"responded_at\": null,\n        \"created_at\": \"2026-05-23T...\",\n        \"updated_at\": \"2026-05-23T...\"\n    }\n}"
+									"body": "{\n    \"status\": 201,\n    \"message\": \"Supervision request created successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"patient_id\": \"{{patient_id}}\",\n        \"doctor_id\": \"{{doctor_id}}\",\n        \"status\": \"pending\",\n        \"responded_at\": null,\n        \"created_at\": \"2026-05-23T...\",\n        \"updated_at\": \"2026-05-23T...\"\n    }\n}"
 								}
 							]
 						},

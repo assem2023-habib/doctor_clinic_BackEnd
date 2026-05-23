@@ -4912,14 +4912,6 @@
                                         "description": "Doctor UUID",
                                         "type": "string",
                                         "format": "uuid"
-                                    },
-                                    "notes": {
-                                        "description": "Request notes",
-                                        "type": [
-                                            "string",
-                                            "null"
-                                        ],
-                                        "maxLength": 1000
                                     }
                                 },
                                 "type": "object"

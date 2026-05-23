@@ -4,6 +4,7 @@ namespace App\Domains\Supervisions\Models;
 
 use App\Domains\Doctors\Models\Doctor;
 use App\Domains\Patients\Models\Patient;
+use App\Domains\Supervisions\Enums\SupervisionRequestStatusEnum;
 use App\Traits\HasUuidV7;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,9 +17,15 @@ class SupervisionRequest extends Model
         'patient_id',
         'doctor_id',
         'status',
-        'notes',
         'responded_at',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'status' => SupervisionRequestStatusEnum::class,
+        ];
+    }
 
     public function patient(): BelongsTo
     {

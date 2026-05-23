@@ -4,6 +4,7 @@ namespace App\Domains\Supervisions\Actions;
 
 use App\Domains\Notifications\DTOs\NotificationData;
 use App\Domains\Notifications\Services\NotificationManager;
+use App\Domains\Supervisions\Enums\SupervisionRequestStatusEnum;
 use App\Domains\Supervisions\Models\SupervisionRequest;
 
 class RejectSupervisionRequestAction
@@ -14,14 +15,14 @@ class RejectSupervisionRequestAction
 
     public function execute(SupervisionRequest $request): void
     {
-        if ($request->status !== 'pending') {
+        if ($request->status !== SupervisionRequestStatusEnum::Pending) {
             abort(422, __('Supervision request is not pending'));
         }
 
         $request->loadMissing(['patient.user', 'doctor.user']);
 
         $request->update([
-            'status' => 'rejected',
+            'status' => SupervisionRequestStatusEnum::Rejected,
             'responded_at' => now(),
         ]);
 

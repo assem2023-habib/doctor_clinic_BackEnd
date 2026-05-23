@@ -12,8 +12,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('patient_id')->constrained('patients')->cascadeOnDelete();
             $table->foreignUuid('doctor_id')->constrained('doctors')->cascadeOnDelete();
-            $table->string('status', 20)->default('pending');
-            $table->text('notes')->nullable();
+            $table->string('status', 20)->default(\App\Domains\Supervisions\Enums\SupervisionRequestStatusEnum::Pending->value);
             $table->timestamp('responded_at')->nullable();
             $table->timestamps();
 

@@ -36,7 +36,7 @@ class SupervisionRequestController
 
         $doctor = Doctor::findOrFail($request->doctor_id);
 
-        $result = $this->createAction->execute($patient, $doctor, $request->notes);
+        $result = $this->createAction->execute($patient, $doctor);
 
         return ApiResponse::success(
             new SupervisionRequestResource($result),
