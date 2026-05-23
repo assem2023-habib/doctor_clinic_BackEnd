@@ -4537,6 +4537,100 @@
                 ]
             }
         },
+        "/api/v1/doctors/{doctor}/patients/self": {
+            "post": {
+                "tags": [
+                    "Supervisions"
+                ],
+                "summary": "Self-assign a patient to the doctor",
+                "description": "The doctor themselves can assign a patient directly without staff role.",
+                "operationId": "035728efef08e5730592f77340363181",
+                "parameters": [
+                    {
+                        "name": "doctor",
+                        "in": "path",
+                        "description": "Doctor UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "patient_id": {
+                                        "description": "Patient UUID",
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "notes": {
+                                        "description": "Assignment notes",
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 1000
+                                    },
+                                    "supervision_status": {
+                                        "description": "Supervision status",
+                                        "type": "string",
+                                        "default": "active",
+                                        "enum": [
+                                            "active",
+                                            "suspended"
+                                        ]
+                                    },
+                                    "supervision_start": {
+                                        "description": "Supervision start date",
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "date"
+                                    },
+                                    "supervision_end": {
+                                        "description": "Supervision end date",
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "date"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Patient assigned to doctor successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden (doctor only)"
+                    },
+                    "409": {
+                        "description": "Patient already has a doctor with this specialization"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/doctors/{doctor}/patients/bulk": {
             "post": {
                 "tags": [
@@ -4745,6 +4839,238 @@
                     },
                     "404": {
                         "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/patients/{patient}/supervision-requests": {
+            "get": {
+                "tags": [
+                    "Supervision Requests"
+                ],
+                "summary": "List supervision requests for a patient",
+                "operationId": "bc0402a9151b09503b615b94b4f69ece",
+                "parameters": [
+                    {
+                        "name": "patient",
+                        "in": "path",
+                        "description": "Patient UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Supervision requests retrieved successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Supervision Requests"
+                ],
+                "summary": "Create a supervision request (patient only)",
+                "operationId": "996bbaaf13dd0cb4ae0c1f890ea77e5e",
+                "parameters": [
+                    {
+                        "name": "patient",
+                        "in": "path",
+                        "description": "Patient UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "doctor_id": {
+                                        "description": "Doctor UUID",
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "notes": {
+                                        "description": "Request notes",
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 1000
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Supervision request created successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "409": {
+                        "description": "Patient already has active supervision or pending request"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/doctors/{doctor}/supervision-requests": {
+            "get": {
+                "tags": [
+                    "Supervision Requests"
+                ],
+                "summary": "List supervision requests for a doctor",
+                "operationId": "b1650e62bbe49af13a0c74dfe2415598",
+                "parameters": [
+                    {
+                        "name": "doctor",
+                        "in": "path",
+                        "description": "Doctor UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by status",
+                        "schema": {
+                            "type": "string",
+                            "default": "pending"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Supervision requests retrieved successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/supervision-requests/{supervision_request}/approve": {
+            "post": {
+                "tags": [
+                    "Supervision Requests"
+                ],
+                "summary": "Approve a supervision request (doctor only)",
+                "operationId": "70af80498a95c7b2d737512e92a1e2e2",
+                "parameters": [
+                    {
+                        "name": "supervision_request",
+                        "in": "path",
+                        "description": "Supervision Request UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Supervision request approved"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden (only the doctor can approve)"
+                    },
+                    "409": {
+                        "description": "Patient already has a doctor with this specialization"
+                    },
+                    "422": {
+                        "description": "Request is not pending"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/supervision-requests/{supervision_request}/reject": {
+            "post": {
+                "tags": [
+                    "Supervision Requests"
+                ],
+                "summary": "Reject a supervision request (doctor only)",
+                "operationId": "fd671fba290e79378352a74e1dd0908f",
+                "parameters": [
+                    {
+                        "name": "supervision_request",
+                        "in": "path",
+                        "description": "Supervision Request UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Supervision request rejected"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden (only the doctor can reject)"
+                    },
+                    "422": {
+                        "description": "Request is not pending"
                     }
                 },
                 "security": [
@@ -5406,6 +5732,10 @@
         {
             "name": "Supervisions",
             "description": "Supervisions"
+        },
+        {
+            "name": "Supervision Requests",
+            "description": "Supervision Requests"
         }
     ]
 }

@@ -40,5 +40,10 @@ return [
 
         'login.new_device' => ['log', 'database', 'firebase', 'websocket', 'socketio'],
         'login.suspicious_activity' => ['log', 'database', 'firebase', 'websocket', 'socketio'],
+
+        'supervision.requested' => ['log', 'database', 'firebase', 'websocket', 'socketio'],
+        'supervision.approved' => ['log', 'database', 'firebase', 'websocket', 'socketio'],
+        'supervision.rejected' => ['log', 'database', 'firebase', 'websocket', 'socketio'],
+        'supervision.cancelled' => ['log', 'database', 'firebase', 'websocket', 'socketio'],
     ],
 ];

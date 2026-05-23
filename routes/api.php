@@ -6,6 +6,7 @@ use App\Domains\RBAC\Controllers\PermissionController;
 use App\Domains\RBAC\Controllers\RoleController;
 use App\Domains\RBAC\Controllers\UserRoleController;
 use App\Domains\Supervisions\Controllers\SupervisionController;
+use App\Domains\Supervisions\Controllers\SupervisionRequestController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Doctor\DoctorController;
 use App\Http\Controllers\Api\V1\Image\ImageController;
@@ -70,6 +71,22 @@ Route::middleware(['auth:api', 'active'])->group(function () {
     Route::get('/v1/patients/{patient}/doctors', [SupervisionController::class, 'patientDoctors']);
 
     Route::get('/v1/patients/{patient}/available-doctors', [SupervisionController::class, 'availableDoctors']);
+
+    Route::post('/v1/doctors/{doctor}/patients/self', [SupervisionController::class, 'selfAssign']);
+
+    Route::prefix('v1/patients/{patient}/supervision-requests')->group(function () {
+        Route::post('/', [SupervisionRequestController::class, 'store']);
+        Route::get('/', [SupervisionRequestController::class, 'indexPatient']);
+    });
+
+    Route::prefix('v1/doctors/{doctor}/supervision-requests')->group(function () {
+        Route::get('/', [SupervisionRequestController::class, 'indexDoctor']);
+    });
+
+    Route::prefix('v1/supervision-requests/{supervision_request}')->group(function () {
+        Route::post('/approve', [SupervisionRequestController::class, 'approve']);
+        Route::post('/reject', [SupervisionRequestController::class, 'reject']);
+    });
 
     Route::middleware('staff')->group(function () {
         Route::post('/v1/doctors/{doctor}/patients', [SupervisionController::class, 'assign']);

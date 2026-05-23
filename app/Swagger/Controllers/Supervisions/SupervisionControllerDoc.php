@@ -45,6 +45,37 @@ class SupervisionControllerDoc
     public function patientDoctors() {}
 
     #[OA\Post(
+        path: '/api/v1/doctors/{doctor}/patients/self',
+        summary: 'Self-assign a patient to the doctor',
+        description: 'The doctor themselves can assign a patient directly without staff role.',
+        tags: ['Supervisions'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(name: 'doctor', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Doctor UUID'),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'patient_id', type: 'string', format: 'uuid', description: 'Patient UUID'),
+                    new OA\Property(property: 'notes', type: 'string', maxLength: 1000, nullable: true, description: 'Assignment notes'),
+                    new OA\Property(property: 'supervision_status', type: 'string', enum: ['active', 'suspended'], default: 'active', description: 'Supervision status'),
+                    new OA\Property(property: 'supervision_start', type: 'string', format: 'date', nullable: true, description: 'Supervision start date'),
+                    new OA\Property(property: 'supervision_end', type: 'string', format: 'date', nullable: true, description: 'Supervision end date'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'Patient assigned to doctor successfully'),
+            new OA\Response(response: 401, description: 'Unauthenticated'),
+            new OA\Response(response: 403, description: 'Forbidden (doctor only)'),
+            new OA\Response(response: 409, description: 'Patient already has a doctor with this specialization'),
+            new OA\Response(response: 422, description: 'Validation error'),
+        ]
+    )]
+    public function selfAssign() {}
+
+    #[OA\Post(
         path: '/api/v1/doctors/{doctor}/patients',
         summary: 'Assign a patient to a doctor',
         description: 'Staff (admin/receptionist) only. Fails with 409 if patient already has a doctor with the same specialization.',

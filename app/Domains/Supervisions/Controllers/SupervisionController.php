@@ -90,6 +90,27 @@ class SupervisionController
         );
     }
 
+    public function selfAssign(Request $request, Doctor $doctor): JsonResponse
+    {
+        $user = $request->user();
+        $isDoctor = $user->id === $doctor->user_id;
+
+        if (!$isDoctor) {
+            return ApiResponse::forbidden(__('Unauthorized to self-assign patients'));
+        }
+
+        $validated = $request->validate([
+            'patient_id' => ['required', 'string', 'exists:patients,id'],
+            'notes' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $patient = Patient::findOrFail($validated['patient_id']);
+
+        $this->assignAction->execute($doctor, $patient, $user, $validated['notes'] ?? null);
+
+        return ApiResponse::success(null, __('Patient assigned to doctor successfully'));
+    }
+
     public function assign(AssignPatientRequest $request, Doctor $doctor): JsonResponse
     {
         $user = $request->user();
