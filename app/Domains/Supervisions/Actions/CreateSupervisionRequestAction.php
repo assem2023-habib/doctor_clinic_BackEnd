@@ -36,6 +36,16 @@ class CreateSupervisionRequestAction
             abort(409, __('A pending request to this doctor already exists'));
         }
 
+        $maxPendingRequests = 5;
+
+        $pendingCount = SupervisionRequest::where('patient_id', $patient->id)
+            ->where('status', 'pending')
+            ->count();
+
+        if ($pendingCount >= $maxPendingRequests) {
+            abort(409, __('Maximum of :max pending supervision requests reached', ['max' => $maxPendingRequests]));
+        }
+
         $request = SupervisionRequest::create([
             'patient_id' => $patient->id,
             'doctor_id' => $doctor->id,

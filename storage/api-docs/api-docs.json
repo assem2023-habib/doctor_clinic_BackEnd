@@ -4938,7 +4938,7 @@
                         "description": "Forbidden"
                     },
                     "409": {
-                        "description": "Patient already has active supervision with this specialization, or pending request to this doctor"
+                        "description": "Patient already has active supervision with this specialization, pending request exists, or max 5 pending requests reached"
                     },
                     "422": {
                         "description": "Validation error"

@@ -41,6 +41,7 @@
 - **Supervision request specialization** — a patient can only request supervision from a doctor if they don't already have an active supervision with a doctor of the **same specialization** (enforced in `CreateSupervisionRequestAction`)
 - **Pending request uniqueness** — a patient cannot have more than one pending request to the same doctor
 - **Multiple requests allowed** — a patient can request from multiple doctors with different specializations simultaneously
+- **Max 5 pending requests** — a patient cannot have more than 5 pending supervision requests at a time (enforced in `CreateSupervisionRequestAction`)
 
 ## Supervision Requests Table
 

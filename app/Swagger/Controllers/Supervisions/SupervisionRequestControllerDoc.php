@@ -25,7 +25,7 @@ class SupervisionRequestControllerDoc
             new OA\Response(response: 201, description: 'Supervision request created successfully'),
             new OA\Response(response: 401, description: 'Unauthenticated'),
             new OA\Response(response: 403, description: 'Forbidden'),
-            new OA\Response(response: 409, description: 'Patient already has active supervision with this specialization, or pending request to this doctor'),
+            new OA\Response(response: 409, description: 'Patient already has active supervision with this specialization, pending request exists, or max 5 pending requests reached'),
             new OA\Response(response: 422, description: 'Validation error'),
         ]
     )]
