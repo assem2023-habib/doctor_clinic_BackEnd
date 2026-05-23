@@ -20,6 +20,13 @@
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `search` | `string` | — | فلترة بالاسم أو الإيميل |
+| `specialization` | `string` | — | فلترة بالتخصص (enum) |
+| `experience_from` | `integer` | — | خبرة من (شهر) |
+| `experience_to` | `integer` | — | خبرة إلى (شهر) |
+| `gender` | `string` | — | فلترة بالجنس (male/female) |
+| `date_from` | `date` | — | birthday_date من |
+| `date_to` | `date` | — | birthday_date إلى |
+| `is_active` | `boolean` | — | فلترة بالحالة (true/false) |
 | `limit` | `integer` | `20` | عدد العناصر (max: 100) |
 
 ---
@@ -38,6 +45,13 @@ public function index(Request $request): JsonResponse
               ->orWhere('last_name', 'like', "%{$v}%")
               ->orWhere('email', 'like', "%{$v}%");
         }))
+        ->when($request->specialization, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('specialization', $v)))
+        ->when($request->experience_from, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('experience_months', '>=', (int) $v)))
+        ->when($request->experience_to, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('experience_months', '<=', (int) $v)))
+        ->when($request->gender, fn ($q, $v) => $q->where('gender', $v))
+        ->when($request->date_from, fn ($q, $v) => $q->where('birthday_date', '>=', $v))
+        ->when($request->date_to, fn ($q, $v) => $q->where('birthday_date', '<=', $v))
+        ->when($request->has('is_active'), fn ($q) => $q->where('is_active', $request->boolean('is_active')))
         ->paginate(min($limit, 100));
 
     return ApiResponse::success(
@@ -53,9 +67,14 @@ public function index(Request $request): JsonResponse
 1. User::whereHas('roles', slug=doctor)
 2. with('doctor.schedules', 'roles') — eager load
 3. if search → filter by first_name, last_name, email
-4. paginate(min(limit, 100))
-5. DoctorResource::collection()
-6. return 200
+4. if specialization → whereHas doctor.specialization
+5. if experience_from/to → whereHas doctor.experience_months >= / <=
+6. if gender → where gender
+7. if date_from/to → where birthday_date >= / <=
+8. if is_active → where is_active
+9. paginate(min(limit, 100))
+10. DoctorResource::collection()
+11. return 200
 ```
 
 ---

@@ -99,6 +99,7 @@ Route::middleware(['auth:api', 'active'])->group(function () {
         });
 
         Route::prefix('v1/doctors')->group(function () {
+            Route::post('/', [DoctorController::class, 'store'])->middleware('image.content');
             Route::put('/{doctor}', [DoctorController::class, 'update']);
             Route::patch('/{doctor}', [DoctorController::class, 'updatePartial']);
             Route::delete('/{doctor}', [DoctorController::class, 'destroy']);

@@ -8,12 +8,13 @@
 
 | # | Method | Endpoint | Auth | الوصف |
 |---|--------|----------|------|-------|
-| 1 | `GET` | `/api/v1/doctors` | ❌ عام | قائمة الأطباء مع البحث |
-| 2 | `GET` | `/api/v1/doctors/{doctor}` | ❌ عام | عرض طبيب |
-| 3 | `PUT` | `/api/v1/doctors/{doctor}` | ✅ admin | تحديث كامل |
-| 4 | `PATCH` | `/api/v1/doctors/{doctor}` | ✅ admin | تحديث جزئي |
-| 5 | `DELETE` | `/api/v1/doctors/{doctor}` | ✅ admin | حذف مع تنظيف |
-| 6 | `PUT` | `/api/v1/doctors/{doctor}/activate-account` | ✅ admin | تفعيل حساب الدكتور ([توثيق](activate-account.md)) |
+| 1 | `GET` | `/api/v1/doctors` | ❌ عام | قائمة الأطباء مع البحث والفلترة |
+| 2 | `POST` | `/api/v1/doctors` | ✅ admin | إنشاء دكتور جديد ([توثيق](create-doctor.md)) |
+| 3 | `GET` | `/api/v1/doctors/{doctor}` | ❌ عام | عرض طبيب |
+| 4 | `PUT` | `/api/v1/doctors/{doctor}` | ✅ admin | تحديث كامل |
+| 5 | `PATCH` | `/api/v1/doctors/{doctor}` | ✅ admin | تحديث جزئي |
+| 6 | `DELETE` | `/api/v1/doctors/{doctor}` | ✅ admin | حذف مع تنظيف |
+| 7 | `PUT` | `/api/v1/doctors/{doctor}/activate-account` | ✅ admin | تفعيل حساب الدكتور ([توثيق](activate-account.md)) |
 
 ---
 
@@ -38,6 +39,7 @@
 app/Domains/Doctors/
 ├── Actions/
 │   ├── ActivateDoctorAccountAction.php
+│   ├── CreateDoctorAction.php
 │   ├── UpdateDoctorAction.php
 │   └── DeleteDoctorAction.php
 ├── DTOs/
@@ -46,6 +48,7 @@ app/Domains/Doctors/
 │   ├── Doctor.php
 │   └── DoctorSchedule.php
 ├── Requests/
+│   ├── StoreDoctorRequest.php
 │   ├── UpdateDoctorRequest.php
 │   └── PatchDoctorRequest.php
 ├── Resources/

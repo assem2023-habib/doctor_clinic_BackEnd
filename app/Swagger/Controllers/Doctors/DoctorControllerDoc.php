@@ -14,6 +14,13 @@ class DoctorControllerDoc
             new OA\Parameter(name: 'limit', in: 'query', schema: new OA\Schema(type: 'integer', default: 20, maximum: 100), description: 'Items per page (max 100)'),
             new OA\Parameter(name: 'page', in: 'query', schema: new OA\Schema(type: 'integer', default: 1), description: 'Page number'),
             new OA\Parameter(name: 'search', in: 'query', schema: new OA\Schema(type: 'string'), description: 'Search by first name, last name, or email'),
+            new OA\Parameter(name: 'specialization', in: 'query', schema: new OA\Schema(type: 'string'), description: 'Filter by specialization (enum)'),
+            new OA\Parameter(name: 'experience_from', in: 'query', schema: new OA\Schema(type: 'integer', minimum: 0), description: 'Minimum experience in months'),
+            new OA\Parameter(name: 'experience_to', in: 'query', schema: new OA\Schema(type: 'integer', minimum: 0), description: 'Maximum experience in months'),
+            new OA\Parameter(name: 'gender', in: 'query', schema: new OA\Schema(type: 'string', enum: ['male', 'female']), description: 'Filter by gender'),
+            new OA\Parameter(name: 'date_from', in: 'query', schema: new OA\Schema(type: 'string', format: 'date'), description: 'Birthday date range start'),
+            new OA\Parameter(name: 'date_to', in: 'query', schema: new OA\Schema(type: 'string', format: 'date'), description: 'Birthday date range end'),
+            new OA\Parameter(name: 'is_active', in: 'query', schema: new OA\Schema(type: 'boolean'), description: 'Filter by active status'),
         ],
         responses: [
             new OA\Response(
@@ -53,6 +60,47 @@ class DoctorControllerDoc
         ]
     )]
     public function index() {}
+
+    #[OA\Post(
+        path: '/api/v1/doctors',
+        summary: 'Create a new doctor',
+        description: 'Admin-only. Creates a doctor with is_active=true immediately.',
+        tags: ['Doctors'],
+        security: [['bearerAuth' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\MediaType(
+                mediaType: 'multipart/form-data',
+                schema: new OA\Schema(
+                    properties: [
+                        new OA\Property(property: 'first_name', type: 'string', example: 'Khaled'),
+                        new OA\Property(property: 'last_name', type: 'string', example: 'Suleiman'),
+                        new OA\Property(property: 'username', type: 'string', example: 'drkhaled'),
+                        new OA\Property(property: 'email', type: 'string', format: 'email', example: 'doctor@example.com'),
+                        new OA\Property(property: 'phone', type: 'string', example: '+963912345679'),
+                        new OA\Property(property: 'address', type: 'string', example: 'Aleppo, Syria'),
+                        new OA\Property(property: 'gender', type: 'string', enum: ['male', 'female'], example: 'male'),
+                        new OA\Property(property: 'birthday_date', type: 'string', format: 'date', example: '1985-03-20'),
+                        new OA\Property(property: 'specialization', type: 'string', example: 'cardiology'),
+                        new OA\Property(property: 'experience_months', type: 'integer', example: 60),
+                        new OA\Property(property: 'password', type: 'string', format: 'password'),
+                        new OA\Property(property: 'file', type: 'string', format: 'binary', description: 'Profile image'),
+                    ]
+                )
+            )
+        ),
+        responses: [
+            new OA\Response(response: 201, description: 'Doctor created successfully', content: new OA\JsonContent(properties: [
+                new OA\Property(property: 'status', type: 'integer', example: 201),
+                new OA\Property(property: 'message', type: 'string', example: 'Doctor created successfully'),
+                new OA\Property(property: 'data', ref: '#/components/schemas/DoctorResource'),
+            ])),
+            new OA\Response(response: 401, description: 'Unauthenticated'),
+            new OA\Response(response: 403, description: 'Forbidden (admin only)'),
+            new OA\Response(response: 422, description: 'Validation error'),
+        ]
+    )]
+    public function store() {}
 
     #[OA\Get(
         path: '/api/v1/doctors/{doctor}',

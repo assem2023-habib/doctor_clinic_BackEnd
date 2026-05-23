@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api\V1\Doctor;
 
 use App\Domains\Doctors\Actions\ActivateDoctorAccountAction;
+use App\Domains\Doctors\Actions\CreateDoctorAction;
 use App\Domains\Doctors\Actions\DeleteDoctorAction;
 use App\Domains\Doctors\Actions\UpdateDoctorAction;
 use App\Domains\Doctors\Models\Doctor;
 use App\Domains\Doctors\Requests\PatchDoctorRequest;
+use App\Domains\Doctors\Requests\StoreDoctorRequest;
 use App\Domains\Doctors\Requests\UpdateDoctorRequest;
 use App\Domains\Doctors\Resources\DoctorResource;
 use App\Domains\Shared\Responses\ApiResponse;
@@ -20,6 +22,7 @@ class DoctorController
         private readonly UpdateDoctorAction $updateDoctorAction,
         private readonly DeleteDoctorAction $deleteDoctorAction,
         private readonly ActivateDoctorAccountAction $activateDoctorAccountAction,
+        private readonly CreateDoctorAction $createDoctorAction,
     ) {}
 
     public function index(Request $request): JsonResponse
@@ -32,6 +35,13 @@ class DoctorController
                   ->orWhere('last_name', 'like', "%{$v}%")
                   ->orWhere('email', 'like', "%{$v}%");
             }))
+            ->when($request->specialization, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('specialization', $v)))
+            ->when($request->experience_from, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('experience_months', '>=', (int) $v)))
+            ->when($request->experience_to, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('experience_months', '<=', (int) $v)))
+            ->when($request->gender, fn ($q, $v) => $q->where('gender', $v))
+            ->when($request->date_from, fn ($q, $v) => $q->where('birthday_date', '>=', $v))
+            ->when($request->date_to, fn ($q, $v) => $q->where('birthday_date', '<=', $v))
+            ->when($request->has('is_active'), fn ($q) => $q->where('is_active', $request->boolean('is_active')))
             ->paginate(min($limit, 100));
 
         return ApiResponse::success(
@@ -80,6 +90,17 @@ class DoctorController
         $this->deleteDoctorAction->execute($doctor, request()->user());
 
         return ApiResponse::noContent(__('Doctor deleted successfully'));
+    }
+
+    public function store(StoreDoctorRequest $request): JsonResponse
+    {
+        $user = $this->createDoctorAction->execute($request);
+
+        return ApiResponse::success(
+            new DoctorResource($user),
+            __('Doctor created successfully'),
+            status: 201
+        );
     }
 
     public function activateAccount(Doctor $doctor): JsonResponse
