@@ -2583,8 +2583,485 @@
 		},
 		{
 			"name": "Receptionists",
-			"description": "Receptionist management.\n\nProtected routes (auth + admin): Activate account.",
+			"description": "Receptionist management.\n\nPublic routes: List / Get.\nProtected routes (auth + admin): Create, Update, Delete, Activate Account.",
 			"item": [
+				{
+					"name": "List Receptionists",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    if (json.data && json.data.length > 0) {",
+									"        pm.collectionVariables.set('receptionist_id', json.data[0].id);",
+									"        console.log('Receptionist ID stored:', json.data[0].id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/receptionists",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "receptionists"],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Filter by name or email"
+								},
+								{
+									"key": "gender",
+									"value": "",
+									"description": "Filter by gender (male/female)"
+								},
+								{
+									"key": "shift_start_from",
+									"value": "",
+									"description": "Shift start time from (H:i)"
+								},
+								{
+									"key": "shift_start_to",
+									"value": "",
+									"description": "Shift start time to (H:i)"
+								},
+								{
+									"key": "shift_end_from",
+									"value": "",
+									"description": "Shift end time from (H:i)"
+								},
+								{
+									"key": "shift_end_to",
+									"value": "",
+									"description": "Shift end time to (H:i)"
+								},
+								{
+									"key": "is_active",
+									"value": "",
+									"description": "Filter by active status (true/false)"
+								},
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Items per page (max 100)"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Receptionists retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Layla\",\n            \"last_name\": \"Hassan\",\n            \"email\": \"receptionist@example.com\",\n            \"roles\": [\"receptionist\"],\n            \"phone\": \"+963912345680\",\n            \"gender\": \"female\",\n            \"birthday_date\": \"1998-11-05\",\n            \"is_active\": true,\n            \"shift_start\": \"09:00\",\n            \"shift_end\": \"17:00\"\n        }\n    ],\n    \"meta\": {\n        \"pagination\": {\n            \"current_page\": 1,\n            \"last_page\": 1,\n            \"per_page\": 20,\n            \"total\": 1,\n            \"from\": 1,\n            \"to\": 1,\n            \"limit\": 20\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Create Receptionist",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('receptionist_id', json.data.id);",
+									"    console.log('Receptionist ID stored:', json.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "first_name",
+									"value": "Layla",
+									"type": "text"
+								},
+								{
+									"key": "last_name",
+									"value": "Hassan",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "laylah",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "receptionist@example.com",
+									"type": "text"
+								},
+								{
+									"key": "phone",
+									"value": "+963912345680",
+									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "Homs, Syria",
+									"type": "text"
+								},
+								{
+									"key": "gender",
+									"value": "female",
+									"type": "text"
+								},
+								{
+									"key": "birthday_date",
+									"value": "1998-11-05",
+									"type": "text"
+								},
+								{
+									"key": "shift_start",
+									"value": "09:00",
+									"type": "text"
+								},
+								{
+									"key": "shift_end",
+									"value": "17:00",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "Password@123",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": "",
+									"description": "Profile image (jpg, jpeg, png, webp) - optional"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/receptionists",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "receptionists"]
+						}
+					},
+					"response": [
+						{
+							"name": "Created",
+							"status": "Created",
+							"code": 201,
+							"body": "{\n    \"status\": 201,\n    \"message\": \"Receptionist created successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Layla\",\n        \"last_name\": \"Hassan\",\n        \"email\": \"receptionist@example.com\",\n        \"roles\": [\"receptionist\"],\n        \"phone\": \"+963912345680\",\n        \"gender\": \"female\",\n        \"birthday_date\": \"1998-11-05\",\n        \"is_active\": true,\n        \"shift_start\": \"09:00\",\n        \"shift_end\": \"17:00\"\n    }\n}"
+						},
+						{
+							"name": "Unauthenticated",
+							"status": "Unauthorized",
+							"code": 401
+						},
+						{
+							"name": "Forbidden",
+							"status": "Forbidden",
+							"code": 403,
+							"body": "{\n    \"status\": 403,\n    \"message\": \"Forbidden\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Receptionist",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('receptionist_id', json.data.id);",
+									"    console.log('Receptionist ID stored:', json.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/receptionists/{{receptionist_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "receptionists", "{{receptionist_id}}"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Receptionist retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Layla\",\n        \"last_name\": \"Hassan\",\n        \"email\": \"receptionist@example.com\",\n        \"roles\": [\"receptionist\"],\n        \"phone\": \"+963912345680\",\n        \"gender\": \"female\",\n        \"birthday_date\": \"1998-11-05\",\n        \"is_active\": true,\n        \"shift_start\": \"09:00\",\n        \"shift_end\": \"17:00\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Receptionist",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    console.log('Receptionist updated:', json.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "first_name",
+									"value": "Layla",
+									"type": "text"
+								},
+								{
+									"key": "last_name",
+									"value": "Hassan Updated",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "laylah",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "receptionist@example.com",
+									"type": "text"
+								},
+								{
+									"key": "phone",
+									"value": "+963912345680",
+									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "Homs, Syria",
+									"type": "text"
+								},
+								{
+									"key": "gender",
+									"value": "female",
+									"type": "text"
+								},
+								{
+									"key": "birthday_date",
+									"value": "1998-11-05",
+									"type": "text"
+								},
+								{
+									"key": "shift_start",
+									"value": "09:00",
+									"type": "text"
+								},
+								{
+									"key": "shift_end",
+									"value": "17:00",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": "",
+									"description": "Profile image (jpg, jpeg, png, webp) - optional"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/receptionists/{{receptionist_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "receptionists", "{{receptionist_id}}"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Receptionist updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Layla\",\n        \"last_name\": \"Hassan Updated\",\n        \"email\": \"receptionist@example.com\",\n        \"roles\": [\"receptionist\"],\n        \"phone\": \"+963912345680\",\n        \"gender\": \"female\",\n        \"birthday_date\": \"1998-11-05\",\n        \"is_active\": true,\n        \"shift_start\": \"09:00\",\n        \"shift_end\": \"17:00\"\n    }\n}"
+						},
+						{
+							"name": "Forbidden",
+							"status": "Forbidden",
+							"code": 403,
+							"body": "{\n    \"status\": 403,\n    \"message\": \"Forbidden\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Receptionist (PATCH)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    console.log('Receptionist patched:', json.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "first_name",
+									"value": "Layla",
+									"type": "text"
+								},
+								{
+									"key": "shift_end",
+									"value": "18:00",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/receptionists/{{receptionist_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "receptionists", "{{receptionist_id}}"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Receptionist updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Layla\",\n        \"last_name\": \"Hassan\",\n        \"email\": \"receptionist@example.com\",\n        \"roles\": [\"receptionist\"],\n        \"phone\": \"+963912345680\",\n        \"gender\": \"female\",\n        \"birthday_date\": \"1998-11-05\",\n        \"is_active\": true,\n        \"shift_start\": \"09:00\",\n        \"shift_end\": \"18:00\"\n    }\n}"
+						},
+						{
+							"name": "Forbidden",
+							"status": "Forbidden",
+							"code": 403,
+							"body": "{\n    \"status\": 403,\n    \"message\": \"Forbidden\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete Receptionist",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/receptionists/{{receptionist_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "receptionists", "{{receptionist_id}}"]
+						}
+					},
+					"response": [
+						{
+							"name": "No Content",
+							"status": "No Content",
+							"code": 204
+						},
+						{
+							"name": "Conflict (Active Appointments)",
+							"status": "Conflict",
+							"code": 409,
+							"body": "{\n    \"status\": 409,\n    \"message\": \"Receptionist has active appointments. Cannot delete.\"\n}"
+						}
+					]
+				},
 				{
 					"name": "Activate Receptionist Account",
 					"request": {

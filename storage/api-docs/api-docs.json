@@ -1819,6 +1819,70 @@
                         "schema": {
                             "type": "string"
                         }
+                    },
+                    {
+                        "name": "specialization",
+                        "in": "query",
+                        "description": "Filter by specialization (enum)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "experience_from",
+                        "in": "query",
+                        "description": "Minimum experience in months",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 0
+                        }
+                    },
+                    {
+                        "name": "experience_to",
+                        "in": "query",
+                        "description": "Maximum experience in months",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 0
+                        }
+                    },
+                    {
+                        "name": "gender",
+                        "in": "query",
+                        "description": "Filter by gender",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "male",
+                                "female"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "date_from",
+                        "in": "query",
+                        "description": "Birthday date range start",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "date_to",
+                        "in": "query",
+                        "description": "Birthday date range end",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "is_active",
+                        "in": "query",
+                        "description": "Filter by active status",
+                        "schema": {
+                            "type": "boolean"
+                        }
                     }
                 ],
                 "responses": {
@@ -1877,6 +1941,120 @@
                         }
                     }
                 }
+            },
+            "post": {
+                "tags": [
+                    "Doctors"
+                ],
+                "summary": "Create a new doctor",
+                "description": "Admin-only. Creates a doctor with is_active=true immediately.",
+                "operationId": "022239722cb15e7ae8dce5c3fff094d4",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string",
+                                        "example": "Khaled"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "example": "Suleiman"
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "example": "drkhaled"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "doctor@example.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+963912345679"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "Aleppo, Syria"
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "example": "male",
+                                        "enum": [
+                                            "male",
+                                            "female"
+                                        ]
+                                    },
+                                    "birthday_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1985-03-20"
+                                    },
+                                    "specialization": {
+                                        "type": "string",
+                                        "example": "cardiology"
+                                    },
+                                    "experience_months": {
+                                        "type": "integer",
+                                        "example": 60
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "file": {
+                                        "description": "Profile image",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Doctor created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 201
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Doctor created successfully"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/DoctorResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden (admin only)"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/v1/doctors/{doctor}": {
@@ -3443,6 +3621,525 @@
                 ]
             }
         },
+        "/api/v1/receptionists": {
+            "get": {
+                "tags": [
+                    "Receptionists"
+                ],
+                "summary": "List all receptionists",
+                "operationId": "a291d041cef39e54f27e286028412f23",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page (max 100)",
+                        "schema": {
+                            "type": "integer",
+                            "default": 20,
+                            "maximum": 100
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by first name, last name, or email",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "gender",
+                        "in": "query",
+                        "description": "Filter by gender",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "male",
+                                "female"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "date_from",
+                        "in": "query",
+                        "description": "Birthday date range start",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "date_to",
+                        "in": "query",
+                        "description": "Birthday date range end",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "is_active",
+                        "in": "query",
+                        "description": "Filter by active status",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "shift_start_from",
+                        "in": "query",
+                        "description": "Shift start time from",
+                        "schema": {
+                            "type": "string",
+                            "format": "time",
+                            "example": "08:00"
+                        }
+                    },
+                    {
+                        "name": "shift_start_to",
+                        "in": "query",
+                        "description": "Shift start time to",
+                        "schema": {
+                            "type": "string",
+                            "format": "time",
+                            "example": "12:00"
+                        }
+                    },
+                    {
+                        "name": "shift_end_from",
+                        "in": "query",
+                        "description": "Shift end time from",
+                        "schema": {
+                            "type": "string",
+                            "format": "time",
+                            "example": "16:00"
+                        }
+                    },
+                    {
+                        "name": "shift_end_to",
+                        "in": "query",
+                        "description": "Shift end time to",
+                        "schema": {
+                            "type": "string",
+                            "format": "time",
+                            "example": "20:00"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Receptionists retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Receptionists retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ReceptionistResource"
+                                            }
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "pagination": {
+                                                    "properties": {
+                                                        "current_page": {
+                                                            "type": "integer"
+                                                        },
+                                                        "last_page": {
+                                                            "type": "integer"
+                                                        },
+                                                        "per_page": {
+                                                            "type": "integer"
+                                                        },
+                                                        "total": {
+                                                            "type": "integer"
+                                                        },
+                                                        "from": {
+                                                            "type": "integer"
+                                                        },
+                                                        "to": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Receptionists"
+                ],
+                "summary": "Create a new receptionist",
+                "description": "Admin-only. Creates a receptionist with is_active=true immediately.",
+                "operationId": "d41957bfd73efb6a6456dba65060e4c6",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string",
+                                        "example": "Layla"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "example": "Hassan"
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "example": "laylah"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "receptionist@example.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+963912345680"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "Homs, Syria"
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "example": "female",
+                                        "enum": [
+                                            "male",
+                                            "female"
+                                        ]
+                                    },
+                                    "birthday_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1998-11-05"
+                                    },
+                                    "shift_start": {
+                                        "type": "string",
+                                        "format": "time",
+                                        "example": "09:00"
+                                    },
+                                    "shift_end": {
+                                        "type": "string",
+                                        "format": "time",
+                                        "example": "17:00"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "file": {
+                                        "description": "Profile image",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Receptionist created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 201
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Receptionist created successfully"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/ReceptionistResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden (admin only)"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/receptionists/{receptionist}": {
+            "get": {
+                "tags": [
+                    "Receptionists"
+                ],
+                "summary": "Get a single receptionist",
+                "operationId": "955e1092ddb0e139f25446588e4ee2de",
+                "parameters": [
+                    {
+                        "name": "receptionist",
+                        "in": "path",
+                        "description": "Receptionist ID (UUID)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Receptionist retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Receptionist retrieved successfully"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/ReceptionistResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Receptionist not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Receptionists"
+                ],
+                "summary": "Update a receptionist",
+                "operationId": "d4567654b59ddf30c575a5be99a5ba28",
+                "parameters": [
+                    {
+                        "name": "receptionist",
+                        "in": "path",
+                        "description": "Receptionist UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string",
+                                        "example": "Layla"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "example": "Hassan Updated"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "receptionist@example.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+963912345680"
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "example": "female",
+                                        "enum": [
+                                            "male",
+                                            "female"
+                                        ]
+                                    },
+                                    "birthday_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1998-11-05"
+                                    },
+                                    "shift_start": {
+                                        "type": "string",
+                                        "format": "time",
+                                        "example": "09:00"
+                                    },
+                                    "shift_end": {
+                                        "type": "string",
+                                        "format": "time",
+                                        "example": "17:00"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Receptionist updated successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden (admin only)"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Receptionists"
+                ],
+                "summary": "Delete a receptionist",
+                "operationId": "7aeb6600363fad31ff47a128ee8eed9f",
+                "parameters": [
+                    {
+                        "name": "receptionist",
+                        "in": "path",
+                        "description": "Receptionist UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Receptionist deleted successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden (admin only)"
+                    },
+                    "409": {
+                        "description": "Receptionist has active appointments"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Receptionists"
+                ],
+                "summary": "Partially update a receptionist",
+                "operationId": "e9f45d326942f820721ea28b8154084a",
+                "parameters": [
+                    {
+                        "name": "receptionist",
+                        "in": "path",
+                        "description": "Receptionist UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string",
+                                        "example": "Layla"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Receptionist updated successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden (admin only)"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/receptionists/{receptionist}/activate-account": {
             "put": {
                 "tags": [
@@ -3477,6 +4174,9 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Account activated successfully."
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/ReceptionistResource"
                                         }
                                     },
                                     "type": "object"
@@ -4251,6 +4951,91 @@
                                 "type": "null"
                             }
                         ]
+                    }
+                },
+                "type": "object"
+            },
+            "ReceptionistResource": {
+                "description": "Receptionist resource",
+                "properties": {
+                    "id": {
+                        "description": "User UUID",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "first_name": {
+                        "type": "string",
+                        "example": "Layla"
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "example": "Hassan"
+                    },
+                    "username": {
+                        "type": "string",
+                        "example": "laylah"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "receptionist@example.com"
+                    },
+                    "phone": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "+963912345680"
+                    },
+                    "address": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "Homs, Syria"
+                    },
+                    "gender": {
+                        "type": "string",
+                        "example": "female",
+                        "enum": [
+                            "male",
+                            "female"
+                        ]
+                    },
+                    "birthday_date": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date",
+                        "example": "1998-11-05"
+                    },
+                    "roles": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "receptionist"
+                        ]
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "shift_start": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "09:00"
+                    },
+                    "shift_end": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "17:00"
                     }
                 },
                 "type": "object"

@@ -43,6 +43,11 @@ Route::prefix('v1/doctors')->group(function () {
     Route::get('/{doctor}', [DoctorController::class, 'show']);
 });
 
+Route::prefix('v1/receptionists')->group(function () {
+    Route::get('/', [ReceptionistController::class, 'index']);
+    Route::get('/{receptionist}', [ReceptionistController::class, 'show']);
+});
+
 Route::middleware(['auth:api', 'active', 'staff'])->prefix('v1/patients')->group(function () {
     Route::get('/', [PatientController::class, 'index']);
     Route::get('/{patient}', [PatientController::class, 'show']);
@@ -107,6 +112,10 @@ Route::middleware(['auth:api', 'active'])->group(function () {
         });
 
         Route::prefix('v1/receptionists')->group(function () {
+            Route::post('/', [ReceptionistController::class, 'store'])->middleware('image.content');
+            Route::put('/{receptionist}', [ReceptionistController::class, 'update']);
+            Route::patch('/{receptionist}', [ReceptionistController::class, 'updatePartial']);
+            Route::delete('/{receptionist}', [ReceptionistController::class, 'destroy']);
             Route::put('/{receptionist}/activate-account', [ReceptionistController::class, 'activateAccount']);
         });
 
