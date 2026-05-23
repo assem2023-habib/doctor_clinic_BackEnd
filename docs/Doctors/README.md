@@ -13,6 +13,7 @@
 | 3 | `PUT` | `/api/v1/doctors/{doctor}` | ✅ admin | تحديث كامل |
 | 4 | `PATCH` | `/api/v1/doctors/{doctor}` | ✅ admin | تحديث جزئي |
 | 5 | `DELETE` | `/api/v1/doctors/{doctor}` | ✅ admin | حذف مع تنظيف |
+| 6 | `PUT` | `/api/v1/doctors/{doctor}/activate-account` | ✅ admin | تفعيل حساب الدكتور ([توثيق](activate-account.md)) |
 
 ---
 
@@ -36,6 +37,7 @@
 ```
 app/Domains/Doctors/
 ├── Actions/
+│   ├── ActivateDoctorAccountAction.php
 │   ├── UpdateDoctorAction.php
 │   └── DeleteDoctorAction.php
 ├── DTOs/

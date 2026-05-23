@@ -1,6 +1,6 @@
 # POST /api/v1/auth/register/receptionist
 
-تسجيل موظف استقبال جديد + تسجيل دخول تلقائي.
+تسجيل حساب موظف استقبال جديد (يحتاج تفعيل من الأدمن). **لا يتم تسجيل الدخول تلقائياً.**
 
 ---
 
@@ -55,7 +55,7 @@
 
 ## 3. DTO: `RegisterReceptionistData`
 
-**الملف:** `app/Domains\Auth/DTOs/RegisterReceptionistData.php`
+**الملف:** `app/Domains/Auth/DTOs/RegisterReceptionistData.php`
 
 ```php
 class RegisterReceptionistData
@@ -103,7 +103,7 @@ class RegisterReceptionistData
 ```
 RegisterReceptionistAction::execute(RegisterReceptionistData $data)
 │
-├── 1. User::create([...])
+├── 1. User::create(['is_active' => false, ...])
 │
 ├── 2. $user->assignRole('receptionist')
 │
@@ -118,7 +118,7 @@ RegisterReceptionistAction::execute(RegisterReceptionistData $data)
 └── 5. return $user
 ```
 
-> **الفرق الجوهري:** ينشئ سجل `Receptionist` مع `shift_start` و `shift_end`.
+> **ملاحظة:** الحساب يُنشأ بـ `is_active = false` ولا يتم تسجيل الدخول تلقائياً.
 
 ### Dependencies:
 
@@ -136,16 +136,9 @@ RegisterReceptionistAction::execute(RegisterReceptionistData $data)
 public function registerReceptionist(RegisterReceptionistRequest $request): JsonResponse
 {
     $dto = RegisterReceptionistData::fromRequest($request);
-    $user = $this->registerReceptionistAction->execute($dto);
-    $tokenData = $this->loginAction->execute(LoginData::fromCredentials(
-        $dto->email,
-        $dto->password
-    ));
+    $this->registerReceptionistAction->execute($dto);
 
-    return ApiResponse::created(
-        new AuthResource((object) compact('user', 'tokenData')),
-        __('auth.register_success')
-    );
+    return ApiResponse::created(null, __('auth.pending_activation'));
 }
 ```
 
@@ -158,42 +151,19 @@ public function registerReceptionist(RegisterReceptionistRequest $request): Json
 ```json
 {
     "status": 201,
-    "message": "Registered successfully.",
-    "data": {
-        "access_token": "eyJ0eXAiOiJKV1Qi...",
-        "refresh_token": "def50200...",
-        "expires_in": 31536000,
-        "token_type": "Bearer",
-        "user": {
-            "id": "0196f0a0-zzzz-7abc-def0-zzzzzzzzzzzz",
-            "first_name": "خالد",
-            "last_name": "عمر",
-            "username": "khaled_r",
-            "email": "khaled@clinic.com",
-            "phone": "0555777888",
-            "address": "الدمام، المملكة العربية السعودية",
-            "gender": "male",
-            "birthday_date": "1995-03-10",
-            "roles": [
-                {
-                    "id": "...",
-                    "name": "Receptionist",
-                    "slug": "receptionist",
-                    "description": null,
-                    "guard_name": "api",
-                    "is_system": true,
-                    "created_at": "...",
-                    "updated_at": "..."
-                }
-            ],
-            "is_active": true,
-            "receptionist": {
-                "id": "0196f0a0-wwww-7abc-def0-wwwwwwwwwwww",
-                "shift_start": "08:00",
-                "shift_end": "16:00"
-            },
-            "image": null
-        }
+    "message": "Account created successfully. Please wait for admin approval.",
+    "data": null
+}
+```
+
+### ❌ Validation Error — `422 Unprocessable Entity`
+
+```json
+{
+    "status": 422,
+    "message": "Validation failed",
+    "errors": {
+        "email": ["The email has already been taken."]
     }
 }
 ```
@@ -204,6 +174,15 @@ public function registerReceptionist(RegisterReceptionistRequest $request): Json
 
 | كود الحالة | الرسالة | السبب |
 |-----------|---------|-------|
-| `201` | `Registered successfully.` | نجاح |
+| `201` | `Account created successfully...` | نجاح |
 | `422` | `Validation failed` | حقل مطلوب ناقص أو قيمة غير صحيحة |
 | `429` | `Too Many Attempts.` | تجاوز rate limit |
+
+---
+
+## 8. تفعيل الحساب
+
+بعد الإنشاء، يمكن للأدمن تفعيل الحساب عبر:
+- **`PUT /api/v1/receptionists/{receptionist}/activate-account`** (محمي بالأدمن)
+
+انظر [activate-account.md](../Receptionists/activate-account.md).

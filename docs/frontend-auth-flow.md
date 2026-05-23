@@ -12,26 +12,44 @@
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
 | POST | `/api/v1/auth/register/patient` | ❌ | Register + auto-login |
-| POST | `/api/v1/auth/register/doctor` | ❌ | Register + auto-login |
-| POST | `/api/v1/auth/register/receptionist` | ❌ | Register + auto-login |
+| POST | `/api/v1/auth/register/doctor` | ❌ | Register (pending admin activation — no auto-login) |
+| POST | `/api/v1/auth/register/receptionist` | ❌ | Register (pending admin activation — no auto-login) |
 | POST | `/api/v1/auth/login` | ❌ | Login by email + password |
 | POST | `/api/v1/auth/logout` | ✅ | Revoke current token |
 | POST | `/api/v1/auth/refresh` | ❌ | Get new tokens using `refresh_token` |
 | PUT | `/api/v1/auth/password` | ✅ | Change password (needs old_password) |
 | DELETE | `/api/v1/auth/account` | ✅ | Delete account permanently |
 | GET | `/api/v1/auth/me` | ✅ | Get current user profile |
+| PUT | `/api/v1/doctors/{doctor}/activate-account` | ✅ admin | Activate doctor account |
+| PUT | `/api/v1/receptionists/{receptionist}/activate-account` | ✅ admin | Activate receptionist account |
 
 ## Response Structures
 
-### Login / Register (201/200)
+### Login / Register Patient (201/200)
 
 ```json
 {
-    "access_token": "eyJ0eXAiOiJKV1Qi...",
-    "refresh_token": "def50200...",
-    "expires_in": 31536000,
-    "token_type": "Bearer",
-    "user": { ... }
+    "status": 200,
+    "message": "Logged in successfully",
+    "data": {
+        "access_token": "eyJ0eXAiOiJKV1Qi...",
+        "refresh_token": "def50200...",
+        "expires_in": 31536000,
+        "token_type": "Bearer",
+        "user": { ... }
+    }
+}
+```
+
+### Register Doctor / Receptionist (201)
+
+> الحساب يُنشأ بحالة غير مفعلة. لا يوجد auto-login ولا token.
+
+```json
+{
+    "status": 201,
+    "message": "Account created successfully. Please wait for admin approval.",
+    "data": null
 }
 ```
 
