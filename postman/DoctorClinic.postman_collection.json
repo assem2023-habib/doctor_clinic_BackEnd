@@ -2410,7 +2410,7 @@
 		},
 		{
 			"name": "Supervisions",
-			"description": "Doctor-Patient assignment management.\n\nAll endpoints require authentication. Assign/Remove require staff role (admin or receptionist).",
+			"description": "Doctor-Patient supervision management.\n\nAll endpoints require authentication. Assign/Remove/Bulk require staff role. Available-doctors requires auth.",
 			"item": [
 				{
 					"name": "Get Doctor's Patients",
@@ -2487,6 +2487,63 @@
 					]
 				},
 				{
+					"name": "Available Doctors",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/patients/{{patient_id}}/available-doctors",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "patients", "{{patient_id}}", "available-doctors"],
+"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Filter by name or email"
+								},
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Items per page (max 100)"
+								},
+								{
+									"key": "gender",
+									"value": "",
+									"description": "Filter by gender (male/female)"
+								},
+								{
+									"key": "date_from",
+									"value": "",
+									"description": "Filter by birthday from (YYYY-MM-DD)"
+								},
+								{
+									"key": "date_to",
+									"value": "",
+									"description": "Filter by birthday to (YYYY-MM-DD)"
+								},
+								{
+									"key": "is_active",
+									"value": "",
+									"description": "Filter by active status (1/0)"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Available doctors retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Khaled\",\n            \"last_name\": \"Suleiman\",\n            \"email\": \"doctor@example.com\",\n            \"specialization\": \"cardiology\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
 					"name": "Assign Patient to Doctor",
 					"event": [
 						{
@@ -2516,7 +2573,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"patient_id\": \"{{patient_id}}\",\n    \"notes\": \"Regular follow-up patient\"\n}",
+							"raw": "{\n    \"patient_id\": \"{{patient_id}}\",\n    \"notes\": \"Regular follow-up patient\",\n    \"supervision_status\": \"active\",\n    \"supervision_start\": \"2026-05-23\",\n    \"supervision_end\": null\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2535,6 +2592,58 @@
 							"status": "Created",
 							"code": 201,
 							"body": "{\n    \"status\": 201,\n    \"message\": \"Patient assigned to doctor successfully\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Bulk Assign Patients to Doctor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    console.log('Bulk assign results:', JSON.stringify(json.data));",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"patient_ids\": [\"{{patient_id}}\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/doctors/{{doctor_id}}/patients/bulk",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "doctors", "{{doctor_id}}", "patients", "bulk"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Bulk assignment completed\",\n    \"data\": {\n        \"assigned\": [\"patient-uuid-1\"],\n        \"skipped\": [\"patient-uuid-2\"],\n        \"errors\": []\n    }\n}"
 						}
 					]
 				},

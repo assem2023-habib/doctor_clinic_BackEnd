@@ -6,7 +6,7 @@
 
 - **Method:** `GET`
 - **Path:** `/v1/patients`
-- **Middleware:** `auth:api`, `staff`
+- **Middleware:** `auth:api`, `staff:doctor`
 
 ## Request
 
@@ -99,7 +99,7 @@ $patients = User::whereHas('roles', fn ($q) => $q->where('slug', 'patient'))
 Client          StaffMiddleware      PatientController          User Model
   │                    │                     │                     │
   │── GET /patients ──>│                     │                     │
-  │                    │── pass (staff) ────>│                     │
+   │                    │── pass (staff:doctor) ────>│                     │
   │                    │                     │── query(hasRole=patient, with=patient,roles) ──>│
   │                    │                     │<──── paginated results ───────────────│
   │                    │                     │── PatientResource::collection()       │
@@ -112,5 +112,5 @@ Client          StaffMiddleware      PatientController          User Model
 | Status | Condition |
 |--------|-----------|
 | 401 | Unauthenticated (missing/invalid token) |
-| 403 | Forbidden (user is not staff) |
+| 403 | Forbidden (user is not staff/doctor) |
 | 422 | Invalid `limit` value |
