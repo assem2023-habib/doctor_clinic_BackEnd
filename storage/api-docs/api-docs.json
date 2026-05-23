@@ -3388,6 +3388,44 @@
                         "schema": {
                             "type": "string"
                         }
+                    },
+                    {
+                        "name": "gender",
+                        "in": "query",
+                        "description": "Filter by gender",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "male",
+                                "female"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "date_from",
+                        "in": "query",
+                        "description": "Filter by birthday from (YYYY-MM-DD)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "date_to",
+                        "in": "query",
+                        "description": "Filter by birthday to (YYYY-MM-DD)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "is_active",
+                        "in": "query",
+                        "description": "Filter by active status",
+                        "schema": {
+                            "type": "boolean"
+                        }
                     }
                 ],
                 "responses": {
@@ -3398,7 +3436,88 @@
                         "description": "Unauthenticated"
                     },
                     "403": {
-                        "description": "Forbidden (staff only)"
+                        "description": "Forbidden (staff/doctor only)"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Patients"
+                ],
+                "summary": "Create a new patient (admin only)",
+                "operationId": "0ba119fa94da49865da6eb9d3d429171",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string",
+                                        "example": "Ahmed"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "example": "Ali"
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "example": "ahmedali"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "patient@example.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+963912345678"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "Damascus, Syria"
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "example": "male",
+                                        "enum": [
+                                            "male",
+                                            "female"
+                                        ]
+                                    },
+                                    "birthday_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1995-06-15"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Patient created successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden (admin only)"
+                    },
+                    "422": {
+                        "description": "Validation error"
                     }
                 },
                 "security": [
@@ -3435,7 +3554,7 @@
                         "description": "Unauthenticated"
                     },
                     "403": {
-                        "description": "Forbidden (staff only)"
+                        "description": "Forbidden (staff/doctor only)"
                     },
                     "404": {
                         "description": "Not found"

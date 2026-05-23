@@ -14,11 +14,15 @@
 |-----------|------|---------|-------------|-------------|
 | `limit` | integer | 20 | max 100 | Items per page |
 | `search` | string | — | — | Search term for `first_name`, `last_name`, or `email` (LIKE match) |
+| `gender` | string | — | `male` / `female` | Filter by gender |
+| `date_from` | date | — | YYYY-MM-DD | Filter by birthday from (inclusive) |
+| `date_to` | date | — | YYYY-MM-DD | Filter by birthday to (inclusive) |
+| `is_active` | boolean | — | `1` / `0` | Filter by active status |
 
 ### Example
 
 ```
-GET /v1/patients?limit=10&search=john
+GET /v1/patients?limit=10&search=john&gender=male&is_active=1
 ```
 
 ## DTO

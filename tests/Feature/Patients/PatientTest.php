@@ -359,4 +359,141 @@ class PatientTest extends TestCase
 
         $response->assertStatus(401);
     }
+
+    public function test_admin_can_create_patient(): void
+    {
+        $admin = $this->createAdmin();
+        Passport::actingAs($admin);
+
+        $response = $this->postJson('/api/v1/patients', [
+            'first_name' => 'New',
+            'last_name' => 'Patient',
+            'username' => 'newpatient',
+            'email' => 'newpatient@example.com',
+            'gender' => GenderEnum::Male->value,
+            'password' => 'password123',
+        ]);
+
+        $response->assertStatus(201)
+            ->assertJsonStructure([
+                'status', 'message',
+                'data' => ['id', 'first_name', 'last_name', 'email', 'is_active'],
+            ]);
+
+        $json = $response->json();
+        $this->assertEquals('New', $json['data']['first_name']);
+        $this->assertEquals('newpatient@example.com', $json['data']['email']);
+        $this->assertTrue($json['data']['is_active']);
+
+        $this->assertDatabaseHas('users', ['email' => 'newpatient@example.com', 'is_active' => true]);
+        $this->assertDatabaseHas('patients', ['user_id' => User::where('email', 'newpatient@example.com')->first()->id]);
+    }
+
+    public function test_non_admin_cannot_create_patient(): void
+    {
+        $patient = $this->createPatient();
+        Passport::actingAs($patient);
+
+        $response = $this->postJson('/api/v1/patients', [
+            'first_name' => 'Hacked',
+            'last_name' => 'Patient',
+            'username' => 'hackedpatient',
+            'email' => 'hacked@example.com',
+            'gender' => GenderEnum::Male->value,
+            'password' => 'password123',
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_unauthenticated_user_cannot_create_patient(): void
+    {
+        $response = $this->postJson('/api/v1/patients', [
+            'first_name' => 'Hacked',
+            'last_name' => 'Patient',
+            'username' => 'hackedpatient',
+            'email' => 'hacked@example.com',
+            'gender' => GenderEnum::Male->value,
+            'password' => 'password123',
+        ]);
+
+        $response->assertStatus(401);
+    }
+
+    public function test_doctor_can_list_patients(): void
+    {
+        $doctorUser = User::factory()->create();
+        $doctorUser->assignRole('doctor');
+        $doctorUser->doctor()->create([]);
+        Passport::actingAs($doctorUser);
+
+        $this->createPatient(['email' => 'patient1@example.com']);
+        $this->createPatient(['email' => 'patient2@example.com']);
+
+        $response = $this->getJson('/api/v1/patients');
+
+        $response->assertStatus(200);
+        $this->assertCount(2, $response->json()['data']);
+    }
+
+    public function test_doctor_can_show_single_patient(): void
+    {
+        $doctorUser = User::factory()->create();
+        $doctorUser->assignRole('doctor');
+        $doctorUser->doctor()->create([]);
+        Passport::actingAs($doctorUser);
+
+        $patientUser = $this->createPatient(['email' => 'patient@example.com']);
+
+        $response = $this->getJson("/api/v1/patients/{$patientUser->patient->id}");
+
+        $response->assertStatus(200);
+        $json = $response->json();
+        $this->assertEquals('patient@example.com', $json['data']['email']);
+    }
+
+    public function test_list_patients_can_filter_by_gender(): void
+    {
+        $admin = $this->createAdmin();
+        Passport::actingAs($admin);
+
+        $this->createPatient(['first_name' => 'Male', 'gender' => GenderEnum::Male->value]);
+        $this->createPatient(['first_name' => 'Female', 'gender' => GenderEnum::Female->value]);
+
+        $response = $this->getJson('/api/v1/patients?gender=' . GenderEnum::Male->value);
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $response->json()['data']);
+        $this->assertEquals('Male', $response->json()['data'][0]['first_name']);
+    }
+
+    public function test_list_patients_can_filter_by_date_range(): void
+    {
+        $admin = $this->createAdmin();
+        Passport::actingAs($admin);
+
+        $this->createPatient(['first_name' => 'Old', 'birthday_date' => '1990-01-01']);
+        $this->createPatient(['first_name' => 'Young', 'birthday_date' => '2000-01-01']);
+
+        $response = $this->getJson('/api/v1/patients?date_from=1995-01-01&date_to=2005-01-01');
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $response->json()['data']);
+        $this->assertEquals('Young', $response->json()['data'][0]['first_name']);
+    }
+
+    public function test_list_patients_can_filter_by_is_active(): void
+    {
+        $admin = $this->createAdmin();
+        Passport::actingAs($admin);
+
+        $this->createPatient(['first_name' => 'Active', 'is_active' => true]);
+        $this->createPatient(['first_name' => 'Inactive', 'is_active' => false]);
+
+        $response = $this->getJson('/api/v1/patients?is_active=1');
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $response->json()['data']);
+        $this->assertEquals('Active', $response->json()['data'][0]['first_name']);
+    }
 }

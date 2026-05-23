@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Api\V1\Patient;
 
+use App\Domains\Patients\Actions\CreatePatientAction;
 use App\Domains\Patients\Actions\DeletePatientAction;
 use App\Domains\Patients\Actions\UpdatePatientAction;
 use App\Domains\Patients\Models\Patient;
 use App\Domains\Patients\Requests\PatchPatientRequest;
+use App\Domains\Patients\Requests\StorePatientRequest;
 use App\Domains\Patients\Requests\UpdatePatientRequest;
 use App\Domains\Patients\Resources\PatientResource;
 use App\Domains\Shared\Responses\ApiResponse;
@@ -16,6 +18,7 @@ use Illuminate\Http\Request;
 class PatientController
 {
     public function __construct(
+        private readonly CreatePatientAction $createPatientAction,
         private readonly UpdatePatientAction $updatePatientAction,
         private readonly DeletePatientAction $deletePatientAction,
     ) {}
@@ -30,6 +33,10 @@ class PatientController
                   ->orWhere('last_name', 'like', "%{$v}%")
                   ->orWhere('email', 'like', "%{$v}%");
             }))
+            ->when($request->gender, fn ($q, $v) => $q->where('gender', $v))
+            ->when($request->date_from, fn ($q, $v) => $q->where('birthday_date', '>=', $v))
+            ->when($request->date_to, fn ($q, $v) => $q->where('birthday_date', '<=', $v))
+            ->when($request->has('is_active'), fn ($q) => $q->where('is_active', $request->boolean('is_active')))
             ->paginate(min($limit, 100));
 
         return ApiResponse::success(
@@ -70,6 +77,16 @@ class PatientController
         return ApiResponse::success(
             new PatientResource($user),
             __('Patient updated successfully')
+        );
+    }
+
+    public function store(StorePatientRequest $request): JsonResponse
+    {
+        $user = $this->createPatientAction->execute($request);
+
+        return ApiResponse::created(
+            new PatientResource($user),
+            __('Patient created successfully')
         );
     }
 

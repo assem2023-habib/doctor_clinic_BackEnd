@@ -6,18 +6,20 @@
 
 | Method | Endpoint | Middleware | Controller | Description |
 |--------|----------|-----------|------------|-------------|
-| GET | `/v1/patients` | `auth:api`, `staff` | `index` | List/search patients |
-| GET | `/v1/patients/{patient}` | `auth:api`, `staff` | `show` | Get a single patient |
-| PUT | `/v1/patients/{patient}` | `auth:api`, `staff`, `admin` | `update` | Fully update a patient |
-| PATCH | `/v1/patients/{patient}` | `auth:api`, `staff`, `admin` | `updatePartial` | Partially update a patient |
-| DELETE | `/v1/patients/{patient}` | `auth:api`, `staff`, `admin` | `destroy` | Delete a patient (cascade) |
+| POST | `/v1/patients` | `auth:api`, `active`, `admin` | `store` | Create a new patient (admin only) |
+| GET | `/v1/patients` | `auth:api`, `active`, `staff:doctor` | `index` | List/search patients with filters |
+| GET | `/v1/patients/{patient}` | `auth:api`, `active`, `staff:doctor` | `show` | Get a single patient |
+| PUT | `/v1/patients/{patient}` | `auth:api`, `active`, `admin` | `update` | Fully update a patient |
+| PATCH | `/v1/patients/{patient}` | `auth:api`, `active`, `admin` | `updatePartial` | Partially update a patient |
+| DELETE | `/v1/patients/{patient}` | `auth:api`, `active`, `admin` | `destroy` | Delete a patient (cascade) |
 
 ## Architecture
 
 ```
 PatientController
- └── index()          → PatientResource::collection(User::whereHas('roles', slug=patient))
+ └── index()          → PatientResource::collection(User::whereHas('roles', slug=patient)) + filters
  └── show()           → PatientResource (loads user.roles relation)
+ └── store()          → CreatePatientAction → PatientResource (status 201)
  └── update()         → UpdatePatientAction → UpdatePatientData (fromRequest)
  └── updatePartial()  → UpdatePatientAction → UpdatePatientData (fromRequestPartial)
  └── destroy()        → DeletePatientAction → PatientDeletionService

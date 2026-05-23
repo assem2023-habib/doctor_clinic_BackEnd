@@ -8,10 +8,12 @@ use Illuminate\Http\Request;
 
 class CheckStaffRole
 {
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next, ...$extraRoles)
     {
-        if (!$request->user()?->hasAnyRole(['admin', 'receptionist'])) {
-            return ApiResponse::forbidden(__('Only admin or receptionist can perform this action'));
+        $roles = array_merge(['admin', 'receptionist'], $extraRoles);
+
+        if (!$request->user()?->hasAnyRole($roles)) {
+            return ApiResponse::forbidden(__('Only staff can perform this action'));
         }
 
         return $next($request);
