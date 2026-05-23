@@ -1,6 +1,6 @@
 # Appointments Domain
 
-> Manages the full appointment lifecycle: request → set time → patient response → confirm → complete/cancel. Includes slot availability, overlap checking, auto-confirmation jobs, and status logging.
+> Manages the full appointment lifecycle: request → set time → patient response → confirm → complete/cancel. Includes slot availability, overlap checking, auto-confirmation jobs, status logging, and Firebase Realtime Database synchronization.
 
 ## Lifecycle
 
@@ -37,11 +37,11 @@ AppointmentController
  ├── index()          → AppointmentResource::collection (role-scoped query)
  ├── show()           → AppointmentResource (with canAccess guard)
  ├── store()          → RequestAppointmentAction → NotificationManager
- ├── setTime()        → SetAppointmentTimeAction → AutoConfirmAppointment Job → NotificationManager
- ├── respond()        → PatientRespondAction → NotificationManager
- ├── start()          → StartAppointmentAction → NotificationManager
- ├── cancel()         → CancelAppointmentAction → NotificationManager
- ├── complete()       → CompleteAppointmentAction → NotificationManager
+ ├── setTime()        → SetAppointmentTimeAction → AutoConfirmAppointment Job → NotificationManager → AppointmentRtdbService::sync()
+ ├── respond()        → PatientRespondAction → NotificationManager → AppointmentRtdbService::sync()/remove()
+ ├── start()          → StartAppointmentAction → NotificationManager → AppointmentRtdbService::sync()
+ ├── cancel()         → CancelAppointmentAction → NotificationManager → AppointmentRtdbService::remove()
+ ├── complete()       → CompleteAppointmentAction → NotificationManager → AppointmentRtdbService::remove()
  └── suggestAlternative() → SuggestAlternativeAction → NotificationManager
 ```
 
@@ -58,3 +58,67 @@ AppointmentController
 - **Notifications:** Each state transition fires a notification via `NotificationManager` (appointment.requested, .time_set, .accepted, .rejected, .in_progress, .cancelled, .completed, .alternative_suggested)
 - **Slot Service:** `AvailableSlotsService::getBookedSlots()` returns future booked appointments (Set, Accepted, InProgress, Confirmed) with optional date/range filter. Always excludes past appointments.
 - **Actions:** 7 actions (RequestAppointment, SetAppointmentTime, PatientRespond, StartAppointment, CancelAppointment, CompleteAppointment, SuggestAlternative) — each is a single-class use case
+
+## Firebase Realtime Database Sync
+
+Appointments are synchronized to Firebase RTDB so the frontend can display real-time updates per doctor.
+
+### Structure
+
+```
+/doctors/{doctorId}/booked-appointments/{appointmentId}: {
+  "id": "uuid",
+  "doctor_id": "uuid",
+  "patient_id": "uuid",
+  "patient_name": "Patient Name",
+  "patient_phone": "+123456789",
+  "appointment_date": "2026-06-01",
+  "start_time": "10:00",
+  "end_time": "11:00",
+  "status": "accepted",
+  "reason": "Checkup",
+  "notes": "...",
+  "synced_at": "2026-05-23T12:00:00+00:00",
+  "synced_at_timestamp": 123456789
+}
+```
+
+### Sync Rules
+
+| Transition | Status After | RTDB Action |
+|---|---|---|
+| `setTime()` → status becomes `Set` | Booked | **Write** to RTDB |
+| `respond(accept)` / `AutoConfirm` → `Accepted` | Booked | **Write** (update status) |
+| `respond(reject)` → `Rejected` | Not Booked | **Remove** from RTDB |
+| `start()` → `InProgress` | Booked | **Write** (update status) |
+| `cancel()` → `Cancelled` | Not Booked | **Remove** from RTDB |
+| `complete()` → `Completed` | Not Booked | **Remove** from RTDB |
+
+### Services
+
+- **`FirebaseRtdbService`** (`app/Domains/Notifications/Services/FirebaseRtdbService.php`): Low-level wrapper around the Kreait Firebase RTDB client. Provides `setValue()`, `removeValue()`, `getValue()` for any path. Registered as a singleton.
+- **`AppointmentRtdbService`** (`app/Domains/Appointments/Services/AppointmentRtdbService.php`): Domain-specific service that builds appointment payloads, determines the correct RTDB path (`doctors/{doctorId}/booked-appointments/{appointmentId}`), and delegates writes/removes to `FirebaseRtdbService`.
+
+### Cleanup
+
+- **`appointments:cleanup-rtdb`** — Artisan command (`app/Console/Commands/CleanupExpiredRtdbAppointments.php`) that scans for booked appointments (Set, Accepted, InProgress, Confirmed) whose `appointment_date + end_time` has passed and removes them from RTDB.
+- Runs every 5 minutes via the scheduler (`routes/console.php`).
+
+### Frontend Rules
+
+The Firebase RTDB should be configured with read-only security rules so the frontend can only read data, never write:
+
+```json
+{
+  "rules": {
+    "doctors": {
+      "$doctorId": {
+        "booked-appointments": {
+          ".read": true,
+          ".write": false
+        }
+      }
+    }
+  }
+}
+```

@@ -11,6 +11,7 @@ return [
         'firebase' => [
             'enabled' => env('FCM_ENABLED', false),
             'credentials' => env('FIREBASE_CREDENTIALS', storage_path('app/firebase/service-account.json')),
+            'rtdb_url' => env('FIREBASE_RTDB_URL'),
         ],
         'websocket' => [
             'enabled' => env('REVERB_ENABLED', false),

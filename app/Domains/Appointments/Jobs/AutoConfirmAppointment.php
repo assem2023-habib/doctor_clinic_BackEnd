@@ -4,6 +4,7 @@ namespace App\Domains\Appointments\Jobs;
 
 use App\Domains\Appointments\Models\Appointment;
 use App\Domains\Appointments\Models\AppointmentStatusLog;
+use App\Domains\Appointments\Services\AppointmentRtdbService;
 use App\Enums\AppointmentStatusEnum;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -35,5 +36,9 @@ class AutoConfirmAppointment implements ShouldQueue
             'changed_by' => 'system: auto-confirm',
             'created_at' => now(),
         ]);
+
+        $appointment = $appointment->fresh();
+        $rtdb = app(AppointmentRtdbService::class);
+        $rtdb->syncAppointment($appointment);
     }
 }

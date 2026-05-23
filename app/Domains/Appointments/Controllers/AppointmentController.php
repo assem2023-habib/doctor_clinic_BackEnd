@@ -21,6 +21,7 @@ use App\Domains\Appointments\Requests\RequestAppointmentRequest;
 use App\Domains\Appointments\Requests\SetAppointmentTimeRequest;
 use App\Domains\Appointments\Requests\SuggestAlternativeRequest;
 use App\Domains\Appointments\Resources\AppointmentResource;
+use App\Domains\Appointments\Services\AppointmentRtdbService;
 use App\Domains\Appointments\Services\AvailableSlotsService;
 use App\Domains\Doctors\Models\Doctor;
 use App\Domains\Notifications\DTOs\NotificationData;
@@ -44,6 +45,7 @@ class AppointmentController
         private readonly SuggestAlternativeAction $suggestAction,
         private readonly AvailableSlotsService $slotsService,
         private readonly NotificationManager $notificationManager,
+        private readonly AppointmentRtdbService $rtdb,
     ) {}
 
     public function bookedSlots(Request $request, Doctor $doctor): JsonResponse
@@ -210,6 +212,8 @@ class AppointmentController
             type: 'appointment',
         ));
 
+        $this->rtdb->syncAppointment($appointment);
+
         return ApiResponse::success(
             new AppointmentResource($appointment),
             __('Appointment time set successfully')
@@ -257,6 +261,12 @@ class AppointmentController
             type: 'appointment',
         ));
 
+        if ($response === PatientResponseEnum::Accepted) {
+            $this->rtdb->syncAppointment($appointment);
+        } else {
+            $this->rtdb->removeAppointment($appointment);
+        }
+
         return ApiResponse::success(
             new AppointmentResource($appointment),
             $response === PatientResponseEnum::Accepted
@@ -293,6 +303,8 @@ class AppointmentController
             userIds: [$appointment->patient?->user_id, $appointment->doctor?->user_id],
             type: 'appointment',
         ));
+
+        $this->rtdb->removeAppointment($appointment);
 
         return ApiResponse::success(
             new AppointmentResource($appointment),
@@ -332,6 +344,8 @@ class AppointmentController
             type: 'appointment',
         ));
 
+        $this->rtdb->removeAppointment($appointment);
+
         return ApiResponse::success(
             new AppointmentResource($appointment),
             __('Appointment completed successfully')
@@ -369,6 +383,8 @@ class AppointmentController
             userIds: [$appointment->patient?->user_id],
             type: 'appointment',
         ));
+
+        $this->rtdb->syncAppointment($appointment);
 
         return ApiResponse::success(
             new AppointmentResource($appointment),
