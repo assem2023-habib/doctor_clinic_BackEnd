@@ -1,6 +1,7 @@
 <?php
 
 use App\Domains\Appointments\Controllers\AppointmentController;
+use App\Domains\Notifications\Controllers\NotificationController;
 use App\Domains\RBAC\Controllers\PermissionController;
 use App\Domains\RBAC\Controllers\RoleController;
 use App\Domains\RBAC\Controllers\UserRoleController;
@@ -139,14 +140,25 @@ Route::middleware(['auth:api', 'active'])->group(function () {
         });
 
         Route::prefix('v1/appointments')->group(function () {
-        Route::get('/', [AppointmentController::class, 'index']);
-        Route::get('/{appointment}', [AppointmentController::class, 'show']);
-        Route::post('/', [AppointmentController::class, 'store']);
-        Route::post('/{appointment}/respond', [AppointmentController::class, 'respond']);
-        Route::post('/{appointment}/set-time', [AppointmentController::class, 'setTime']);
-        Route::post('/{appointment}/cancel', [AppointmentController::class, 'cancel']);
-        Route::post('/{appointment}/start', [AppointmentController::class, 'start']);
-        Route::post('/{appointment}/complete', [AppointmentController::class, 'complete']);
-        Route::post('/{appointment}/suggest-alternative', [AppointmentController::class, 'suggestAlternative']);
+            Route::get('/', [AppointmentController::class, 'index']);
+            Route::get('/{appointment}', [AppointmentController::class, 'show']);
+            Route::post('/', [AppointmentController::class, 'store']);
+            Route::post('/{appointment}/respond', [AppointmentController::class, 'respond']);
+            Route::post('/{appointment}/set-time', [AppointmentController::class, 'setTime']);
+            Route::post('/{appointment}/cancel', [AppointmentController::class, 'cancel']);
+            Route::post('/{appointment}/start', [AppointmentController::class, 'start']);
+            Route::post('/{appointment}/complete', [AppointmentController::class, 'complete']);
+            Route::post('/{appointment}/suggest-alternative', [AppointmentController::class, 'suggestAlternative']);
+        });
+
+        Route::prefix('v1/notifications')->group(function () {
+            Route::get('/', [NotificationController::class, 'index']);
+            Route::post('/read', [NotificationController::class, 'markMultipleAsRead']);
+            Route::post('/read-all', [NotificationController::class, 'markAllAsRead']);
+            Route::delete('/', [NotificationController::class, 'destroyMultiple']);
+            Route::delete('/all', [NotificationController::class, 'destroyAll']);
+            Route::get('/{notification}', [NotificationController::class, 'show'])->whereUuid('notification');
+            Route::post('/{notification}/read', [NotificationController::class, 'markAsRead'])->whereUuid('notification');
+            Route::delete('/{notification}', [NotificationController::class, 'destroy'])->whereUuid('notification');
+        });
     });
-});

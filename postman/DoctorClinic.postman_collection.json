@@ -55,6 +55,11 @@
 			"key": "appointment_id",
 			"value": "",
 			"type": "string"
+		},
+		{
+			"key": "notification_id",
+			"value": "",
+			"type": "string"
 		}
 	],
 	"item": [
@@ -2815,6 +2820,316 @@
 							"status": "Conflict",
 							"code": 409,
 							"body": "{\n    \"status\": 409,\n    \"message\": \"Patient has active appointments. Cannot delete.\"\n}"
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var token = pm.collectionVariables.get('access_token');",
+							"if (token) {",
+							"    pm.request.headers.add({",
+							"        key: 'Authorization',",
+							"        value: 'Bearer ' + token",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "Notifications",
+			"description": "Notification management for authenticated users.\n\nEvery request in this folder automatically attaches `Authorization: Bearer {{access_token}}` via the Pre-request Script.",
+			"item": [
+				{
+					"name": "List Notifications",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    if (json.data && json.data.notifications && json.data.notifications.length > 0) {",
+									"        pm.collectionVariables.set('notification_id', json.data.notifications[0].id);",
+									"        console.log('Notification ID stored:', json.data.notifications[0].id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/notifications",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "notifications"],
+							"query": [
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Items per page (max 100)"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Notifications retrieved successfully\",\n    \"data\": {\n        \"notifications\": [\n            {\n                \"id\": \"019e5596-4346-73e6-aaf2-005432d2cfd1\",\n                \"topic\": \"appointment.requested\",\n                \"title\": \"New Appointment Request\",\n                \"body\": {\n                    \"appointment_id\": \"...\",\n                    \"doctor_id\": \"...\",\n                    \"patient_id\": \"...\",\n                    \"reason\": \"Checkup\"\n                },\n                \"is_read\": false,\n                \"read_at\": null,\n                \"created_at\": \"2026-05-23T10:00:00.000000Z\",\n                \"updated_at\": \"2026-05-23T10:00:00.000000Z\"\n            }\n        ],\n        \"unread_count\": 5\n    },\n    \"meta\": {\n        \"pagination\": {\n            \"current_page\": 1,\n            \"last_page\": 5,\n            \"limit\": 20,\n            \"total\": 42,\n            \"hasNextPage\": true,\n            \"hasPreviousPage\": false\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Notification",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('notification_id', json.data.id);",
+									"    console.log('Notification ID stored:', json.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/notifications/{{notification_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "notifications", "{{notification_id}}"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Notification retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e5596-4346-73e6-aaf2-005432d2cfd1\",\n        \"topic\": \"appointment.requested\",\n        \"title\": \"New Appointment Request\",\n        \"body\": {\n            \"appointment_id\": \"...\",\n            \"doctor_id\": \"...\",\n            \"patient_id\": \"...\",\n            \"reason\": \"Checkup\"\n        },\n        \"is_read\": true,\n        \"read_at\": \"2026-05-23T10:05:00.000000Z\",\n        \"created_at\": \"2026-05-23T10:00:00.000000Z\",\n        \"updated_at\": \"2026-05-23T10:00:00.000000Z\"\n    }\n}"
+						},
+						{
+							"name": "Not Found",
+							"status": "Not Found",
+							"code": 404
+						}
+					]
+				},
+				{
+					"name": "Mark Notification as Read",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/notifications/{{notification_id}}/read",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "notifications", "{{notification_id}}", "read"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Notification marked as read\",\n    \"data\": null\n}"
+						}
+					]
+				},
+				{
+					"name": "Mark Multiple Notifications as Read",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"ids\": [\n        \"{{notification_id}}\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/notifications/read",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "notifications", "read"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Notifications marked as read\",\n    \"data\": null\n}"
+						},
+						{
+							"name": "Validation Error",
+							"status": "Unprocessable Entity",
+							"code": 422,
+							"body": "{\n    \"status\": 422,\n    \"message\": \"Validation failed\",\n    \"errors\": {\n        \"ids\": [\"The ids field is required.\"]\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Mark All Notifications as Read",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/notifications/read-all",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "notifications", "read-all"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"All notifications marked as read\",\n    \"data\": null\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete Notification",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/notifications/{{notification_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "notifications", "{{notification_id}}"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Notification deleted\",\n    \"data\": null\n}"
+						},
+						{
+							"name": "Not Found",
+							"status": "Not Found",
+							"code": 404
+						}
+					]
+				},
+				{
+					"name": "Delete Multiple Notifications",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"ids\": [\n        \"{{notification_id}}\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/notifications",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "notifications"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Notifications deleted\",\n    \"data\": null\n}"
+						},
+						{
+							"name": "Validation Error",
+							"status": "Unprocessable Entity",
+							"code": 422,
+							"body": "{\n    \"status\": 422,\n    \"message\": \"Validation failed\",\n    \"errors\": {\n        \"ids\": [\"The ids field is required.\"]\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete All Notifications",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/notifications/all",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "notifications", "all"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"All notifications deleted\",\n    \"data\": null\n}"
 						}
 					]
 				}
