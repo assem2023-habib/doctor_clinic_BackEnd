@@ -32,6 +32,11 @@
 			"type": "string"
 		},
 		{
+			"key": "receptionist_id",
+			"value": "",
+			"type": "string"
+		},
+		{
 			"key": "country_id",
 			"value": "",
 			"type": "string"
@@ -156,22 +161,6 @@
 				},
 				{
 					"name": "Register Doctor",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 201) {",
-									"    var json = pm.response.json();",
-									"    pm.collectionVariables.set('access_token', json.data.access_token);",
-									"    pm.collectionVariables.set('refresh_token', json.data.refresh_token);",
-									"    pm.collectionVariables.set('expires_in', json.data.expires_in);",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -259,28 +248,12 @@
 							"name": "Created",
 							"status": "Created",
 							"code": 201,
-							"body": "{\n    \"status\": 201,\n    \"message\": \"Registered successfully\",\n    \"data\": {\n        \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n        \"refresh_token\": \"def50200...\",\n        \"expires_in\": 31536000,\n        \"token_type\": \"Bearer\",\n        \"user\": {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Khaled\",\n            \"last_name\": \"Suleiman\",\n            \"email\": \"doctor@example.com\",\n            \"roles\": [\"doctor\"],\n            \"phone\": \"+963912345679\",\n            \"gender\": \"male\",\n            \"birthday_date\": \"1985-03-20\",\n            \"is_active\": true,\n            \"specialization\": \"cardiology\",\n            \"experience_months\": 60\n        }\n    }\n}"
+							"body": "{\n    \"status\": 201,\n    \"message\": \"Account created successfully. Please wait for admin approval.\",\n    \"data\": null\n}"
 						}
 					]
 				},
 				{
 					"name": "Register Receptionist",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 201) {",
-									"    var json = pm.response.json();",
-									"    pm.collectionVariables.set('access_token', json.data.access_token);",
-									"    pm.collectionVariables.set('refresh_token', json.data.refresh_token);",
-									"    pm.collectionVariables.set('expires_in', json.data.expires_in);",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -366,7 +339,7 @@
 							"name": "Created",
 							"status": "Created",
 							"code": 201,
-							"body": "{\n    \"status\": 201,\n    \"message\": \"Registered successfully\",\n    \"data\": {\n        \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n        \"refresh_token\": \"def50200...\",\n        \"expires_in\": 31536000,\n        \"token_type\": \"Bearer\",\n        \"user\": {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Layla\",\n            \"last_name\": \"Hassan\",\n            \"email\": \"receptionist@example.com\",\n            \"roles\": [\"receptionist\"],\n            \"shift_start\": \"09:00\",\n            \"shift_end\": \"17:00\",\n            \"phone\": \"+963912345680\",\n            \"gender\": \"female\",\n            \"birthday_date\": \"1998-11-05\",\n            \"is_active\": true\n        }\n    }\n}"
+							"body": "{\n    \"status\": 201,\n    \"message\": \"Account created successfully. Please wait for admin approval.\",\n    \"data\": null\n}"
 						}
 					]
 				},
@@ -1349,7 +1322,7 @@
 		},
 		{
 			"name": "Doctors",
-			"description": "Doctor management.\n\nPublic routes: List / Get.\nProtected routes (auth required + admin): Update, Delete.",
+			"description": "Doctor management.\n\nPublic routes: List / Get.\nProtected routes (auth required + admin): Update, Delete, Activate Account.",
 			"item": [
 				{
 					"name": "List Doctors",
@@ -1666,8 +1639,49 @@
                         }
                     ]
                 },
-                {
-                    "name": "Delete Doctor",
+				{
+					"name": "Activate Doctor Account",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/doctors/{{doctor_id}}/activate-account",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "doctors", "{{doctor_id}}", "activate-account"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Account activated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor@example.com\",\n        \"roles\": [\"doctor\"],\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"specialization\": \"cardiology\",\n        \"experience_months\": 60,\n        \"schedules\": []\n    }\n}"
+						},
+						{
+							"name": "Forbidden",
+							"status": "Forbidden",
+							"code": 403,
+							"body": "{\n    \"status\": 403,\n    \"message\": \"Forbidden\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete Doctor",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -2334,6 +2348,70 @@
 							"name": "No Content",
 							"status": "No Content",
 							"code": 204
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var token = pm.collectionVariables.get('access_token');",
+							"if (token) {",
+							"    pm.request.headers.add({",
+							"        key: 'Authorization',",
+							"        value: 'Bearer ' + token",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "Receptionists",
+			"description": "Receptionist management.\n\nProtected routes (auth + admin): Activate account.",
+			"item": [
+				{
+					"name": "Activate Receptionist Account",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/receptionists/{{receptionist_id}}/activate-account",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "receptionists", "{{receptionist_id}}", "activate-account"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Account activated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Layla\",\n        \"last_name\": \"Hassan\",\n        \"email\": \"receptionist@example.com\",\n        \"roles\": [\"receptionist\"],\n        \"shift_start\": \"09:00\",\n        \"shift_end\": \"17:00\",\n        \"phone\": \"+963912345680\",\n        \"gender\": \"female\",\n        \"birthday_date\": \"1998-11-05\",\n        \"is_active\": true\n    }\n}"
+						},
+						{
+							"name": "Forbidden",
+							"status": "Forbidden",
+							"code": 403,
+							"body": "{\n    \"status\": 403,\n    \"message\": \"Forbidden\"\n}"
 						}
 					]
 				}
