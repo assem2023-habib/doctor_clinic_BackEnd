@@ -3,6 +3,7 @@
 namespace App\Domains\Notifications\Services;
 
 use Illuminate\Support\Facades\Log;
+use Kreait\Firebase\Contract\Auth as AuthContract;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging;
 use Kreait\Firebase\Exception\FirebaseException;
@@ -42,6 +43,20 @@ class FirebaseService
             return $this->factory->createMessaging();
         } catch (FirebaseException $e) {
             Log::error('Failed to create Firebase Messaging', ['message' => $e->getMessage()]);
+            return null;
+        }
+    }
+
+    public function auth(): ?AuthContract
+    {
+        if (!$this->isAvailable()) {
+            return null;
+        }
+
+        try {
+            return $this->factory->createAuth();
+        } catch (FirebaseException $e) {
+            Log::error('Failed to create Firebase Auth', ['message' => $e->getMessage()]);
             return null;
         }
     }

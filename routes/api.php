@@ -26,6 +26,8 @@ Route::prefix('v1/auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
     Route::post('/refresh', [AuthController::class, 'refresh']);
 
+    Route::post('/firebase-token', [AuthController::class, 'firebaseToken'])->middleware(['auth:api', 'active']);
+
     Route::middleware(['auth:api', 'active'])->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::put('/password', [AuthController::class, 'changePassword']);

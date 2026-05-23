@@ -19,6 +19,7 @@ use App\Domains\Auth\DTOs\RegisterPatientData;
 use App\Domains\Auth\DTOs\RegisterReceptionistData;
 use App\Domains\Auth\Requests\LoginRequest;
 use App\Domains\Auth\Requests\UpdateProfileRequest;
+use App\Domains\Notifications\Services\FirebaseService;
 use App\Models\User;
 use App\Domains\Auth\Requests\RegisterDoctorRequest;
 use App\Domains\Auth\Requests\RegisterPatientRequest;
@@ -45,6 +46,7 @@ class AuthController
         private readonly ChangePasswordAction $changePasswordAction,
         private readonly UpdateProfileAction $updateProfileAction,
         private readonly AuthService $authService,
+        private readonly FirebaseService $firebase,
     ) {}
 
     public function registerPatient(RegisterPatientRequest $request): JsonResponse
@@ -162,5 +164,31 @@ class AuthController
         };
 
         return ApiResponse::success($resource, __('Profile updated successfully'));
+    }
+
+    public function firebaseToken(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        $auth = $this->firebase->auth();
+
+        if (!$auth) {
+            return ApiResponse::error(__('Firebase not configured'), 500);
+        }
+
+        try {
+            $uid = "user_{$user->id}";
+            $customToken = $auth->createCustomToken($uid, [
+                'user_id' => $user->id,
+                'role' => $user->roles->pluck('slug')->implode(','),
+            ]);
+
+            return ApiResponse::success([
+                'firebase_token' => $customToken->toString(),
+                'uid' => $uid,
+            ], __('auth.firebase_token_generated'));
+        } catch (\Throwable $e) {
+            return ApiResponse::error(__('Failed to generate Firebase token'), 500);
+        }
     }
 }

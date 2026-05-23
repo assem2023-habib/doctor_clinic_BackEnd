@@ -104,9 +104,65 @@ Appointments are synchronized to Firebase RTDB so the frontend can display real-
 - **`appointments:cleanup-rtdb`** — Artisan command (`app/Console/Commands/CleanupExpiredRtdbAppointments.php`) that scans for booked appointments (Set, Accepted, InProgress, Confirmed) whose `appointment_date + end_time` has passed and removes them from RTDB.
 - Runs every 5 minutes via the scheduler (`routes/console.php`).
 
+### Firebase Authentication Flow
+
+الـ Frontend يحتاج Firebase Custom Token ليتمكن من قراءة RTDB. التدفق كالتالي:
+
+```
+1. المستخدم يسجل دخول في Laravel (POST /api/v1/auth/login) ← يحصل على Bearer token
+2. الـ Frontend يرسل Bearer token إلى POST /api/v1/auth/firebase-token
+3. Laravel يُنشئ Firebase Custom Token خاص بهذا المستخدم ويعيده
+4. الـ Frontend يستخدم Firebase SDK: signInWithCustomToken(firebase_token)
+5. الآن الـ Frontend قادر على قراءة RTDB
+```
+
+#### Request
+
+```
+POST /api/v1/auth/firebase-token
+Authorization: Bearer <laravel_access_token>
+```
+
+#### Response
+
+```json
+{
+  "status": 200,
+  "message": "Firebase token generated successfully.",
+  "data": {
+    "firebase_token": "eyJhbGciOiJSUzI1NiIs...",
+    "uid": "user_019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009"
+  }
+}
+```
+
+#### Frontend Example (JavaScript)
+
+```javascript
+import { initializeApp } from "firebase/app";
+import { getDatabase, ref, onValue } from "firebase/database";
+import { getAuth, signInWithCustomToken } from "firebase/auth";
+
+// 1. بعد ما تجيب firebase_token من الـ API
+const firebaseToken = response.data.firebase_token;
+
+// 2. سجل دخول في Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+await signInWithCustomToken(auth, firebaseToken);
+
+// 3. اقرأ المواعيد
+const db = getDatabase(app);
+const appointmentsRef = ref(db, `doctors/${doctorId}/booked-appointments`);
+onValue(appointmentsRef, (snapshot) => {
+  const data = snapshot.val();
+  // data = { appointmentId1: {...}, appointmentId2: {...}, ... }
+});
+```
+
 ### Firebase RTDB Security Rules
 
-اذهب إلى **Firebase Console → Realtime Database → Rules** والصق هذه القواعد. تسمح بالقراءة فقط للمستخدمين المصادقين (Admin SDK يكتب دون تأثير القواعد):
+اذهب إلى **Firebase Console → Realtime Database → Rules** والصق هذه القواعد:
 
 ```json
 {
@@ -125,5 +181,5 @@ Appointments are synchronized to Firebase RTDB so the frontend can display real-
 }
 ```
 
-- **`.read`: `"auth !== null"`** — أي مستخدم سجل دخوله في Firebase يمكنه قراءة المواعيد
-- **`.write`: `false`** — الـ frontend لا يمكنه الكتابة أبداً، فقط الـ Admin SDK (السيرفر) يكتب/يمسح
+- **`.read`: `"auth !== null"`** — فقط المستخدمون الذين سجلوا دخولهم في Firebase (عبر Custom Token) يمكنهم القراءة
+- **`.write`: `false`** — الـ frontend لا يمكنه الكتابة أبداً، فقط الـ Admin SDK (السيرفر) يكتب/يمسح عبر `FirebaseRtdbService`

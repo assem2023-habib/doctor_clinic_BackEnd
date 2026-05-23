@@ -278,6 +278,27 @@ use OpenApi\Attributes as OA;
         new OA\Response(response: 422, description: 'Validation error'),
     ]
 )]
+#[
+    OA\Post(
+        path: '/api/v1/auth/firebase-token',
+        summary: 'Get Firebase custom token for Realtime Database access',
+        description: 'Generates a Firebase custom token tied to the authenticated user. The frontend uses this token with signInWithCustomToken() to authenticate with Firebase and read RTDB data.',
+        security: [['bearerAuth' => []]],
+        tags: ['Auth'],
+        responses: [
+            new OA\Response(response: 200, description: 'Firebase token generated', content: new OA\JsonContent(properties: [
+                new OA\Property(property: 'status', type: 'integer', example: 200),
+                new OA\Property(property: 'message', type: 'string', example: 'Firebase token generated successfully.'),
+                new OA\Property(property: 'data', type: 'object', properties: [
+                    new OA\Property(property: 'firebase_token', type: 'string', example: 'eyJhbGciOiJSUzI1NiIs...'),
+                    new OA\Property(property: 'uid', type: 'string', example: 'user_019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009'),
+                ]),
+            ])),
+            new OA\Response(response: 401, description: 'Unauthenticated'),
+            new OA\Response(response: 500, description: 'Firebase not configured'),
+        ]
+    )
+]
 class AuthControllerDoc
 {
 }

@@ -27,6 +27,7 @@ return [
     'profile_retrieved' => 'User profile retrieved successfully.',
     'account_deleted' => 'Account deleted successfully.',
     'password_changed' => 'Password changed successfully.',
+    'firebase_token_generated' => 'Firebase token generated successfully.',
 
     'device_blocked' => 'This device is blocked due to multiple failed login attempts. Please try again later.',
     'device_temporarily_blocked' => 'Too many attempts from this device. Please try again in an hour.',
