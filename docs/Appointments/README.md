@@ -104,17 +104,19 @@ Appointments are synchronized to Firebase RTDB so the frontend can display real-
 - **`appointments:cleanup-rtdb`** — Artisan command (`app/Console/Commands/CleanupExpiredRtdbAppointments.php`) that scans for booked appointments (Set, Accepted, InProgress, Confirmed) whose `appointment_date + end_time` has passed and removes them from RTDB.
 - Runs every 5 minutes via the scheduler (`routes/console.php`).
 
-### Frontend Rules
+### Firebase RTDB Security Rules
 
-The Firebase RTDB should be configured with read-only security rules so the frontend can only read data, never write:
+اذهب إلى **Firebase Console → Realtime Database → Rules** والصق هذه القواعد. تسمح بالقراءة فقط للمستخدمين المصادقين (Admin SDK يكتب دون تأثير القواعد):
 
 ```json
 {
   "rules": {
+    ".read": false,
+    ".write": false,
     "doctors": {
       "$doctorId": {
         "booked-appointments": {
-          ".read": true,
+          ".read": "auth !== null",
           ".write": false
         }
       }
@@ -122,3 +124,6 @@ The Firebase RTDB should be configured with read-only security rules so the fron
   }
 }
 ```
+
+- **`.read`: `"auth !== null"`** — أي مستخدم سجل دخوله في Firebase يمكنه قراءة المواعيد
+- **`.write`: `false`** — الـ frontend لا يمكنه الكتابة أبداً، فقط الـ Admin SDK (السيرفر) يكتب/يمسح
