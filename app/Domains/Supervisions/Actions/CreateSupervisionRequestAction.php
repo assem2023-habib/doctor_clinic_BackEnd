@@ -18,8 +18,13 @@ class CreateSupervisionRequestAction
     {
         $patient->loadMissing('user');
 
-        if ($patient->doctors()->wherePivot('supervision_status', 'active')->exists()) {
-            abort(409, __('Patient already has an active supervision'));
+        $hasSameSpecialization = $patient->doctors()
+            ->wherePivot('supervision_status', 'active')
+            ->where('specialization', $doctor->specialization->value)
+            ->exists();
+
+        if ($hasSameSpecialization) {
+            abort(409, __('Patient already has an active supervision with a doctor of this specialization'));
         }
 
         $exists = SupervisionRequest::where('patient_id', $patient->id)

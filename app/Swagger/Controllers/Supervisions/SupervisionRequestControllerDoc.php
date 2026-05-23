@@ -25,7 +25,7 @@ class SupervisionRequestControllerDoc
             new OA\Response(response: 201, description: 'Supervision request created successfully'),
             new OA\Response(response: 401, description: 'Unauthenticated'),
             new OA\Response(response: 403, description: 'Forbidden'),
-            new OA\Response(response: 409, description: 'Patient already has active supervision or pending request'),
+            new OA\Response(response: 409, description: 'Patient already has active supervision with this specialization, or pending request to this doctor'),
             new OA\Response(response: 422, description: 'Validation error'),
         ]
     )]
@@ -63,6 +63,23 @@ class SupervisionRequestControllerDoc
         ]
     )]
     public function indexDoctor() {}
+
+    #[OA\Post(
+        path: '/api/v1/supervision-requests/{supervision_request}/cancel',
+        summary: 'Cancel a supervision request (patient only)',
+        tags: ['Supervision Requests'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(name: 'supervision_request', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Supervision Request UUID'),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Supervision request cancelled'),
+            new OA\Response(response: 401, description: 'Unauthenticated'),
+            new OA\Response(response: 403, description: 'Forbidden (only the patient can cancel)'),
+            new OA\Response(response: 422, description: 'Request is not pending'),
+        ]
+    )]
+    public function cancel() {}
 
     #[OA\Post(
         path: '/api/v1/supervision-requests/{supervision_request}/approve',

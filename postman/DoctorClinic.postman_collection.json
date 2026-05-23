@@ -57,6 +57,11 @@
 			"type": "string"
 		},
 		{
+			"key": "supervision_request_id",
+			"value": "",
+			"type": "string"
+		},
+		{
 			"key": "notification_id",
 			"value": "",
 			"type": "string"
@@ -2410,7 +2415,7 @@
 		},
 		{
 			"name": "Supervisions",
-			"description": "Doctor-Patient supervision management.\n\nAll endpoints require authentication. Assign/Remove/Bulk require staff role. Available-doctors requires auth.",
+			"description": "Doctor-Patient supervision management.\n\nAll endpoints require authentication. Assign/Remove/Bulk require staff role. Available-doctors and supervision requests require auth. Doctor self-assign is for the doctor themselves.",
 			"item": [
 				{
 					"name": "Get Doctor's Patients",
@@ -2668,6 +2673,220 @@
 							"name": "No Content",
 							"status": "No Content",
 							"code": 204
+						}
+					]
+				},
+				{
+					"name": "Doctor Self-Assign",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"patient_id\": \"{{patient_id}}\",\n    \"notes\": \"Direct assignment\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/doctors/{{doctor_id}}/patients/self",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "doctors", "{{doctor_id}}", "patients", "self"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Patient assigned to doctor successfully\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Supervision Requests",
+					"description": "Patient requests supervision from a doctor. Doctor approves/rejects. Patient can cancel.",
+					"item": [
+						{
+							"name": "Create Request",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"doctor_id\": \"{{doctor_id}}\",\n    \"notes\": \"I would like to request supervision\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/patients/{{patient_id}}/supervision-requests",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "patients", "{{patient_id}}", "supervision-requests"]
+								}
+							},
+							"response": [
+								{
+									"name": "Created",
+									"status": "Created",
+									"code": 201,
+									"body": "{\n    \"status\": 201,\n    \"message\": \"Supervision request created successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"patient_id\": \"{{patient_id}}\",\n        \"doctor_id\": \"{{doctor_id}}\",\n        \"status\": \"pending\",\n        \"notes\": \"I would like to request supervision\",\n        \"responded_at\": null,\n        \"created_at\": \"2026-05-23T...\",\n        \"updated_at\": \"2026-05-23T...\"\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "List Patient Requests",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/patients/{{patient_id}}/supervision-requests",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "patients", "{{patient_id}}", "supervision-requests"]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"status": "OK",
+									"code": 200,
+									"body": "{\n    \"status\": 200,\n    \"message\": \"Supervision requests retrieved successfully\",\n    \"data\": []\n}"
+								}
+							]
+						},
+						{
+							"name": "List Doctor Requests",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/doctors/{{doctor_id}}/supervision-requests?status=pending",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "doctors", "{{doctor_id}}", "supervision-requests"],
+									"query": [
+										{
+											"key": "status",
+											"value": "pending",
+											"description": "Filter by status"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"status": "OK",
+									"code": 200,
+									"body": "{\n    \"status\": 200,\n    \"message\": \"Supervision requests retrieved successfully\",\n    \"data\": []\n}"
+								}
+							]
+						},
+						{
+							"name": "Approve Request",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/supervision-requests/{{supervision_request_id}}/approve",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "supervision-requests", "{{supervision_request_id}}", "approve"]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"status": "OK",
+									"code": 200,
+									"body": "{\n    \"status\": 200,\n    \"message\": \"Supervision request approved\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Reject Request",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/supervision-requests/{{supervision_request_id}}/reject",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "supervision-requests", "{{supervision_request_id}}", "reject"]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"status": "OK",
+									"code": 200,
+									"body": "{\n    \"status\": 200,\n    \"message\": \"Supervision request rejected\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Cancel Request",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/supervision-requests/{{supervision_request_id}}/cancel",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "supervision-requests", "{{supervision_request_id}}", "cancel"]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"status": "OK",
+									"code": 200,
+									"body": "{\n    \"status\": 200,\n    \"message\": \"Supervision request cancelled\"\n}"
+								}
+							]
 						}
 					]
 				}

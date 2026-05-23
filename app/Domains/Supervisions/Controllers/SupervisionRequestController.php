@@ -6,6 +6,7 @@ use App\Domains\Doctors\Models\Doctor;
 use App\Domains\Patients\Models\Patient;
 use App\Domains\Shared\Responses\ApiResponse;
 use App\Domains\Supervisions\Actions\ApproveSupervisionRequestAction;
+use App\Domains\Supervisions\Actions\CancelSupervisionRequestAction;
 use App\Domains\Supervisions\Actions\CreateSupervisionRequestAction;
 use App\Domains\Supervisions\Actions\RejectSupervisionRequestAction;
 use App\Domains\Supervisions\Models\SupervisionRequest;
@@ -20,6 +21,7 @@ class SupervisionRequestController
         private readonly CreateSupervisionRequestAction $createAction,
         private readonly ApproveSupervisionRequestAction $approveAction,
         private readonly RejectSupervisionRequestAction $rejectAction,
+        private readonly CancelSupervisionRequestAction $cancelAction,
     ) {}
 
     public function store(StoreSupervisionRequest $request, Patient $patient): JsonResponse
@@ -114,5 +116,20 @@ class SupervisionRequestController
         $this->rejectAction->execute($supervisionRequest);
 
         return ApiResponse::success(null, __('Supervision request rejected'));
+    }
+
+    public function cancel(Request $request, SupervisionRequest $supervisionRequest): JsonResponse
+    {
+        $user = $request->user();
+        $isPatient = $user->id === $supervisionRequest->patient->user_id;
+        $isStaff = $user->hasAnyRole(['admin', 'receptionist']);
+
+        if (!$isPatient && !$isStaff) {
+            return ApiResponse::forbidden(__('Only the patient can cancel this request'));
+        }
+
+        $this->cancelAction->execute($supervisionRequest);
+
+        return ApiResponse::success(null, __('Supervision request cancelled'));
     }
 }

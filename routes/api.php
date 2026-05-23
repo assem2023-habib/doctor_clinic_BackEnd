@@ -86,6 +86,7 @@ Route::middleware(['auth:api', 'active'])->group(function () {
     Route::prefix('v1/supervision-requests/{supervision_request}')->group(function () {
         Route::post('/approve', [SupervisionRequestController::class, 'approve']);
         Route::post('/reject', [SupervisionRequestController::class, 'reject']);
+        Route::post('/cancel', [SupervisionRequestController::class, 'cancel']);
     });
 
     Route::middleware('staff')->group(function () {
