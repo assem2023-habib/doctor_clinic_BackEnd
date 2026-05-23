@@ -29,7 +29,7 @@ class Patient extends Model
     public function doctors(): BelongsToMany
     {
         return $this->belongsToMany(Doctor::class, 'doctor_patient')
-            ->withPivot('assigned_by', 'notes', 'created_at')
+            ->withPivot('assigned_by', 'notes', 'supervision_status', 'supervision_start', 'supervision_end', 'created_at')
             ->withTimestamps();
     }
 }

@@ -69,8 +69,11 @@ Route::middleware(['auth:api', 'active'])->group(function () {
     Route::get('/v1/doctors/{doctor}/patients', [SupervisionController::class, 'doctorPatients']);
     Route::get('/v1/patients/{patient}/doctors', [SupervisionController::class, 'patientDoctors']);
 
+    Route::get('/v1/patients/{patient}/available-doctors', [SupervisionController::class, 'availableDoctors']);
+
     Route::middleware('staff')->group(function () {
         Route::post('/v1/doctors/{doctor}/patients', [SupervisionController::class, 'assign']);
+        Route::post('/v1/doctors/{doctor}/patients/bulk', [SupervisionController::class, 'bulkAssign']);
         Route::delete('/v1/doctors/{doctor}/patients/{patient}', [SupervisionController::class, 'remove']);
     });
 

@@ -14,7 +14,7 @@ class DoctorPatient extends Pivot
 
     protected $table = 'doctor_patient';
 
-    protected $fillable = ['doctor_id', 'patient_id', 'assigned_by', 'notes'];
+    protected $fillable = ['doctor_id', 'patient_id', 'assigned_by', 'notes', 'supervision_status', 'supervision_start', 'supervision_end'];
 
     public function doctor(): BelongsTo
     {

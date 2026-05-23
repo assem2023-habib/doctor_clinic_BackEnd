@@ -4385,7 +4385,7 @@
                     "Supervisions"
                 ],
                 "summary": "Assign a patient to a doctor",
-                "description": "Staff (admin/receptionist) only.",
+                "description": "Staff (admin/receptionist) only. Fails with 409 if patient already has a doctor with the same specialization.",
                 "operationId": "8af35536ddb83df3cb504a70d9bcb26e",
                 "parameters": [
                     {
@@ -4433,6 +4433,9 @@
                     },
                     "403": {
                         "description": "Forbidden (staff only)"
+                    },
+                    "409": {
+                        "description": "Patient already has a doctor with this specialization"
                     },
                     "422": {
                         "description": "Validation error"
@@ -4494,6 +4497,147 @@
                 "responses": {
                     "200": {
                         "description": "Doctors retrieved successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/doctors/{doctor}/patients/bulk": {
+            "post": {
+                "tags": [
+                    "Supervisions"
+                ],
+                "summary": "Bulk assign patients to a doctor",
+                "description": "Staff (admin/receptionist) only. Returns assigned, skipped (due to specialization conflict), and error lists.",
+                "operationId": "530a5004acde746501717fcd88effb9e",
+                "parameters": [
+                    {
+                        "name": "doctor",
+                        "in": "path",
+                        "description": "Doctor UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "patient_ids": {
+                                        "description": "Array of patient UUIDs",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    },
+                                    "notes": {
+                                        "description": "Assignment notes",
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 1000
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Bulk assign completed"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden (staff only)"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/patients/{patient}/available-doctors": {
+            "get": {
+                "tags": [
+                    "Supervisions"
+                ],
+                "summary": "List available doctors for a patient (not yet assigned)",
+                "operationId": "b69ad4033c0244e19770038aa2f77ec5",
+                "parameters": [
+                    {
+                        "name": "patient",
+                        "in": "path",
+                        "description": "Patient UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page (max 100)",
+                        "schema": {
+                            "type": "integer",
+                            "default": 20,
+                            "maximum": 100
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by name or email",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "specialization",
+                        "in": "query",
+                        "description": "Filter by specialization",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Available doctors retrieved successfully"
                     },
                     "401": {
                         "description": "Unauthenticated"

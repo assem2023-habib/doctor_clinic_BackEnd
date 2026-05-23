@@ -58,12 +58,12 @@ class SupervisionTest extends TestCase
         return $user;
     }
 
-    private function createDoctor(): User
+    private function createDoctor(?SpecializationEnum $specialization = null): User
     {
         $user = User::factory()->create();
         $user->assignRole('doctor');
         $user->doctor()->create([
-            'specialization' => SpecializationEnum::Cardiology,
+            'specialization' => $specialization ?? SpecializationEnum::Cardiology,
             'experience_months' => 60,
         ]);
         return $user;
@@ -115,6 +115,7 @@ class SupervisionTest extends TestCase
         $this->assertEquals($patient->id, $json['data'][0]['id']);
         $this->assertArrayHasKey('supervision', $json['data'][0]);
         $this->assertArrayHasKey('assigned_by', $json['data'][0]['supervision']);
+        $this->assertArrayHasKey('supervision_status', $json['data'][0]['supervision']);
     }
 
     public function test_admin_can_view_doctor_patients(): void
@@ -185,6 +186,7 @@ class SupervisionTest extends TestCase
         $this->assertCount(1, $response->json()['data']);
         $this->assertEquals($doctor->id, $response->json()['data'][0]['id']);
         $this->assertArrayHasKey('supervision', $response->json()['data'][0]);
+        $this->assertArrayHasKey('supervision_status', $response->json()['data'][0]['supervision']);
         $this->assertArrayHasKey('specialization', $response->json()['data'][0]);
     }
 
@@ -235,6 +237,7 @@ class SupervisionTest extends TestCase
             'doctor_id' => $doctor->doctor->id,
             'patient_id' => $patient->patient->id,
             'notes' => 'Follow up on cardiology',
+            'supervision_status' => 'active',
         ]);
     }
 
@@ -295,6 +298,47 @@ class SupervisionTest extends TestCase
         ]);
 
         $response->assertStatus(422);
+    }
+
+    // ─── Specialization constraint ───
+
+    public function test_cannot_assign_doctor_with_same_specialization(): void
+    {
+        $doctor1 = $this->createDoctor(SpecializationEnum::Cardiology);
+        $doctor2 = $this->createDoctor(SpecializationEnum::Cardiology);
+        $patient = $this->createPatient();
+        $admin = $this->createAdmin();
+
+        Passport::actingAs($admin);
+        $this->postJson("/api/v1/doctors/{$doctor1->doctor->id}/patients", [
+            'patient_id' => $patient->patient->id,
+        ])->assertStatus(200);
+
+        $response = $this->postJson("/api/v1/doctors/{$doctor2->doctor->id}/patients", [
+            'patient_id' => $patient->patient->id,
+        ]);
+
+        $response->assertStatus(409);
+    }
+
+    public function test_can_assign_doctor_with_different_specialization(): void
+    {
+        $doctor1 = $this->createDoctor(SpecializationEnum::Cardiology);
+        $doctor2 = $this->createDoctor(SpecializationEnum::Neurology);
+        $patient = $this->createPatient();
+        $admin = $this->createAdmin();
+
+        Passport::actingAs($admin);
+        $this->postJson("/api/v1/doctors/{$doctor1->doctor->id}/patients", [
+            'patient_id' => $patient->patient->id,
+        ])->assertStatus(200);
+
+        $response = $this->postJson("/api/v1/doctors/{$doctor2->doctor->id}/patients", [
+            'patient_id' => $patient->patient->id,
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseCount('doctor_patient', 2);
     }
 
     // ─── Remove patient from doctor ───
@@ -361,5 +405,104 @@ class SupervisionTest extends TestCase
 
         $response->assertStatus(200);
         $this->assertCount(0, $response->json()['data']);
+    }
+
+    // ─── Available doctors ───
+
+    public function test_patient_can_view_available_doctors(): void
+    {
+        $doctor = $this->createDoctor();
+        $patient = $this->createPatient();
+        $admin = $this->createAdmin();
+
+        Passport::actingAs($patient);
+        $response = $this->getJson("/api/v1/patients/{$patient->patient->id}/available-doctors");
+
+        $response->assertStatus(200);
+        $ids = collect($response->json()['data'])->pluck('id');
+        $this->assertContains($doctor->id, $ids);
+    }
+
+    public function test_available_doctors_excludes_assigned_doctors(): void
+    {
+        $doctor = $this->createDoctor();
+        $patient = $this->createPatient();
+        $admin = $this->createAdmin();
+        $this->assignPatientToDoctor($patient->patient, $doctor, $admin);
+
+        Passport::actingAs($patient);
+        $response = $this->getJson("/api/v1/patients/{$patient->patient->id}/available-doctors");
+
+        $response->assertStatus(200);
+        $ids = collect($response->json()['data'])->pluck('id');
+        $this->assertNotContains($doctor->id, $ids);
+    }
+
+    public function test_available_doctors_can_filter_by_specialization(): void
+    {
+        $cardioDoctor = $this->createDoctor(SpecializationEnum::Cardiology);
+        $neuroDoctor = $this->createDoctor(SpecializationEnum::Neurology);
+        $patient = $this->createPatient();
+
+        Passport::actingAs($patient);
+        $response = $this->getJson("/api/v1/patients/{$patient->patient->id}/available-doctors?specialization=" . SpecializationEnum::Cardiology->value);
+
+        $response->assertStatus(200);
+        $ids = collect($response->json()['data'])->pluck('id');
+        $this->assertContains($cardioDoctor->id, $ids);
+        $this->assertNotContains($neuroDoctor->id, $ids);
+    }
+
+    // ─── Bulk assign ───
+
+    public function test_admin_can_bulk_assign_patients(): void
+    {
+        $doctor = $this->createDoctor();
+        $patient1 = $this->createPatient();
+        $patient2 = $this->createPatient();
+        $admin = $this->createAdmin();
+
+        Passport::actingAs($admin);
+        $response = $this->postJson("/api/v1/doctors/{$doctor->doctor->id}/patients/bulk", [
+            'patient_ids' => [$patient1->patient->id, $patient2->patient->id],
+        ]);
+
+        $response->assertStatus(200);
+        $json = $response->json();
+        $this->assertEquals(2, $json['data']['assigned_count']);
+        $this->assertEquals(0, $json['data']['skipped_count']);
+        $this->assertDatabaseCount('doctor_patient', 2);
+    }
+
+    public function test_bulk_assign_skips_specialization_conflicts(): void
+    {
+        $doctor1 = $this->createDoctor(SpecializationEnum::Cardiology);
+        $doctor2 = $this->createDoctor(SpecializationEnum::Cardiology);
+        $patient = $this->createPatient();
+        $admin = $this->createAdmin();
+        $this->assignPatientToDoctor($patient->patient, $doctor1, $admin);
+
+        Passport::actingAs($admin);
+        $response = $this->postJson("/api/v1/doctors/{$doctor2->doctor->id}/patients/bulk", [
+            'patient_ids' => [$patient->patient->id],
+        ]);
+
+        $response->assertStatus(200);
+        $json = $response->json();
+        $this->assertEquals(0, $json['data']['assigned_count']);
+        $this->assertEquals(1, $json['data']['skipped_count']);
+    }
+
+    public function test_non_staff_cannot_bulk_assign(): void
+    {
+        $doctor = $this->createDoctor();
+        $patient = $this->createPatient();
+
+        Passport::actingAs($patient);
+        $response = $this->postJson("/api/v1/doctors/{$doctor->doctor->id}/patients/bulk", [
+            'patient_ids' => [$patient->patient->id],
+        ]);
+
+        $response->assertStatus(403);
     }
 }

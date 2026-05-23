@@ -26,6 +26,9 @@ class SupervisionPatientResource extends JsonResource
                 'assigned_by' => $this->pivot?->assigned_by,
                 'notes' => $this->pivot?->notes,
                 'assigned_at' => $this->pivot?->created_at?->toIso8601String(),
+                'supervision_status' => $this->pivot?->supervision_status,
+                'supervision_start' => $this->pivot?->supervision_start?->toIso8601String(),
+                'supervision_end' => $this->pivot?->supervision_end?->toIso8601String(),
             ],
         ];
     }
