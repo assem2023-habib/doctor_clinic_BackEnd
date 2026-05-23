@@ -18,6 +18,7 @@
 | 8 | `DELETE` | `/api/v1/auth/account` | ✅ Bearer | — | [delete-account.md](delete-account.md) |
 | 9 | `GET` | `/api/v1/auth/me` | ✅ Bearer | — | [me.md](me.md) |
 | 10 | `PUT` | `/api/v1/auth/me` | ✅ Bearer | — | [update-profile.md](update-profile.md) |
+| 11 | `POST` | `/api/v1/auth/firebase-token` | ✅ Bearer | — | [firebase-token.md](firebase-token.md) |
 
 ---
 

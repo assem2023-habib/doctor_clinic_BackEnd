@@ -690,6 +690,50 @@
 							"body": "{\n    \"status\": 200,\n    \"message\": \"User retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Layla\",\n        \"last_name\": \"Hassan\",\n        \"email\": \"receptionist@example.com\",\n        \"roles\": [\"receptionist\"],\n        \"shift_start\": \"09:00\",\n        \"shift_end\": \"17:00\",\n        \"phone\": \"+963912345680\",\n        \"gender\": \"female\",\n        \"birthday_date\": \"1998-11-05\",\n        \"is_active\": true\n    }\n}"
 						}
 					]
+				},
+				{
+					"name": "Firebase Token",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/firebase-token",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "firebase-token"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Firebase token generated successfully.\",\n    \"data\": {\n        \"firebase_token\": \"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...\",\n        \"uid\": \"user_019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009\"\n    }\n}"
+						},
+						{
+							"name": "Unauthenticated",
+							"status": "Unauthorized",
+							"code": 401
+						}
+					]
 				}
 			],
 			"event": [
