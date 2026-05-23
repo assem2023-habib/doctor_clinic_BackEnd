@@ -59,6 +59,9 @@ class SupervisionControllerDoc
                 properties: [
                     new OA\Property(property: 'patient_id', type: 'string', format: 'uuid', description: 'Patient UUID'),
                     new OA\Property(property: 'notes', type: 'string', maxLength: 1000, nullable: true, description: 'Assignment notes'),
+                    new OA\Property(property: 'supervision_status', type: 'string', enum: ['active', 'suspended'], default: 'active', description: 'Supervision status'),
+                    new OA\Property(property: 'supervision_start', type: 'string', format: 'date', nullable: true, description: 'Supervision start date'),
+                    new OA\Property(property: 'supervision_end', type: 'string', format: 'date', nullable: true, description: 'Supervision end date'),
                 ]
             )
         ),
@@ -87,6 +90,9 @@ class SupervisionControllerDoc
                 properties: [
                     new OA\Property(property: 'patient_ids', type: 'array', items: new OA\Items(type: 'string', format: 'uuid'), description: 'Array of patient UUIDs'),
                     new OA\Property(property: 'notes', type: 'string', maxLength: 1000, nullable: true, description: 'Assignment notes'),
+                    new OA\Property(property: 'supervision_status', type: 'string', enum: ['active', 'suspended'], default: 'active', description: 'Supervision status'),
+                    new OA\Property(property: 'supervision_start', type: 'string', format: 'date', nullable: true, description: 'Supervision start date'),
+                    new OA\Property(property: 'supervision_end', type: 'string', format: 'date', nullable: true, description: 'Supervision end date'),
                 ]
             )
         ),

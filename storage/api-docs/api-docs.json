@@ -4417,6 +4417,31 @@
                                             "null"
                                         ],
                                         "maxLength": 1000
+                                    },
+                                    "supervision_status": {
+                                        "description": "Supervision status",
+                                        "type": "string",
+                                        "default": "active",
+                                        "enum": [
+                                            "active",
+                                            "suspended"
+                                        ]
+                                    },
+                                    "supervision_start": {
+                                        "description": "Supervision start date",
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "date"
+                                    },
+                                    "supervision_end": {
+                                        "description": "Supervision end date",
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "date"
                                     }
                                 },
                                 "type": "object"
@@ -4553,6 +4578,31 @@
                                             "null"
                                         ],
                                         "maxLength": 1000
+                                    },
+                                    "supervision_status": {
+                                        "description": "Supervision status",
+                                        "type": "string",
+                                        "default": "active",
+                                        "enum": [
+                                            "active",
+                                            "suspended"
+                                        ]
+                                    },
+                                    "supervision_start": {
+                                        "description": "Supervision start date",
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "date"
+                                    },
+                                    "supervision_end": {
+                                        "description": "Supervision end date",
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "date"
                                     }
                                 },
                                 "type": "object"
