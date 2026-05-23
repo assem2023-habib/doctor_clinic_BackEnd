@@ -4,6 +4,7 @@ use App\Domains\Shared\Responses\ApiResponse;
 use App\Http\Middleware\AuthorizeByAttribute;
 use App\Http\Middleware\CheckAdminRole;
 use App\Http\Middleware\CheckStaffRole;
+use App\Http\Middleware\EnsureUserIsActive;
 use App\Http\Middleware\LogApiBearerAndRequestDetails;
 use App\Http\Middleware\NormalizeDuplicateBearerAuthorization;
 use App\Http\Middleware\SecurityHeaders;
@@ -40,6 +41,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => CheckAdminRole::class,
             'staff' => CheckStaffRole::class,
+            'active' => EnsureUserIsActive::class,
             'image.content' => ValidateImageContent::class,
             'role.authorize' => AuthorizeByAttribute::class,
         ]);

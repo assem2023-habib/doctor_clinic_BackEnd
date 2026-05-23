@@ -298,6 +298,52 @@ class DoctorTest extends TestCase
         $this->assertDatabaseHas('users', ['id' => $doctor->id]);
     }
 
+    public function test_admin_can_activate_doctor_account(): void
+    {
+        $admin = $this->createAdmin();
+        Passport::actingAs($admin);
+
+        $user = User::factory()->create(['is_active' => false]);
+        $user->assignRole('doctor');
+        $user->doctor()->create([
+            'specialization' => SpecializationEnum::GeneralPractitioner,
+            'experience_months' => 24,
+        ]);
+
+        $response = $this->putJson("/api/v1/doctors/{$user->doctor->id}/activate-account");
+
+        $response->assertStatus(200)
+            ->assertJsonStructure(['status', 'message', 'data' => ['id', 'first_name', 'last_name', 'email', 'is_active']]);
+
+        $json = $response->json();
+        $this->assertEquals(__('auth.account_activated'), $json['message']);
+        $this->assertTrue($json['data']['is_active']);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'is_active' => true,
+        ]);
+    }
+
+    public function test_non_admin_cannot_activate_doctor_account(): void
+    {
+        $user = User::factory()->create(['is_active' => false]);
+        $user->assignRole('doctor');
+        $user->doctor()->create([
+            'specialization' => SpecializationEnum::GeneralPractitioner,
+            'experience_months' => 24,
+        ]);
+        Passport::actingAs($user);
+
+        $response = $this->putJson("/api/v1/doctors/{$user->doctor->id}/activate-account");
+
+        $response->assertStatus(403);
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'is_active' => false,
+        ]);
+    }
+
     public function test_unauthenticated_user_cannot_update_doctor(): void
     {
         $doctor = $this->createDoctor();

@@ -63,27 +63,17 @@ class AuthController
     public function registerDoctor(RegisterDoctorRequest $request): JsonResponse
     {
         $dto = RegisterDoctorData::fromRequest($request);
-        $user = $this->registerDoctorAction->execute($dto);
-        $user->load('roles');
-        $tokenData = $this->loginAction->execute(LoginData::fromCredentials($dto->email, $dto->password));
+        $this->registerDoctorAction->execute($dto);
 
-        return ApiResponse::created(
-            new AuthResource((object) compact('user', 'tokenData')),
-            __('auth.register_success')
-        );
+        return ApiResponse::created(null, __('auth.pending_activation'));
     }
 
     public function registerReceptionist(RegisterReceptionistRequest $request): JsonResponse
     {
         $dto = RegisterReceptionistData::fromRequest($request);
-        $user = $this->registerReceptionistAction->execute($dto);
-        $user->load('roles');
-        $tokenData = $this->loginAction->execute(LoginData::fromCredentials($dto->email, $dto->password));
+        $this->registerReceptionistAction->execute($dto);
 
-        return ApiResponse::created(
-            new AuthResource((object) compact('user', 'tokenData')),
-            __('auth.register_success')
-        );
+        return ApiResponse::created(null, __('auth.pending_activation'));
     }
 
     public function login(LoginRequest $request): JsonResponse

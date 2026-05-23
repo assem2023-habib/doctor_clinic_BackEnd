@@ -49,7 +49,8 @@ use OpenApi\Attributes as OA;
 )]
 #[OA\Post(
     path: '/api/v1/auth/register/doctor',
-    summary: 'Register a new doctor',
+    summary: 'Register a new doctor (requires admin activation)',
+    description: 'Creates a doctor account with is_active=false. The account must be activated by an admin before login.',
     tags: ['Auth'],
     requestBody: new OA\RequestBody(
         required: true,
@@ -66,25 +67,13 @@ use OpenApi\Attributes as OA;
         ])
     ),
     responses: [
-        new OA\Response(response: 201, description: 'Doctor registered and logged in', content: new OA\JsonContent(properties: [
-            new OA\Property(property: 'access_token', description: 'JWT access token', type: 'string', example: 'eyJ0eXAiOiJKV1Qi...'),
-            new OA\Property(property: 'refresh_token', description: 'Refresh token', type: 'string', example: 'def50200...'),
-            new OA\Property(property: 'expires_in', description: 'Token expiration in seconds', type: 'integer', example: 31536000),
-            new OA\Property(property: 'token_type', description: 'Token type', type: 'string', example: 'Bearer'),
-            new OA\Property(property: 'user', description: 'User profile', type: 'object', properties: [
-                new OA\Property(property: 'id', description: 'User UUID', type: 'string', format: 'uuid', example: '019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009'),
-                new OA\Property(property: 'first_name', type: 'string', example: 'Khaled'),
-                new OA\Property(property: 'last_name', type: 'string', example: 'Suleiman'),
-                new OA\Property(property: 'email', type: 'string', format: 'email', example: 'doctor@example.com'),
-                new OA\Property(property: 'roles', type: 'array', items: new OA\Items(type: 'string'), example: ['doctor']),
-                new OA\Property(property: 'phone', type: 'string', example: '+963912345679'),
-                new OA\Property(property: 'address', type: 'string', example: 'Aleppo, Syria'),
-                new OA\Property(property: 'gender', type: 'string', enum: ['male', 'female'], example: 'male'),
-                new OA\Property(property: 'birthday_date', type: 'string', format: 'date', example: '1985-03-20'),
-                new OA\Property(property: 'is_active', type: 'boolean', example: true),
-            ]),
+        new OA\Response(response: 201, description: 'Account created, pending admin activation (no token returned)', content: new OA\JsonContent(properties: [
+            new OA\Property(property: 'status', type: 'integer', example: 201),
+            new OA\Property(property: 'message', type: 'string', example: 'Account created successfully. Please wait for admin approval.'),
+            new OA\Property(property: 'data', type: 'null', example: null),
         ])),
         new OA\Response(response: 422, description: 'Validation error', content: new OA\JsonContent(properties: [
+            new OA\Property(property: 'status', type: 'integer', example: 422),
             new OA\Property(property: 'message', description: 'Error message', type: 'string', example: 'Validation failed'),
             new OA\Property(property: 'errors', description: 'Validation errors', type: 'object', example: ['email' => ['The email has already been taken.']]),
         ])),
@@ -92,7 +81,8 @@ use OpenApi\Attributes as OA;
 )]
 #[OA\Post(
     path: '/api/v1/auth/register/receptionist',
-    summary: 'Register a new receptionist',
+    summary: 'Register a new receptionist (requires admin activation)',
+    description: 'Creates a receptionist account with is_active=false. The account must be activated by an admin before login.',
     tags: ['Auth'],
     requestBody: new OA\RequestBody(
         required: true,
@@ -111,27 +101,13 @@ use OpenApi\Attributes as OA;
         ])
     ),
     responses: [
-        new OA\Response(response: 201, description: 'Receptionist registered and logged in', content: new OA\JsonContent(properties: [
-            new OA\Property(property: 'access_token', description: 'JWT access token', type: 'string', example: 'eyJ0eXAiOiJKV1Qi...'),
-            new OA\Property(property: 'refresh_token', description: 'Refresh token', type: 'string', example: 'def50200...'),
-            new OA\Property(property: 'expires_in', description: 'Token expiration in seconds', type: 'integer', example: 31536000),
-            new OA\Property(property: 'token_type', description: 'Token type', type: 'string', example: 'Bearer'),
-            new OA\Property(property: 'user', description: 'User profile', type: 'object', properties: [
-                new OA\Property(property: 'id', description: 'User UUID', type: 'string', format: 'uuid', example: '019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009'),
-                new OA\Property(property: 'first_name', type: 'string', example: 'Layla'),
-                new OA\Property(property: 'last_name', type: 'string', example: 'Hassan'),
-                new OA\Property(property: 'email', type: 'string', format: 'email', example: 'receptionist@example.com'),
-                new OA\Property(property: 'roles', type: 'array', items: new OA\Items(type: 'string'), example: ['receptionist']),
-                new OA\Property(property: 'phone', type: 'string', example: '+963912345680'),
-                new OA\Property(property: 'address', type: 'string', example: 'Homs, Syria'),
-                new OA\Property(property: 'gender', type: 'string', enum: ['male', 'female'], example: 'female'),
-                new OA\Property(property: 'birthday_date', type: 'string', format: 'date', example: '1998-11-05'),
-                new OA\Property(property: 'is_active', type: 'boolean', example: true),
-                new OA\Property(property: 'shift_start', type: 'string', format: 'time', example: '09:00'),
-                new OA\Property(property: 'shift_end', type: 'string', format: 'time', example: '17:00'),
-            ]),
+        new OA\Response(response: 201, description: 'Account created, pending admin activation (no token returned)', content: new OA\JsonContent(properties: [
+            new OA\Property(property: 'status', type: 'integer', example: 201),
+            new OA\Property(property: 'message', type: 'string', example: 'Account created successfully. Please wait for admin approval.'),
+            new OA\Property(property: 'data', type: 'null', example: null),
         ])),
         new OA\Response(response: 422, description: 'Validation error', content: new OA\JsonContent(properties: [
+            new OA\Property(property: 'status', type: 'integer', example: 422),
             new OA\Property(property: 'message', description: 'Error message', type: 'string', example: 'Validation failed'),
             new OA\Property(property: 'errors', description: 'Validation errors', type: 'object', example: ['email' => ['The email has already been taken.']]),
         ])),

@@ -25,7 +25,7 @@ class RegisterReceptionistAction
             'address' => $data->address,
             'gender' => $data->gender,
             'birthday_date' => $data->birthdayDate,
-            'is_active' => true,
+            'is_active' => false,
             'password' => bcrypt($data->password),
         ]);
 

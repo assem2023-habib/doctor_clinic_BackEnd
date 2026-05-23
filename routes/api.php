@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Doctor\DoctorController;
 use App\Http\Controllers\Api\V1\Image\ImageController;
 use App\Http\Controllers\Api\V1\Patient\PatientController;
+use App\Http\Controllers\Api\V1\Receptionist\ReceptionistController;
 use App\Http\Controllers\Api\V1\Location\CityController;
 use App\Http\Controllers\Api\V1\Location\CountryController;
 use App\Http\Controllers\Api\V1\DeviceTokenController;
@@ -25,7 +26,7 @@ Route::prefix('v1/auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
     Route::post('/refresh', [AuthController::class, 'refresh']);
 
-    Route::middleware('auth:api')->group(function () {
+    Route::middleware(['auth:api', 'active'])->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::put('/password', [AuthController::class, 'changePassword']);
         Route::delete('/account', [AuthController::class, 'deleteAccount']);
@@ -39,7 +40,7 @@ Route::prefix('v1/doctors')->group(function () {
     Route::get('/{doctor}', [DoctorController::class, 'show']);
 });
 
-Route::middleware(['auth:api', 'staff'])->prefix('v1/patients')->group(function () {
+Route::middleware(['auth:api', 'active', 'staff'])->prefix('v1/patients')->group(function () {
     Route::get('/', [PatientController::class, 'index']);
     Route::get('/{patient}', [PatientController::class, 'show']);
 });
@@ -56,7 +57,7 @@ Route::prefix('v1/cities')->group(function () {
 
 Route::get('/v1/doctors/{doctor}/booked-slots', [AppointmentController::class, 'bookedSlots']);
 
-Route::middleware('auth:api')->group(function () {
+Route::middleware(['auth:api', 'active'])->group(function () {
     Route::get('/v1/doctors/{doctor}/patients', [SupervisionController::class, 'doctorPatients']);
     Route::get('/v1/patients/{patient}/doctors', [SupervisionController::class, 'patientDoctors']);
 
@@ -98,6 +99,11 @@ Route::middleware('auth:api')->group(function () {
             Route::put('/{doctor}', [DoctorController::class, 'update']);
             Route::patch('/{doctor}', [DoctorController::class, 'updatePartial']);
             Route::delete('/{doctor}', [DoctorController::class, 'destroy']);
+            Route::put('/{doctor}/activate-account', [DoctorController::class, 'activateAccount']);
+        });
+
+        Route::prefix('v1/receptionists')->group(function () {
+            Route::put('/{receptionist}/activate-account', [ReceptionistController::class, 'activateAccount']);
         });
 
         Route::prefix('v1/patients')->group(function () {

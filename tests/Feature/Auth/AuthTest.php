@@ -133,19 +133,17 @@ class AuthTest extends TestCase
         $response = $this->postJson('/api/v1/auth/register/doctor', $this->validDoctorData);
 
         $response->assertStatus(201)
-            ->assertJsonStructure([
-                'status',
-                'message',
-                'data' => ['access_token', 'refresh_token', 'expires_in', 'token_type', 'user'],
-            ]);
+            ->assertJsonStructure(['status', 'message']);
 
         $json = $response->json();
         $this->assertEquals(201, $json['status']);
-        $this->assertEquals(__('auth.register_success'), $json['message']);
-        $this->assertEquals('jane@example.com', $json['data']['user']['email']);
-        $this->assertEquals('doctor', $json['data']['user']['roles'][0]['slug']);
+        $this->assertEquals(__('auth.pending_activation'), $json['message']);
+        $this->assertNull($json['data']);
 
-        $this->assertDatabaseHas('users', ['email' => 'jane@example.com']);
+        $this->assertDatabaseHas('users', [
+            'email' => 'jane@example.com',
+            'is_active' => false,
+        ]);
     }
 
     public function test_can_register_receptionist(): void
@@ -153,21 +151,17 @@ class AuthTest extends TestCase
         $response = $this->postJson('/api/v1/auth/register/receptionist', $this->validReceptionistData);
 
         $response->assertStatus(201)
-            ->assertJsonStructure([
-                'status',
-                'message',
-                'data' => ['access_token', 'refresh_token', 'expires_in', 'token_type', 'user'],
-            ]);
+            ->assertJsonStructure(['status', 'message']);
 
         $json = $response->json();
         $this->assertEquals(201, $json['status']);
-        $this->assertEquals(__('auth.register_success'), $json['message']);
-        $this->assertEquals('bob@example.com', $json['data']['user']['email']);
-        $this->assertEquals('receptionist', $json['data']['user']['roles'][0]['slug']);
-        $this->assertEquals('09:00', $json['data']['user']['shift_start']);
-        $this->assertEquals('17:00', $json['data']['user']['shift_end']);
+        $this->assertEquals(__('auth.pending_activation'), $json['message']);
+        $this->assertNull($json['data']);
 
-        $this->assertDatabaseHas('users', ['email' => 'bob@example.com']);
+        $this->assertDatabaseHas('users', [
+            'email' => 'bob@example.com',
+            'is_active' => false,
+        ]);
     }
 
     public function test_registration_fails_with_duplicate_email(): void
@@ -399,5 +393,49 @@ class AuthTest extends TestCase
         $this->postJson('/api/v1/auth/logout')->assertStatus(401);
         $this->putJson('/api/v1/auth/password', [])->assertStatus(401);
         $this->deleteJson('/api/v1/auth/account', [])->assertStatus(401);
+    }
+
+    // ---- Account Activation Tests ----
+
+    public function test_login_fails_for_inactive_doctor(): void
+    {
+        $this->postJson('/api/v1/auth/register/doctor', $this->validDoctorData);
+
+        $response = $this->postJson('/api/v1/auth/login', [
+            'email' => $this->validDoctorData['email'],
+            'password' => $this->validDoctorData['password'],
+        ]);
+
+        $response->assertStatus(401);
+        $this->assertEquals(__('auth.not_activated'), $response->json()['message']);
+    }
+
+    public function test_login_fails_for_inactive_receptionist(): void
+    {
+        $this->postJson('/api/v1/auth/register/receptionist', $this->validReceptionistData);
+
+        $response = $this->postJson('/api/v1/auth/login', [
+            'email' => $this->validReceptionistData['email'],
+            'password' => $this->validReceptionistData['password'],
+        ]);
+
+        $response->assertStatus(401);
+        $this->assertEquals(__('auth.not_activated'), $response->json()['message']);
+    }
+
+    public function test_inactive_user_cannot_access_protected_routes(): void
+    {
+        $user = User::factory()->create([
+            'is_active' => false,
+            'password' => Hash::make('Password1!'),
+        ]);
+        $user->assignRole('patient');
+        Passport::actingAs($user);
+
+        $this->getJson('/api/v1/auth/me')->assertStatus(403);
+        $this->postJson('/api/v1/auth/logout')->assertStatus(403);
+        $this->putJson('/api/v1/auth/password', [])->assertStatus(403);
+        $this->deleteJson('/api/v1/auth/account', [])->assertStatus(403);
+        $this->putJson('/api/v1/auth/me', [])->assertStatus(403);
     }
 }

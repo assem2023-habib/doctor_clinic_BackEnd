@@ -782,7 +782,8 @@
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Register a new doctor",
+                "summary": "Register a new doctor (requires admin activation)",
+                "description": "Creates a doctor account with is_active=false. The account must be activated by an admin before login.",
                 "operationId": "db47d5c3f3d37b7ef75af37192872bc9",
                 "requestBody": {
                     "required": true,
@@ -850,89 +851,22 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Doctor registered and logged in",
+                        "description": "Account created, pending admin activation (no token returned)",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "access_token": {
-                                            "description": "JWT access token",
-                                            "type": "string",
-                                            "example": "eyJ0eXAiOiJKV1Qi..."
-                                        },
-                                        "refresh_token": {
-                                            "description": "Refresh token",
-                                            "type": "string",
-                                            "example": "def50200..."
-                                        },
-                                        "expires_in": {
-                                            "description": "Token expiration in seconds",
+                                        "status": {
                                             "type": "integer",
-                                            "example": 31536000
+                                            "example": 201
                                         },
-                                        "token_type": {
-                                            "description": "Token type",
+                                        "message": {
                                             "type": "string",
-                                            "example": "Bearer"
+                                            "example": "Account created successfully. Please wait for admin approval."
                                         },
-                                        "user": {
-                                            "description": "User profile",
-                                            "properties": {
-                                                "id": {
-                                                    "description": "User UUID",
-                                                    "type": "string",
-                                                    "format": "uuid",
-                                                    "example": "019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009"
-                                                },
-                                                "first_name": {
-                                                    "type": "string",
-                                                    "example": "Khaled"
-                                                },
-                                                "last_name": {
-                                                    "type": "string",
-                                                    "example": "Suleiman"
-                                                },
-                                                "email": {
-                                                    "type": "string",
-                                                    "format": "email",
-                                                    "example": "doctor@example.com"
-                                                },
-                                                "roles": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string"
-                                                    },
-                                                    "example": [
-                                                        "doctor"
-                                                    ]
-                                                },
-                                                "phone": {
-                                                    "type": "string",
-                                                    "example": "+963912345679"
-                                                },
-                                                "address": {
-                                                    "type": "string",
-                                                    "example": "Aleppo, Syria"
-                                                },
-                                                "gender": {
-                                                    "type": "string",
-                                                    "example": "male",
-                                                    "enum": [
-                                                        "male",
-                                                        "female"
-                                                    ]
-                                                },
-                                                "birthday_date": {
-                                                    "type": "string",
-                                                    "format": "date",
-                                                    "example": "1985-03-20"
-                                                },
-                                                "is_active": {
-                                                    "type": "boolean",
-                                                    "example": true
-                                                }
-                                            },
-                                            "type": "object"
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
                                         }
                                     },
                                     "type": "object"
@@ -946,6 +880,10 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 422
+                                        },
                                         "message": {
                                             "description": "Error message",
                                             "type": "string",
@@ -974,7 +912,8 @@
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Register a new receptionist",
+                "summary": "Register a new receptionist (requires admin activation)",
+                "description": "Creates a receptionist account with is_active=false. The account must be activated by an admin before login.",
                 "operationId": "4d20f8b441cd4b9f72c59f80bc432771",
                 "requestBody": {
                     "required": true,
@@ -1054,99 +993,22 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Receptionist registered and logged in",
+                        "description": "Account created, pending admin activation (no token returned)",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "access_token": {
-                                            "description": "JWT access token",
-                                            "type": "string",
-                                            "example": "eyJ0eXAiOiJKV1Qi..."
-                                        },
-                                        "refresh_token": {
-                                            "description": "Refresh token",
-                                            "type": "string",
-                                            "example": "def50200..."
-                                        },
-                                        "expires_in": {
-                                            "description": "Token expiration in seconds",
+                                        "status": {
                                             "type": "integer",
-                                            "example": 31536000
+                                            "example": 201
                                         },
-                                        "token_type": {
-                                            "description": "Token type",
+                                        "message": {
                                             "type": "string",
-                                            "example": "Bearer"
+                                            "example": "Account created successfully. Please wait for admin approval."
                                         },
-                                        "user": {
-                                            "description": "User profile",
-                                            "properties": {
-                                                "id": {
-                                                    "description": "User UUID",
-                                                    "type": "string",
-                                                    "format": "uuid",
-                                                    "example": "019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009"
-                                                },
-                                                "first_name": {
-                                                    "type": "string",
-                                                    "example": "Layla"
-                                                },
-                                                "last_name": {
-                                                    "type": "string",
-                                                    "example": "Hassan"
-                                                },
-                                                "email": {
-                                                    "type": "string",
-                                                    "format": "email",
-                                                    "example": "receptionist@example.com"
-                                                },
-                                                "roles": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string"
-                                                    },
-                                                    "example": [
-                                                        "receptionist"
-                                                    ]
-                                                },
-                                                "phone": {
-                                                    "type": "string",
-                                                    "example": "+963912345680"
-                                                },
-                                                "address": {
-                                                    "type": "string",
-                                                    "example": "Homs, Syria"
-                                                },
-                                                "gender": {
-                                                    "type": "string",
-                                                    "example": "female",
-                                                    "enum": [
-                                                        "male",
-                                                        "female"
-                                                    ]
-                                                },
-                                                "birthday_date": {
-                                                    "type": "string",
-                                                    "format": "date",
-                                                    "example": "1998-11-05"
-                                                },
-                                                "is_active": {
-                                                    "type": "boolean",
-                                                    "example": true
-                                                },
-                                                "shift_start": {
-                                                    "type": "string",
-                                                    "format": "time",
-                                                    "example": "09:00"
-                                                },
-                                                "shift_end": {
-                                                    "type": "string",
-                                                    "format": "time",
-                                                    "example": "17:00"
-                                                }
-                                            },
-                                            "type": "object"
+                                        "data": {
+                                            "type": "null",
+                                            "example": null
                                         }
                                     },
                                     "type": "object"
@@ -1160,6 +1022,10 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 422
+                                        },
                                         "message": {
                                             "description": "Error message",
                                             "type": "string",
@@ -2186,6 +2052,64 @@
                 ]
             }
         },
+        "/api/v1/doctors/{doctor}/activate-account": {
+            "put": {
+                "tags": [
+                    "Doctors"
+                ],
+                "summary": "Activate a doctor account",
+                "description": "Admin-only. Sets is_active=true for the doctor user.",
+                "operationId": "3d63571e0094cd1d103587d7aa4f3fa0",
+                "parameters": [
+                    {
+                        "name": "doctor",
+                        "in": "path",
+                        "description": "Doctor UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Account activated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Account activated successfully."
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/DoctorResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden (admin only)"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/images": {
             "post": {
                 "tags": [
@@ -2965,6 +2889,61 @@
                 ]
             }
         },
+        "/api/v1/receptionists/{receptionist}/activate-account": {
+            "put": {
+                "tags": [
+                    "Receptionists"
+                ],
+                "summary": "Activate a receptionist account",
+                "description": "Admin-only. Sets is_active=true for the receptionist user.",
+                "operationId": "56fcd9228a860ba81947633514dd506f",
+                "parameters": [
+                    {
+                        "name": "receptionist",
+                        "in": "path",
+                        "description": "Receptionist UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Account activated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Account activated successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden (admin only)"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/doctors/{doctor}/patients": {
             "get": {
                 "tags": [
@@ -3718,6 +3697,10 @@
         {
             "name": "Patients",
             "description": "Patients"
+        },
+        {
+            "name": "Receptionists",
+            "description": "Receptionists"
         },
         {
             "name": "Supervisions",

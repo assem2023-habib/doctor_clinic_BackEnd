@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Doctor;
 
+use App\Domains\Doctors\Actions\ActivateDoctorAccountAction;
 use App\Domains\Doctors\Actions\DeleteDoctorAction;
 use App\Domains\Doctors\Actions\UpdateDoctorAction;
 use App\Domains\Doctors\Models\Doctor;
@@ -18,6 +19,7 @@ class DoctorController
     public function __construct(
         private readonly UpdateDoctorAction $updateDoctorAction,
         private readonly DeleteDoctorAction $deleteDoctorAction,
+        private readonly ActivateDoctorAccountAction $activateDoctorAccountAction,
     ) {}
 
     public function index(Request $request): JsonResponse
@@ -78,5 +80,15 @@ class DoctorController
         $this->deleteDoctorAction->execute($doctor, request()->user());
 
         return ApiResponse::noContent(__('Doctor deleted successfully'));
+    }
+
+    public function activateAccount(Doctor $doctor): JsonResponse
+    {
+        $doctor = $this->activateDoctorAccountAction->execute($doctor);
+
+        return ApiResponse::success(
+            new DoctorResource($doctor->user),
+            __('auth.account_activated')
+        );
     }
 }
