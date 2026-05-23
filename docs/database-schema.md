@@ -30,7 +30,8 @@ pending, confirmed, cancelled, completed
 ```
 user, doctor, patient, receptionist, doctor_schedule,
 appointment, appointment_status_log, medical_record,
-prescription, prescription_item, medicine, notification, rating
+prescription, prescription_item, medicine, notification, rating,
+doctor_patient, supervision_request
 ```
 
 ### `RatingTypeEnum`
@@ -195,7 +196,37 @@ user, country
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 10. `appointments`
+### 10. `doctor_patient` (pivot)
+| Column | Type | Constraints |
+|--------|------|-------------|
+| doctor_id | uuid | FK → doctors |
+| patient_id | uuid | FK → patients |
+| assigned_by | string(500) | `"{uuid}: {name}"`, no FK |
+| notes | text | nullable |
+| supervision_status | string(20) | default `active` |
+| supervision_start | timestamp | nullable |
+| supervision_end | timestamp | nullable |
+| created_at | timestamp | |
+| updated_at | timestamp | |
+| Unique | | `(doctor_id, patient_id)` |
+
+> Default `supervision_status` is `active`. When a supervision request is approved, the assign action creates a row here with `supervision_status=active`.
+
+### 11. `supervision_requests`
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | uuid | PK |
+| patient_id | uuid | FK → patients |
+| doctor_id | uuid | FK → doctors |
+| status | string(20) | `pending`, `approved`, `rejected`, `cancelled` |
+| notes | text | nullable |
+| responded_at | timestamp | nullable |
+| created_at | timestamp | |
+| updated_at | timestamp | |
+| Index | | `(patient_id, status)` |
+| Index | | `(doctor_id, status)` |
+
+### 13. `appointments`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -211,7 +242,7 @@ user, country
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 11. `appointment_status_logs`
+### 14. `appointment_status_logs`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -223,7 +254,7 @@ user, country
 
 > No `updated_at` — immutable log.
 
-### 12. `medical_records`
+### 15. `medical_records`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -236,7 +267,7 @@ user, country
 
 > No `updated_at` — immutable record.
 
-### 13. `prescriptions`
+### 16. `prescriptions`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -247,7 +278,7 @@ user, country
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 14. `prescription_items`
+### 17. `prescription_items`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -260,7 +291,7 @@ user, country
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 15. `medicines`
+### 18. `medicines`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -270,7 +301,7 @@ user, country
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 16. `notifications`
+### 19. `notifications`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -280,7 +311,7 @@ user, country
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 17. `notification_user` (pivot)
+### 20. `notification_user` (pivot)
 | Column | Type | Constraints |
 |--------|------|-------------|
 | notification_id | uuid | FK → notifications, PK |
@@ -289,7 +320,7 @@ user, country
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 18. `ratings`
+### 21. `ratings`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -306,7 +337,7 @@ user, country
 
 > `rateable_id` + `rateable_type` are nullable — only used when `type = user`.
 
-### 19. `activity_logs`
+### 22. `activity_logs`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -320,7 +351,7 @@ user, country
 
 > Polymorphic reference: `model_type` + `model_id` point to any table.
 
-### 20. `images`
+### 23. `images`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -349,11 +380,17 @@ users 1──1 receptionists
 users 1──1 patients
 
 doctors 1──N doctor_schedules
+doctors N──M patients  (pivot: doctor_patient)
+    └── pivot: assigned_by, notes, supervision_status, supervision_start, supervision_end
+doctors 1──N supervision_requests
+    └── polymorphic: (doctor_id)
 doctors 1──N appointments        (doctor_id is nullable, no FK — nulled on doctor delete)
 doctors 1──N medical_records     (doctor_id is nullable, no FK — nulled on doctor delete)
 doctors 1──N prescriptions       (doctor_id is nullable, no FK — nulled on doctor delete)
 
-patients 1──N appointments
+patients N──M doctors  (pivot: doctor_patient)
+    └── pivot: assigned_by, notes, supervision_status, supervision_start, supervision_end
+patients 1──N supervision_requests
 patients 1──N medical_records
 patients 1──N prescriptions
 
@@ -396,7 +433,7 @@ countries 1──1 images (morph — imageable)
 
 ---
 
-> Total custom tables: 24
+> Total custom tables: 25
 
 ## Laravel Default Tables
 

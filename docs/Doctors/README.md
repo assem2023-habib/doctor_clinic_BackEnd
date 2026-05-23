@@ -15,6 +15,8 @@
 | 5 | `PATCH` | `/api/v1/doctors/{doctor}` | ✅ admin | تحديث جزئي |
 | 6 | `DELETE` | `/api/v1/doctors/{doctor}` | ✅ admin | حذف مع تنظيف |
 | 7 | `PUT` | `/api/v1/doctors/{doctor}/activate-account` | ✅ admin | تفعيل حساب الدكتور ([توثيق](activate-account.md)) |
+| 8 | `POST` | `/api/v1/doctors/{doctor}/patients/self` | ✅ auth:api | تعيين مريض للدكتور لنفسه |
+| 9 | `GET` | `/api/v1/doctors/{doctor}/supervision-requests` | ✅ auth:api | طلبات الإشراف الواردة للدكتور |
 
 ---
 
