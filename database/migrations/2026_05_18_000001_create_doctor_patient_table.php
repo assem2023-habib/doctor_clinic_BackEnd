@@ -13,6 +13,9 @@ return new class extends Migration
             $table->uuid('patient_id');
             $table->string('assigned_by', 500);
             $table->text('notes')->nullable();
+            $table->string('supervision_status', 20)->default('active');
+            $table->timestamp('supervision_start')->nullable();
+            $table->timestamp('supervision_end')->nullable();
             $table->timestamps();
 
             $table->unique(['doctor_id', 'patient_id']);
