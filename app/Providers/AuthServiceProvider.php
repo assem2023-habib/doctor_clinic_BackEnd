@@ -22,7 +22,7 @@ class AuthServiceProvider extends ServiceProvider
 
         Passport::$passwordGrantEnabled = true;
 
-        Passport::tokensExpireIn(now()->addMinutes(15));
+        Passport::tokensExpireIn(now()->addDay());
         Passport::refreshTokensExpireIn(now()->addDays(30));
         Passport::personalAccessTokensExpireIn(now()->addMonths(6));
     }
