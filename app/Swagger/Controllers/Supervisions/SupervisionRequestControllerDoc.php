@@ -8,7 +8,8 @@ class SupervisionRequestControllerDoc
 {
     #[OA\Post(
         path: '/api/v1/patients/{patient}/supervision-requests',
-        summary: 'Create a supervision request (patient only)',
+        summary: 'Create a supervision request',
+        description: 'Patient or staff (admin/receptionist) can create a request.',
         tags: ['Supervision Requests'],
         security: [['bearerAuth' => []]],
         parameters: [
@@ -24,7 +25,7 @@ class SupervisionRequestControllerDoc
             new OA\Response(response: 201, description: 'Supervision request created successfully'),
             new OA\Response(response: 401, description: 'Unauthenticated'),
             new OA\Response(response: 403, description: 'Forbidden'),
-            new OA\Response(response: 409, description: 'Patient already has active supervision with this specialization, pending request exists, or max 5 pending requests reached'),
+            new OA\Response(response: 409, description: 'Patient already has active supervision with this specialization, pending request exists, max 5 pending requests reached, or 7-day cooldown not elapsed since last cancellation'),
             new OA\Response(response: 422, description: 'Validation error'),
         ]
     )]

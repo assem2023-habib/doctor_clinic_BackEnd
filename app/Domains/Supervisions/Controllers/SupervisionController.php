@@ -3,11 +3,15 @@
 namespace App\Domains\Supervisions\Controllers;
 
 use App\Domains\Doctors\Models\Doctor;
+use App\Domains\Notifications\DTOs\NotificationData;
+use App\Domains\Notifications\Services\NotificationManager;
 use App\Domains\Patients\Models\Patient;
 use App\Domains\Shared\Responses\ApiResponse;
 use App\Domains\Supervisions\Actions\AssignPatientToDoctorAction;
 use App\Domains\Supervisions\Actions\BulkAssignPatientsToDoctorAction;
 use App\Domains\Supervisions\Actions\RemovePatientFromDoctorAction;
+use App\Domains\Supervisions\Enums\SupervisionRequestStatusEnum;
+use App\Domains\Supervisions\Models\SupervisionRequest;
 use App\Domains\Supervisions\Requests\AssignPatientRequest;
 use App\Domains\Supervisions\Requests\BulkAssignPatientRequest;
 use App\Domains\Supervisions\Resources\SupervisionDoctorResource;
@@ -22,6 +26,7 @@ class SupervisionController
         private readonly AssignPatientToDoctorAction $assignAction,
         private readonly RemovePatientFromDoctorAction $removeAction,
         private readonly BulkAssignPatientsToDoctorAction $bulkAssignAction,
+        private readonly NotificationManager $notificationManager,
     ) {}
 
     public function doctorPatients(Request $request, Doctor $doctor): JsonResponse
@@ -131,14 +136,48 @@ class SupervisionController
     {
         $user = $request->user();
         $isStaff = $user->hasAnyRole(['admin', 'receptionist']);
+        $isDoctor = $user->id === $doctor->user_id;
 
-        if (!$isStaff) {
+        if (!$isStaff && !$isDoctor) {
             return ApiResponse::forbidden(__('Unauthorized to remove patients'));
         }
 
         $this->removeAction->execute($doctor, $patient);
 
         return ApiResponse::success(null, __('Patient removed from doctor successfully'));
+    }
+
+    public function patientRemoveDoctor(Request $request, Patient $patient, Doctor $doctor): JsonResponse
+    {
+        $user = $request->user();
+        $isPatient = $user->id === $patient->user_id;
+
+        if (!$isPatient) {
+            return ApiResponse::forbidden(__('Unauthorized to remove doctor'));
+        }
+
+        $doctor->loadMissing('user');
+
+        SupervisionRequest::create([
+            'patient_id' => $patient->id,
+            'doctor_id' => $doctor->id,
+            'status' => SupervisionRequestStatusEnum::Cancelled,
+            'responded_at' => now(),
+        ]);
+
+        $this->removeAction->execute($doctor, $patient);
+
+        $this->notificationManager->send('supervision.cancelled', new NotificationData(
+            topic: 'supervision.cancelled',
+            title: __('Patient removed you from supervision'),
+            body: [
+                'patient_id' => $patient->id,
+                'doctor_id' => $doctor->id,
+            ],
+            userIds: [$doctor->user_id],
+        ));
+
+        return ApiResponse::success(null, __('Doctor removed successfully'));
     }
 
     public function availableDoctors(Request $request, Patient $patient): JsonResponse

@@ -159,7 +159,7 @@ class SupervisionControllerDoc
     #[OA\Delete(
         path: '/api/v1/doctors/{doctor}/patients/{patient}',
         summary: 'Remove a patient from a doctor',
-        description: 'Staff (admin/receptionist) only.',
+        description: 'Doctor themselves or staff (admin/receptionist).',
         tags: ['Supervisions'],
         security: [['bearerAuth' => []]],
         parameters: [
@@ -169,9 +169,28 @@ class SupervisionControllerDoc
         responses: [
             new OA\Response(response: 200, description: 'Patient removed from doctor successfully'),
             new OA\Response(response: 401, description: 'Unauthenticated'),
-            new OA\Response(response: 403, description: 'Forbidden (staff only)'),
+            new OA\Response(response: 403, description: 'Forbidden'),
             new OA\Response(response: 404, description: 'Not found'),
         ]
     )]
     public function remove() {}
+
+    #[OA\Delete(
+        path: '/api/v1/patients/{patient}/doctors/{doctor}',
+        summary: 'Remove a doctor from a patient (patient self-service)',
+        description: 'Patient can remove themselves from a doctor. Creates a cancelled supervision request record and notifies the doctor.',
+        tags: ['Supervisions'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(name: 'patient', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Patient UUID'),
+            new OA\Parameter(name: 'doctor', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Doctor UUID'),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Doctor removed successfully'),
+            new OA\Response(response: 401, description: 'Unauthenticated'),
+            new OA\Response(response: 403, description: 'Forbidden (patient only)'),
+            new OA\Response(response: 404, description: 'Not found'),
+        ]
+    )]
+    public function patientRemoveDoctor() {}
 }

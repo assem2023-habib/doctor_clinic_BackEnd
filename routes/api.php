@@ -94,8 +94,11 @@ Route::middleware(['auth:api', 'active'])->group(function () {
     Route::middleware('staff')->group(function () {
         Route::post('/v1/doctors/{doctor}/patients', [SupervisionController::class, 'assign']);
         Route::post('/v1/doctors/{doctor}/patients/bulk', [SupervisionController::class, 'bulkAssign']);
-        Route::delete('/v1/doctors/{doctor}/patients/{patient}', [SupervisionController::class, 'remove']);
     });
+
+    Route::delete('/v1/doctors/{doctor}/patients/{patient}', [SupervisionController::class, 'remove']);
+
+    Route::delete('/v1/patients/{patient}/doctors/{doctor}', [SupervisionController::class, 'patientRemoveDoctor']);
 
     Route::post('/v1/device-tokens', [DeviceTokenController::class, 'update']);
 

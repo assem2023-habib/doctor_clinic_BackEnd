@@ -5359,7 +5359,7 @@
                     "Supervisions"
                 ],
                 "summary": "Remove a patient from a doctor",
-                "description": "Staff (admin/receptionist) only.",
+                "description": "Doctor themselves or staff (admin/receptionist).",
                 "operationId": "a730ca8aa3108d79152a1eac6bfc5121",
                 "parameters": [
                     {
@@ -5391,7 +5391,58 @@
                         "description": "Unauthenticated"
                     },
                     "403": {
-                        "description": "Forbidden (staff only)"
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/patients/{patient}/doctors/{doctor}": {
+            "delete": {
+                "tags": [
+                    "Supervisions"
+                ],
+                "summary": "Remove a doctor from a patient (patient self-service)",
+                "description": "Patient can remove themselves from a doctor. Creates a cancelled supervision request record and notifies the doctor.",
+                "operationId": "13ebe38c80fee27bb047337c380e4f42",
+                "parameters": [
+                    {
+                        "name": "patient",
+                        "in": "path",
+                        "description": "Patient UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "doctor",
+                        "in": "path",
+                        "description": "Doctor UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Doctor removed successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden (patient only)"
                     },
                     "404": {
                         "description": "Not found"
@@ -5444,7 +5495,8 @@
                 "tags": [
                     "Supervision Requests"
                 ],
-                "summary": "Create a supervision request (patient only)",
+                "summary": "Create a supervision request",
+                "description": "Patient or staff (admin/receptionist) can create a request.",
                 "operationId": "996bbaaf13dd0cb4ae0c1f890ea77e5e",
                 "parameters": [
                     {
@@ -5486,7 +5538,7 @@
                         "description": "Forbidden"
                     },
                     "409": {
-                        "description": "Patient already has active supervision with this specialization, pending request exists, or max 5 pending requests reached"
+                        "description": "Patient already has active supervision with this specialization, pending request exists, max 5 pending requests reached, or 7-day cooldown not elapsed since last cancellation"
                     },
                     "422": {
                         "description": "Validation error"

@@ -38,10 +38,9 @@ class SupervisionRequestController
 
         $result = $this->createAction->execute($patient, $doctor);
 
-        return ApiResponse::success(
+        return ApiResponse::created(
             new SupervisionRequestResource($result),
-            __('Supervision request created successfully'),
-            status: 201
+            __('Supervision request created successfully')
         );
     }
 

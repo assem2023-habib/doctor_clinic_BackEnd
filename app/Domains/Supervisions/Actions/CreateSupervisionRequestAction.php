@@ -28,6 +28,16 @@ class CreateSupervisionRequestAction
             abort(409, __('Patient already has an active supervision with a doctor of this specialization'));
         }
 
+        $recentCancellation = SupervisionRequest::where('patient_id', $patient->id)
+            ->where('doctor_id', $doctor->id)
+            ->where('status', SupervisionRequestStatusEnum::Cancelled)
+            ->where('responded_at', '>=', now()->subDays(7))
+            ->exists();
+
+        if ($recentCancellation) {
+            abort(429, __('You cannot request supervision from this doctor again yet. Please wait 7 days after cancellation.'));
+        }
+
         $exists = SupervisionRequest::where('patient_id', $patient->id)
             ->where('doctor_id', $doctor->id)
             ->where('status', SupervisionRequestStatusEnum::Pending)

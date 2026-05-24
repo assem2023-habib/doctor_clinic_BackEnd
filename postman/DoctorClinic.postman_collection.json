@@ -2957,9 +2957,35 @@
 					},
 					"response": [
 						{
-							"name": "No Content",
-							"status": "No Content",
-							"code": 204
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Patient removed from doctor successfully\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Remove Doctor from Patient",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/patients/{{patient_id}}/doctors/{{doctor_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "patients", "{{patient_id}}", "doctors", "{{doctor_id}}"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctor removed successfully\"\n}"
 						}
 					]
 				},

@@ -514,4 +514,134 @@ class SupervisionTest extends TestCase
 
         $response->assertStatus(403);
     }
+
+    // ─── Doctor can remove their own patient ───
+
+    public function test_doctor_can_remove_patient(): void
+    {
+        $doctor = $this->createDoctor();
+        $patient = $this->createPatient();
+        $admin = $this->createAdmin();
+        $this->assignPatientToDoctor($patient->patient, $doctor, $admin);
+
+        Passport::actingAs($doctor);
+        $response = $this->deleteJson("/api/v1/doctors/{$doctor->doctor->id}/patients/{$patient->patient->id}");
+
+        $response->assertStatus(200);
+        $this->assertDatabaseMissing('doctor_patient', [
+            'doctor_id' => $doctor->doctor->id,
+            'patient_id' => $patient->patient->id,
+        ]);
+    }
+
+    public function test_other_doctor_cannot_remove_patient(): void
+    {
+        $doctor = $this->createDoctor();
+        $otherDoctor = $this->createDoctor();
+        $patient = $this->createPatient();
+        $admin = $this->createAdmin();
+        $this->assignPatientToDoctor($patient->patient, $doctor, $admin);
+
+        Passport::actingAs($otherDoctor);
+        $response = $this->deleteJson("/api/v1/doctors/{$doctor->doctor->id}/patients/{$patient->patient->id}");
+
+        $response->assertStatus(403);
+    }
+
+    // ─── Patient can remove themselves from a doctor ───
+
+    public function test_patient_can_remove_themself_from_doctor(): void
+    {
+        $doctor = $this->createDoctor();
+        $patient = $this->createPatient();
+        $admin = $this->createAdmin();
+        $this->assignPatientToDoctor($patient->patient, $doctor, $admin);
+
+        Passport::actingAs($patient);
+        $response = $this->deleteJson("/api/v1/patients/{$patient->patient->id}/doctors/{$doctor->doctor->id}");
+
+        $response->assertStatus(200);
+        $this->assertDatabaseMissing('doctor_patient', [
+            'doctor_id' => $doctor->doctor->id,
+            'patient_id' => $patient->patient->id,
+        ]);
+    }
+
+    public function test_other_patient_cannot_remove_doctor_from_another_patient(): void
+    {
+        $doctor = $this->createDoctor();
+        $patient = $this->createPatient();
+        $otherPatient = $this->createPatient();
+        $admin = $this->createAdmin();
+        $this->assignPatientToDoctor($patient->patient, $doctor, $admin);
+
+        Passport::actingAs($otherPatient);
+        $response = $this->deleteJson("/api/v1/patients/{$patient->patient->id}/doctors/{$doctor->doctor->id}");
+
+        $response->assertStatus(403);
+    }
+
+    // ─── 7-day cooldown after patient removes doctor ───
+
+    public function test_patient_cannot_request_same_doctor_within_7_days_after_self_removal(): void
+    {
+        $doctor = $this->createDoctor();
+        $patient = $this->createPatient();
+        $admin = $this->createAdmin();
+        $this->assignPatientToDoctor($patient->patient, $doctor, $admin);
+
+        Passport::actingAs($patient);
+        $this->deleteJson("/api/v1/patients/{$patient->patient->id}/doctors/{$doctor->doctor->id}")->assertStatus(200);
+
+        $this->travel(3)->days();
+
+        $response = $this->postJson("/api/v1/patients/{$patient->patient->id}/supervision-requests", [
+            'doctor_id' => $doctor->doctor->id,
+        ]);
+
+        $response->assertStatus(429);
+    }
+
+    public function test_patient_can_request_same_doctor_after_7_days(): void
+    {
+        $doctor = $this->createDoctor();
+        $patient = $this->createPatient();
+        $admin = $this->createAdmin();
+        $this->assignPatientToDoctor($patient->patient, $doctor, $admin);
+
+        Passport::actingAs($patient);
+        $this->deleteJson("/api/v1/patients/{$patient->patient->id}/doctors/{$doctor->doctor->id}")->assertStatus(200);
+
+        $this->travel(8)->days();
+
+        $response = $this->postJson("/api/v1/patients/{$patient->patient->id}/supervision-requests", [
+            'doctor_id' => $doctor->doctor->id,
+        ]);
+
+        $response->assertStatus(201);
+    }
+
+    public function test_patient_cannot_request_same_doctor_within_7_days_after_cancelling_pending_request(): void
+    {
+        $doctor = $this->createDoctor();
+        $patient = $this->createPatient();
+
+        Passport::actingAs($patient);
+
+        $createResponse = $this->postJson("/api/v1/patients/{$patient->patient->id}/supervision-requests", [
+            'doctor_id' => $doctor->doctor->id,
+        ]);
+        $createResponse->assertStatus(201);
+        $requestId = $createResponse->json('data.id');
+
+        $this->postJson("/api/v1/supervision-requests/{$requestId}/cancel")->assertStatus(200);
+
+        $this->travel(3)->days();
+
+        $response = $this->postJson("/api/v1/patients/{$patient->patient->id}/supervision-requests", [
+            'doctor_id' => $doctor->doctor->id,
+        ]);
+
+        $response->assertStatus(429);
+    }
 }

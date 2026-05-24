@@ -12,8 +12,9 @@
 | `POST` | `/v1/doctors/{doctor}/patients` | `auth:api`, `active`, `staff` | Assign a patient to a doctor (staff) |
 | `POST` | `/v1/doctors/{doctor}/patients/self` | `auth:api`, `active` | Doctor self-assign a patient |
 | `POST` | `/v1/doctors/{doctor}/patients/bulk` | `auth:api`, `active`, `staff` | Bulk assign patients to a doctor |
-| `DELETE` | `/v1/doctors/{doctor}/patients/{patient}` | `auth:api`, `active`, `staff` | Remove a patient from a doctor |
-| `POST` | `/v1/patients/{patient}/supervision-requests` | `auth:api`, `active` | Patient requests supervision from a doctor |
+| `DELETE` | `/v1/doctors/{doctor}/patients/{patient}` | `auth:api`, `active` | Remove a patient from a doctor (doctor themselves or staff) |
+| `DELETE` | `/v1/patients/{patient}/doctors/{doctor}` | `auth:api`, `active` | Remove a doctor from a patient (patient self-service) |
+| `POST` | `/v1/patients/{patient}/supervision-requests` | `auth:api`, `active` | Create a supervision request (patient or staff) |
 | `GET` | `/v1/patients/{patient}/supervision-requests` | `auth:api`, `active` | List patient's supervision requests |
 | `GET` | `/v1/doctors/{doctor}/supervision-requests` | `auth:api`, `active` | List doctor's supervision requests (filter by `status`) |
 | `POST` | `/v1/supervision-requests/{id}/approve` | `auth:api`, `active` | Doctor approves a request |
@@ -42,6 +43,7 @@
 - **Pending request uniqueness** — a patient cannot have more than one pending request to the same doctor
 - **Multiple requests allowed** — a patient can request from multiple doctors with different specializations simultaneously
 - **Max 5 pending requests** — a patient cannot have more than 5 pending supervision requests at a time (enforced in `CreateSupervisionRequestAction`)
+- **7-day cooldown** — if a patient cancelled or was rejected in the last 7 days for the same doctor, they must wait before re-requesting (enforced in `CreateSupervisionRequestAction`)
 
 ## Supervision Requests Table
 
@@ -65,10 +67,11 @@ SupervisionController
  └── assign()               → AssignPatientToDoctorAction (with specialization_id check)
  └── selfAssign()           → AssignPatientToDoctorAction (doctor self-assign)
  └── bulkAssign()           → BulkAssignPatientsToDoctorAction (skips conflicts)
- └── remove()               → RemovePatientFromDoctorAction
+ └── remove()               → RemovePatientFromDoctorAction (doctor or staff)
+ └── patientRemoveDoctor()  → RemovePatientFromDoctorAction + cancelled request record + notification
 
 SupervisionRequestController
- └── store()                → CreateSupervisionRequestAction (checks same-specialization_id)
+ └── store()                → CreateSupervisionRequestAction (checks same-specialization + 7-day cooldown)
  └── indexPatient()         → SupervisionRequestResource collection
  └── indexDoctor()          → SupervisionRequestResource collection
  └── approve()              → ApproveSupervisionRequestAction (creates supervision + cancels same-specialization_id pending)
