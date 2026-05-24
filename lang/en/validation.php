@@ -204,5 +204,7 @@ return [
     */
 
     'no_overlapping_appointment' => 'The doctor already has an appointment at this time.',
+    'doctor_not_working_that_day' => 'The doctor does not work on the selected day.',
+    'outside_doctor_schedule' => 'The selected time is outside the doctor\'s working hours.',
 
 ];

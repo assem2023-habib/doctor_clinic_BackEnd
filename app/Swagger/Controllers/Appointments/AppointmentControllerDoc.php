@@ -77,7 +77,7 @@ class AppointmentControllerDoc
             content: new OA\JsonContent(
                 properties: [
                     new OA\Property(property: 'doctor_id', type: 'string', format: 'uuid', description: 'Doctor UUID'),
-                    new OA\Property(property: 'preferred_date', type: 'string', format: 'date', nullable: true, description: 'Preferred date (Y-m-d)'),
+                    new OA\Property(property: 'preferred_date', type: 'string', format: 'date', nullable: true, description: 'Preferred date (Y-m-d). The day-of-week must exist in the doctor\'s active schedule.'),
                     new OA\Property(property: 'reason', type: 'string', nullable: true, maxLength: 2000, description: 'Reason for appointment'),
                 ]
             )
@@ -104,8 +104,8 @@ class AppointmentControllerDoc
             required: true,
             content: new OA\JsonContent(
                 properties: [
-                    new OA\Property(property: 'appointment_date', type: 'string', format: 'date', description: 'Appointment date (Y-m-d)'),
-                    new OA\Property(property: 'start_time', type: 'string', format: 'time', example: '10:00', description: 'Start time (H:i)'),
+                    new OA\Property(property: 'appointment_date', type: 'string', format: 'date', description: 'Appointment date (Y-m-d). The day-of-week must exist in the doctor\'s active schedule.'),
+                    new OA\Property(property: 'start_time', type: 'string', format: 'time', example: '10:00', description: 'Start time (H:i). Must fall within one of the doctor\'s schedule time ranges for that day.'),
                     new OA\Property(property: 'end_time', type: 'string', format: 'time', example: '11:00', description: 'End time (H:i)'),
                 ]
             )

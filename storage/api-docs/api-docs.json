@@ -167,7 +167,7 @@
                                         "format": "uuid"
                                     },
                                     "preferred_date": {
-                                        "description": "Preferred date (Y-m-d)",
+                                        "description": "Preferred date (Y-m-d). The day-of-week must exist in the doctor's active schedule.",
                                         "type": [
                                             "string",
                                             "null"
@@ -295,12 +295,12 @@
                             "schema": {
                                 "properties": {
                                     "appointment_date": {
-                                        "description": "Appointment date (Y-m-d)",
+                                        "description": "Appointment date (Y-m-d). The day-of-week must exist in the doctor's active schedule.",
                                         "type": "string",
                                         "format": "date"
                                     },
                                     "start_time": {
-                                        "description": "Start time (H:i)",
+                                        "description": "Start time (H:i). Must fall within one of the doctor's schedule time ranges for that day.",
                                         "type": "string",
                                         "format": "time",
                                         "example": "10:00"

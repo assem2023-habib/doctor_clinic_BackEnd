@@ -13,7 +13,7 @@
 | Parameter | Type | Constraints | Description |
 |-----------|------|-------------|-------------|
 | `doctor_id` | string | required, exists:doctors,id | Target doctor UUID |
-| `preferred_date` | string | nullable, date, after_or_equal:today | Patient's preferred date |
+| `preferred_date` | string | nullable, date, after_or_equal:today, must exist in doctor's schedule | Patient's preferred date (day-of-week must be in doctor's active schedule) |
 | `reason` | string | nullable, max:2000 | Reason for visit |
 
 ### Example
@@ -116,4 +116,4 @@ Patient     AppointmentController    RequestAppointmentAction    NotificationMan
 | 401 | Unauthenticated |
 | 403 | Only patients can request appointments |
 | 404 | Doctor not found |
-| 422 | Validation failed |
+| 422 | Validation failed — includes schedule validation (`doctor_not_working_that_day`) |

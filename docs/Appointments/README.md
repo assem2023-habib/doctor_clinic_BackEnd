@@ -54,6 +54,7 @@ AppointmentController
 
 - **Status Engine:** `AppointmentStatusEnum` (9 states: pending, requested, set, accepted, rejected, in_progress, confirmed, cancelled, completed)
 - **Overlap Prevention:** `NoOverlappingAppointment` rule → `AppointmentRepositoryInterface::hasOverlap()` → `EloquentAppointmentRepository`
+- **Schedule Validation:** `WithinDoctorSchedule` rule — validates the appointment date's day-of-week exists in the doctor's active `DoctorSchedule`, and optionally checks that `start_time`/`end_time` fall within a schedule time slot
 - **Auto-Confirm:** `AutoConfirmAppointment` job dispatched with `(config:appointment.response_window_hours)` delay when staff sets a time
 - **Notifications:** Each state transition fires a notification via `NotificationManager` (appointment.requested, .time_set, .accepted, .rejected, .in_progress, .cancelled, .completed, .alternative_suggested)
 - **Slot Service:** `AvailableSlotsService::getBookedSlots()` returns future booked appointments (Set, Accepted, InProgress, Confirmed) with optional date/range filter. Always excludes past appointments.

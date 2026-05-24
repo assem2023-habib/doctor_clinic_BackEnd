@@ -16,8 +16,8 @@ Status must be `Requested` — otherwise returns 400.
 
 | Parameter | Type | Constraints | Description |
 |-----------|------|-------------|-------------|
-| `appointment_date` | string | required, date, after_or_equal:today | Proposed date |
-| `start_time` | string | required, format H:i, overlap check | Start time |
+| `appointment_date` | string | required, date, after_or_equal:today, must exist in doctor's schedule | Proposed date (day-of-week must be in doctor's active schedule) |
+| `start_time` | string | required, format H:i, overlap check, must be within doctor's schedule hours | Start time |
 | `end_time` | string | required, format H:i, after:start_time | End time |
 
 ```json
@@ -27,6 +27,10 @@ Status must be `Requested` — otherwise returns 400.
   "end_time": "12:00"
 }
 ```
+
+### Schedule Validation
+
+The `WithinDoctorSchedule` validation rule checks that the appointment date's day of week exists in the doctor's active `DoctorSchedule` records. When `start_time` and `end_time` are also provided, they are validated to fall within one of the doctor's schedule time ranges for that day.
 
 ### Overlap Prevention
 
@@ -168,4 +172,4 @@ Staff           AppointmentController    SetTimeAction    AutoConfirmJob    Pati
 | 403 | Forbidden (wrong role for set-time, not the patient for respond) |
 | 404 | Appointment not found |
 | 409 | Overlapping appointment detected (set-time) |
-| 422 | Validation failed |
+| 422 | Validation failed — includes schedule validation (`doctor_not_working_that_day`, `outside_doctor_schedule`) |

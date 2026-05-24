@@ -2437,7 +2437,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"doctor_id\": \"{{doctor_id}}\",\n    \"reason\": \"Annual checkup\",\n    \"notes\": \"Patient has history of hypertension\"\n}",
+							"raw": "{\n    \"doctor_id\": \"{{doctor_id}}\",\n    \"preferred_date\": \"2026-06-05\",\n    \"reason\": \"Annual checkup\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2455,7 +2455,7 @@
 							"name": "Created",
 							"status": "Created",
 							"code": 201,
-							"body": "{\n    \"status\": 201,\n    \"message\": \"Appointment requested successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"doctor_id\": \"...\",\n        \"patient_id\": \"...\",\n        \"appointment_date\": null,\n        \"start_time\": null,\n        \"end_time\": null,\n        \"status\": \"requested\",\n        \"reason\": \"Annual checkup\",\n        \"notes\": \"Patient has history of hypertension\",\n        \"created_by\": \"...\",\n        \"created_at\": \"2026-05-19T00:00:00.000000Z\",\n        \"updated_at\": \"2026-05-19T00:00:00.000000Z\"\n    }\n}"
+							"body": "{\n    \"status\": 201,\n    \"message\": \"Appointment requested successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"doctor_id\": \"...\",\n        \"patient_id\": \"...\",\n        \"appointment_date\": null,\n        \"start_time\": null,\n        \"end_time\": null,\n        \"status\": \"requested\",\n        \"reason\": \"Annual checkup\",\n        \"notes\": \"Preferred date: 2026-06-05\",\n        \"created_by\": \"...\",\n        \"created_at\": \"2026-05-19T00:00:00.000000Z\",\n        \"updated_at\": \"2026-05-19T00:00:00.000000Z\"\n    }\n}"
 						}
 					]
 				},

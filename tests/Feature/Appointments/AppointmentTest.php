@@ -107,6 +107,18 @@ class AppointmentTest extends TestCase
         ], $overrides));
     }
 
+    private function createScheduleForDate($doctor, string $date): void
+    {
+        $dayName = strtolower(Carbon::parse($date)->format('l'));
+
+        $doctor->schedules()->create([
+            'day_of_week' => $dayName,
+            'start_time' => '09:00',
+            'end_time' => '17:00',
+            'is_active' => true,
+        ]);
+    }
+
     private function createAppointment(array $overrides = []): Appointment
     {
         $patient = $overrides['patient'] ?? $this->createPatientUser();
@@ -204,6 +216,7 @@ class AppointmentTest extends TestCase
         Passport::actingAs($patient);
 
         $doctorUser = $this->createDoctorUser();
+        $this->createScheduleForDate($doctorUser->doctor, now()->addDays(3)->format('Y-m-d'));
 
         $response = $this->postJson('/api/v1/appointments', [
             'doctor_id' => $doctorUser->doctor->id,
@@ -258,6 +271,7 @@ class AppointmentTest extends TestCase
         $appointment = $this->createAppointment();
 
         $futureDate = now()->addDays(5)->format('Y-m-d');
+        $this->createScheduleForDate($appointment->doctor, $futureDate);
 
         $response = $this->postJson("/api/v1/appointments/{$appointment->id}/set-time", [
             'appointment_date' => $futureDate,
@@ -293,6 +307,7 @@ class AppointmentTest extends TestCase
         ]);
 
         $futureDate = now()->addDays(5)->format('Y-m-d');
+        $this->createScheduleForDate($doctorUser->doctor, $futureDate);
 
         $response = $this->postJson("/api/v1/appointments/{$appointment->id}/set-time", [
             'appointment_date' => $futureDate,
@@ -309,6 +324,7 @@ class AppointmentTest extends TestCase
         Passport::actingAs($patient);
 
         $appointment = $this->createAppointment();
+        $this->createScheduleForDate($appointment->doctor, now()->addDays(5)->format('Y-m-d'));
 
         $response = $this->postJson("/api/v1/appointments/{$appointment->id}/set-time", [
             'appointment_date' => now()->addDays(5)->format('Y-m-d'),
@@ -626,6 +642,7 @@ class AppointmentTest extends TestCase
         $doctorUser = $this->createDoctorUser();
         $patient = $this->createPatientUser();
         $futureDate = now()->addDays(5)->format('Y-m-d');
+        $this->createScheduleForDate($doctorUser->doctor, $futureDate);
 
         Appointment::create([
             'doctor_id' => $doctorUser->doctor->id,
@@ -661,6 +678,7 @@ class AppointmentTest extends TestCase
 
         $appointment = $this->createAppointment();
         $futureDate = now()->addDays(5)->format('Y-m-d');
+        $this->createScheduleForDate($appointment->doctor, $futureDate);
 
         $response = $this->postJson("/api/v1/appointments/{$appointment->id}/set-time", [
             'appointment_date' => $futureDate,
