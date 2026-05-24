@@ -8,6 +8,8 @@ class CreateMedicineAction
 {
     public function execute(array $data): Medicine
     {
+        $user = auth()->user();
+
         return Medicine::create([
             'name' => [
                 'ar' => $data['name_ar'],
@@ -21,6 +23,7 @@ class CreateMedicineAction
                 : null,
             'barcode' => $data['barcode'] ?? null,
             'manufacturer' => $data['manufacturer'] ?? null,
+            'created_by' => $user ? "{$user->id} | {$user->first_name} {$user->last_name}" : null,
         ]);
     }
 }

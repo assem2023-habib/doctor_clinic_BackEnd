@@ -63,8 +63,8 @@ class MedicineControllerDoc
         responses: [
             new OA\Response(response: 201, description: 'Medicine created successfully'),
             new OA\Response(response: 401, description: 'Unauthenticated'),
-            new OA\Response(response: 403, description: 'Forbidden (staff:doctor only)'),
-            new OA\Response(response: 422, description: 'Validation error'),
+            new OA\Response(response: 403, description: 'Forbidden (requires medicines.create permission)'),
+            new OA\Response(response: 422, description: 'Validation error or daily limit exceeded (patients: max 15/day)'),
         ]
     )]
     public function store() {}

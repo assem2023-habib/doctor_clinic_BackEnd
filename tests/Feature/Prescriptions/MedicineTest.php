@@ -212,7 +212,7 @@ class MedicineTest extends TestCase
         $this->assertDatabaseMissing('medicines', ['id' => $medicine->id]);
     }
 
-    public function test_patient_cannot_create_medicine(): void
+    public function test_patient_can_create_medicine(): void
     {
         $user = $this->createUser(['patient']);
         Passport::actingAs($user);
@@ -222,7 +222,51 @@ class MedicineTest extends TestCase
             'name_en' => 'Paracetamol',
         ]);
 
-        $response->assertStatus(403);
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('medicines', [
+            'name->en' => 'Paracetamol',
+        ]);
+    }
+
+    public function test_patient_daily_limit_exceeded(): void
+    {
+        $user = $this->createUser(['patient']);
+        Passport::actingAs($user);
+
+        for ($i = 0; $i < 15; $i++) {
+            Medicine::create([
+                'name' => ['en' => "Medicine $i", 'ar' => "دواء $i"],
+                'created_by' => "{$user->id} | {$user->first_name} {$user->last_name}",
+            ]);
+        }
+
+        $response = $this->postJson('/api/v1/medicines', [
+            'name_ar' => 'باراسيتامول',
+            'name_en' => 'Paracetamol',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['daily_limit']);
+    }
+
+    public function test_patient_can_create_up_to_fifteen_per_day(): void
+    {
+        $user = $this->createUser(['patient']);
+        Passport::actingAs($user);
+
+        for ($i = 0; $i < 14; $i++) {
+            Medicine::create([
+                'name' => ['en' => "Medicine $i", 'ar' => "دواء $i"],
+                'created_by' => "{$user->id} | {$user->first_name} {$user->last_name}",
+            ]);
+        }
+
+        $response = $this->postJson('/api/v1/medicines', [
+            'name_ar' => 'باراسيتامول',
+            'name_en' => 'Paracetamol',
+        ]);
+
+        $response->assertStatus(201);
     }
 
     public function test_patient_can_list_medicines(): void

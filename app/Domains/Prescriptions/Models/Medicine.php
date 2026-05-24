@@ -15,6 +15,7 @@ class Medicine extends Model
         'description',
         'barcode',
         'manufacturer',
+        'created_by',
     ];
 
     protected function casts(): array

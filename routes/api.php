@@ -133,9 +133,9 @@ Route::middleware(['auth:api', 'active'])->group(function () {
     Route::prefix('v1/medicines')->group(function () {
         Route::get('/', [MedicineController::class, 'index']);
         Route::get('/{medicine}', [MedicineController::class, 'show']);
+        Route::post('/', [MedicineController::class, 'store']);
 
         Route::middleware('staff:doctor')->group(function () {
-            Route::post('/', [MedicineController::class, 'store']);
             Route::put('/{medicine}', [MedicineController::class, 'update']);
             Route::delete('/{medicine}', [MedicineController::class, 'destroy']);
         });

@@ -14,6 +14,7 @@ class MedicineResource extends JsonResource
             'description' => $this->description,
             'barcode' => $this->barcode,
             'manufacturer' => $this->manufacturer,
+            'created_by' => $this->created_by,
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
         ];

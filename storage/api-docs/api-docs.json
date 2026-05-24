@@ -4159,10 +4159,10 @@
                         "description": "Unauthenticated"
                     },
                     "403": {
-                        "description": "Forbidden (staff:doctor only)"
+                        "description": "Forbidden (requires medicines.create permission)"
                     },
                     "422": {
-                        "description": "Validation error"
+                        "description": "Validation error or daily limit exceeded (patients: max 15/day)"
                     }
                 },
                 "security": [

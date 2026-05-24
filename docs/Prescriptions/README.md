@@ -8,11 +8,11 @@
 |--------|----------|-----------|-------------|
 | `GET` | `/v1/medicines` | `auth:api`, `active` | List all medicines (searchable, filterable by `manufacturer`) |
 | `GET` | `/v1/medicines/{medicine}` | `auth:api`, `active` | Get a single medicine |
-| `POST` | `/v1/medicines` | `auth:api`, `active`, `staff:doctor` | Create a new medicine |
+| `POST` | `/v1/medicines` | `auth:api`, `active` | Create a new medicine (requires `medicines.create` permission; patients limited to **15/day**) |
 | `PUT` | `/v1/medicines/{medicine}` | `auth:api`, `active`, `staff:doctor` | Update a medicine |
 | `DELETE` | `/v1/medicines/{medicine}` | `auth:api`, `active`, `staff:doctor` | Delete a medicine |
 
-> `staff:doctor` middleware allows **admin**, **receptionist**, and **doctor** roles. Read-only endpoints are available to **patients** as well.
+> `staff:doctor` middleware allows **admin**, **receptionist**, and **doctor** roles. **Patients** can now also create medicines (up to 15 per day). All authenticated users can read.
 
 ## Query Parameters (GET /v1/medicines)
 

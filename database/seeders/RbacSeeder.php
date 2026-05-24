@@ -74,7 +74,7 @@ class RbacSeeder extends Seeder
                 'name' => 'Patient',
                 'guard_name' => 'api',
                 'is_system' => true,
-                'permission_slugs' => ['appointments.view', 'appointments.create', 'patients.view'],
+                'permission_slugs' => ['appointments.view', 'appointments.create', 'patients.view', 'medicines.view', 'medicines.create'],
             ],
             'receptionist' => [
                 'name' => 'Receptionist',
