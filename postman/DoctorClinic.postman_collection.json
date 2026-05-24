@@ -37,6 +37,11 @@
 			"type": "string"
 		},
 		{
+			"key": "specialization_id",
+			"value": "",
+			"type": "string"
+		},
+		{
 			"key": "country_id",
 			"value": "",
 			"type": "string"
@@ -223,10 +228,10 @@
 									"type": "text"
 								},
 								{
-									"key": "specialization",
-									"value": "cardiology",
+									"key": "specialization_id",
+									"value": "{{specialization_id}}",
 									"type": "text",
-									"description": "Doctor specialization from SpecializationEnum"
+									"description": "Doctor specialization ID"
 								},
 								{
 									"key": "experience_months",
@@ -691,7 +696,7 @@
 							"name": "Success (Doctor)",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"User retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor@example.com\",\n        \"roles\": [\"doctor\"],\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"specialization\": \"cardiology\",\n        \"experience_months\": 60\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"User retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor@example.com\",\n        \"roles\": [\"doctor\"],\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"specialization\": {\"id\": \"019e1d0f-...\", \"slug\": \"cardiology\", \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"}, \"description\": null},\n        \"experience_months\": 60\n    }\n}"
 						},
 						{
 							"name": "Success (Receptionist)",
@@ -1434,7 +1439,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctors retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Khaled\",\n            \"last_name\": \"Suleiman\",\n            \"email\": \"doctor@example.com\",\n            \"roles\": [\"doctor\"],\n            \"phone\": \"+963912345679\",\n            \"gender\": \"male\",\n            \"birthday_date\": \"1985-03-20\",\n            \"is_active\": true,\n            \"specialization\": \"cardiology\",\n            \"experience_months\": 60,\n            \"schedules\": []\n        }\n    ],\n    \"meta\": {\n        \"pagination\": {\n            \"current_page\": 1,\n            \"last_page\": 1,\n            \"per_page\": 20,\n            \"total\": 1,\n            \"from\": 1,\n            \"to\": 1,\n            \"limit\": 20\n        }\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctors retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Khaled\",\n            \"last_name\": \"Suleiman\",\n            \"email\": \"doctor@example.com\",\n            \"roles\": [\"doctor\"],\n            \"phone\": \"+963912345679\",\n            \"gender\": \"male\",\n            \"birthday_date\": \"1985-03-20\",\n            \"is_active\": true,\n            \"specialization\": {\"id\": \"019e1d0f-...\", \"slug\": \"cardiology\", \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"}, \"description\": null},\n            \"experience_months\": 60,\n            \"schedules\": []\n        }\n    ],\n    \"meta\": {\n        \"pagination\": {\n            \"current_page\": 1,\n            \"last_page\": 1,\n            \"per_page\": 20,\n            \"total\": 1,\n            \"from\": 1,\n            \"to\": 1,\n            \"limit\": 20\n        }\n    }\n}"
 						}
 					]
 				},
@@ -1517,8 +1522,8 @@
 									"type": "text"
 								},
 								{
-									"key": "specialization",
-									"value": "cardiology",
+									"key": "specialization_id",
+									"value": "{{specialization_id}}",
 									"type": "text"
 								},
 								{
@@ -1550,7 +1555,7 @@
 							"name": "Created",
 							"status": "Created",
 							"code": 201,
-							"body": "{\n    \"status\": 201,\n    \"message\": \"Doctor created successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor@example.com\",\n        \"roles\": [\"doctor\"],\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"specialization\": \"cardiology\",\n        \"experience_months\": 60,\n        \"schedules\": []\n    }\n}"
+							"body": "{\n    \"status\": 201,\n    \"message\": \"Doctor created successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor@example.com\",\n        \"roles\": [\"doctor\"],\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"specialization\": {\"id\": \"019e1d0f-...\", \"slug\": \"cardiology\", \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"}, \"description\": null},\n        \"experience_months\": 60,\n        \"schedules\": []\n    }\n}"
 						},
 						{
 							"name": "Unauthenticated",
@@ -1608,7 +1613,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctor retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor@example.com\",\n        \"roles\": [\"doctor\"],\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"specialization\": \"cardiology\",\n        \"experience_months\": 60,\n        \"schedules\": []\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctor retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor@example.com\",\n        \"roles\": [\"doctor\"],\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"specialization\": {\"id\": \"019e1d0f-...\", \"slug\": \"cardiology\", \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"}, \"description\": null},\n        \"experience_months\": 60,\n        \"schedules\": []\n    }\n}"
 						}
 					]
 				},
@@ -1690,10 +1695,10 @@
 									"type": "text"
 								},
 								{
-									"key": "specialization",
-									"value": "cardiology",
+									"key": "specialization_id",
+									"value": "{{specialization_id}}",
 									"type": "text",
-									"description": "Doctor specialization from SpecializationEnum"
+									"description": "Doctor specialization ID"
 								},
 								{
 									"key": "experience_months",
@@ -1727,7 +1732,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctor updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman Updated\",\n        \"email\": \"doctor@example.com\",\n        \"roles\": [\"doctor\"],\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"specialization\": \"cardiology\",\n        \"experience_months\": 60,\n        \"schedules\": []\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctor updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman Updated\",\n        \"email\": \"doctor@example.com\",\n        \"roles\": [\"doctor\"],\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"specialization\": {\"id\": \"019e1d0f-...\", \"slug\": \"cardiology\", \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"}, \"description\": null},\n        \"experience_months\": 60,\n        \"schedules\": []\n    }\n}"
 						},
 						{
 							"name": "Forbidden",
@@ -1851,7 +1856,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Account activated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor@example.com\",\n        \"roles\": [\"doctor\"],\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"specialization\": \"cardiology\",\n        \"experience_months\": 60,\n        \"schedules\": []\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Account activated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor@example.com\",\n        \"roles\": [\"doctor\"],\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"specialization\": {\"id\": \"019e1d0f-...\", \"slug\": \"cardiology\", \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"}, \"description\": null},\n        \"experience_months\": 60,\n        \"schedules\": []\n    }\n}"
 						},
 						{
 							"name": "Forbidden",
@@ -1918,6 +1923,237 @@
 							"var url = pm.request.url.toString();",
 							"var needsAuth = pm.request.method !== 'GET';",
 							"if (token && needsAuth) {",
+							"    pm.request.headers.add({",
+							"        key: 'Authorization',",
+							"        value: 'Bearer ' + token",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "Specializations",
+			"description": "Specializations CRUD.\n\nAll endpoints require authentication. List/Get require auth. Create/Update/Delete require admin.",
+			"item": [
+				{
+					"name": "List Specializations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/specializations",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "specializations"],
+							"query": [
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Items per page (max 100)"
+								},
+								{
+									"key": "search",
+									"value": "",
+									"description": "Search by name (Arabic or English)"
+								},
+								{
+									"key": "slug",
+									"value": "",
+									"description": "Filter by slug"
+								},
+								{
+									"key": "is_active",
+									"value": "",
+									"description": "Filter by active status"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Specializations retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"slug\": \"cardiology\",\n            \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"},\n            \"description\": null,\n            \"is_active\": true,\n            \"doctors_count\": 5,\n            \"created_at\": \"2026-05-24T00:00:00.000000Z\",\n            \"updated_at\": \"2026-05-24T00:00:00.000000Z\"\n        }\n    ],\n    \"meta\": {\n        \"pagination\": {\n            \"current_page\": 1,\n            \"last_page\": 1,\n            \"per_page\": 20,\n            \"total\": 28,\n            \"from\": 1,\n            \"to\": 28,\n            \"limit\": 20\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Specialization",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/specializations/{{specialization_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "specializations", "{{specialization_id}}"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Specialization retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"slug\": \"cardiology\",\n        \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"},\n        \"description\": null,\n        \"is_active\": true,\n        \"doctors_count\": 5,\n        \"created_at\": \"2026-05-24T00:00:00.000000Z\",\n        \"updated_at\": \"2026-05-24T00:00:00.000000Z\"\n    }\n}"
+						},
+						{
+							"name": "Not Found",
+							"status": "Not Found",
+							"code": 404
+						}
+					]
+				},
+				{
+					"name": "Create Specialization",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('specialization_id', json.data.id);",
+									"    console.log('Specialization created:', json.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name_ar\": \"طب القلب\",\n    \"name_en\": \"Cardiology\",\n    \"description_ar\": \"متخصص بأمراض القلب\",\n    \"description_en\": \"Heart disease specialist\",\n    \"is_active\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/specializations",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "specializations"]
+						}
+					},
+					"response": [
+						{
+							"name": "Created",
+							"status": "Created",
+							"code": 201,
+							"body": "{\n    \"status\": 201,\n    \"message\": \"Specialization created successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"slug\": \"cardiology\",\n        \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"},\n        \"description\": {\"ar\": \"متخصص بأمراض القلب\", \"en\": \"Heart disease specialist\"},\n        \"is_active\": true,\n        \"doctors_count\": 0,\n        \"created_at\": \"2026-05-24T00:00:00.000000Z\",\n        \"updated_at\": \"2026-05-24T00:00:00.000000Z\"\n    }\n}"
+						},
+						{
+							"name": "Validation Error",
+							"status": "Unprocessable Entity",
+							"code": 422
+						}
+					]
+				},
+				{
+					"name": "Update Specialization",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name_ar\": \"طب القلب\",\n    \"name_en\": \"Cardiology\",\n    \"description_ar\": \"متخصص بأمراض القلب والشرايين\",\n    \"description_en\": \"Heart and vascular disease specialist\",\n    \"is_active\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/specializations/{{specialization_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "specializations", "{{specialization_id}}"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Specialization updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"slug\": \"cardiology\",\n        \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"},\n        \"description\": {\"ar\": \"متخصص بأمراض القلب والشرايين\", \"en\": \"Heart and vascular disease specialist\"},\n        \"is_active\": true,\n        \"created_at\": \"2026-05-24T00:00:00.000000Z\",\n        \"updated_at\": \"2026-05-24T00:00:00.000000Z\"\n    }\n}"
+						},
+						{
+							"name": "Validation Error",
+							"status": "Unprocessable Entity",
+							"code": 422
+						}
+					]
+				},
+				{
+					"name": "Delete Specialization",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/specializations/{{specialization_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "specializations", "{{specialization_id}}"]
+						}
+					},
+					"response": [
+						{
+							"name": "No Content",
+							"status": "No Content",
+							"code": 204
+						},
+						{
+							"name": "Conflict (Has Doctors)",
+							"status": "Conflict",
+							"code": 409,
+							"body": "{\n    \"status\": 409,\n    \"message\": \"Cannot delete specialization with associated doctors\"\n}"
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var token = pm.collectionVariables.get('access_token');",
+							"if (token) {",
 							"    pm.request.headers.add({",
 							"        key: 'Authorization',",
 							"        value: 'Bearer ' + token",
@@ -2023,9 +2259,9 @@
 									"description": "Filter by name or email"
 								},
 								{
-									"key": "specialization",
+									"key": "specialization_id",
 									"value": "",
-									"description": "Filter by specialization (enum)"
+									"description": "Filter by specialization ID"
 								},
 								{
 									"key": "experience_from",
@@ -2487,7 +2723,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctors retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Khaled\",\n            \"last_name\": \"Suleiman\",\n            \"email\": \"doctor@example.com\",\n            \"specialization\": \"cardiology\"\n        }\n    ]\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctors retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Khaled\",\n            \"last_name\": \"Suleiman\",\n            \"email\": \"doctor@example.com\",\n            \"specialization\": {\"id\": \"019e1d0f-...\", \"slug\": \"cardiology\", \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"}, \"description\": null}\n        }\n    ]\n}"
 						}
 					]
 				},
@@ -2544,7 +2780,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Available doctors retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Khaled\",\n            \"last_name\": \"Suleiman\",\n            \"email\": \"doctor@example.com\",\n            \"specialization\": \"cardiology\"\n        }\n    ]\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Available doctors retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Khaled\",\n            \"last_name\": \"Suleiman\",\n            \"email\": \"doctor@example.com\",\n            \"specialization\": {\"id\": \"019e1d0f-...\", \"slug\": \"cardiology\", \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"}, \"description\": null}\n        }\n    ]\n}"
 						}
 					]
 				},

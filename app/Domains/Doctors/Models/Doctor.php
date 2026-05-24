@@ -4,7 +4,6 @@ namespace App\Domains\Doctors\Models;
 
 use App\Domains\Appointments\Models\Appointment;
 use App\Domains\Patients\Models\Patient;
-use App\Enums\SpecializationEnum;
 use App\Models\User;
 use App\Traits\HasUuidV7;
 use Illuminate\Database\Eloquent\Model;
@@ -16,12 +15,11 @@ class Doctor extends Model
 {
     use HasUuidV7;
 
-    protected $fillable = ['user_id', 'specialization', 'experience_months'];
+    protected $fillable = ['user_id', 'specialization_id', 'experience_months'];
 
     protected function casts(): array
     {
         return [
-            'specialization' => SpecializationEnum::class,
             'experience_months' => 'integer',
         ];
     }
@@ -29,6 +27,11 @@ class Doctor extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function specialization(): BelongsTo
+    {
+        return $this->belongsTo(Specialization::class);
     }
 
     public function schedules(): HasMany

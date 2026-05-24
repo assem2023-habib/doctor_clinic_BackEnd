@@ -3,10 +3,12 @@
 namespace Tests\Feature\Patients;
 
 use App\Domains\Appointments\Models\Appointment;
+use App\Domains\Doctors\Models\Specialization;
 use App\Domains\Patients\Models\Patient;
 use App\Enums\AppointmentStatusEnum;
 use App\Enums\GenderEnum;
 use App\Models\User;
+use Database\Seeders\SpecializationSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
@@ -15,12 +17,18 @@ class PatientTest extends TestCase
 {
     use RefreshDatabase;
 
+    private Specialization $generalPractitioner;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->setupPassportKeys();
         $this->createPasswordGrantClient();
+
+        $this->seed(SpecializationSeeder::class);
+
+        $this->generalPractitioner = Specialization::where('slug', 'general_practitioner')->first();
     }
 
     private function setupPassportKeys(): void
@@ -332,7 +340,9 @@ class PatientTest extends TestCase
         $patientUser = $this->createPatient();
         $doctorUser = User::factory()->create();
         $doctorUser->assignRole('doctor');
-        $doctorUser->doctor()->create([]);
+        $doctorUser->doctor()->create([
+            'specialization_id' => $this->generalPractitioner->id,
+        ]);
 
         Appointment::create([
             'doctor_id' => $doctorUser->doctor->id,
@@ -424,7 +434,9 @@ class PatientTest extends TestCase
     {
         $doctorUser = User::factory()->create();
         $doctorUser->assignRole('doctor');
-        $doctorUser->doctor()->create([]);
+        $doctorUser->doctor()->create([
+            'specialization_id' => $this->generalPractitioner->id,
+        ]);
         Passport::actingAs($doctorUser);
 
         $this->createPatient(['email' => 'patient1@example.com']);
@@ -440,7 +452,9 @@ class PatientTest extends TestCase
     {
         $doctorUser = User::factory()->create();
         $doctorUser->assignRole('doctor');
-        $doctorUser->doctor()->create([]);
+        $doctorUser->doctor()->create([
+            'specialization_id' => $this->generalPractitioner->id,
+        ]);
         Passport::actingAs($doctorUser);
 
         $patientUser = $this->createPatient(['email' => 'patient@example.com']);

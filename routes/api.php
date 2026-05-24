@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\V1\Doctor\DoctorController;
 use App\Http\Controllers\Api\V1\Image\ImageController;
 use App\Http\Controllers\Api\V1\Patient\PatientController;
 use App\Http\Controllers\Api\V1\Receptionist\ReceptionistController;
+use App\Domains\Doctors\Controllers\SpecializationController;
 use App\Http\Controllers\Api\V1\Location\CityController;
 use App\Http\Controllers\Api\V1\Location\CountryController;
 use App\Http\Controllers\Api\V1\DeviceTokenController;
@@ -111,6 +112,11 @@ Route::middleware(['auth:api', 'active'])->group(function () {
         Route::get('/', [UserRoleController::class, 'getUserRoles']);
     });
 
+    Route::prefix('v1/specializations')->group(function () {
+        Route::get('/', [SpecializationController::class, 'index']);
+        Route::get('/{specialization}', [SpecializationController::class, 'show']);
+    });
+
     Route::middleware('admin')->group(function () {
         Route::prefix('v1/countries')->group(function () {
             Route::post('/', [CountryController::class, 'store']);
@@ -122,6 +128,12 @@ Route::middleware(['auth:api', 'active'])->group(function () {
             Route::post('/', [CityController::class, 'store']);
             Route::put('/{city}', [CityController::class, 'update']);
             Route::delete('/{city}', [CityController::class, 'destroy']);
+        });
+
+        Route::prefix('v1/specializations')->group(function () {
+            Route::post('/', [SpecializationController::class, 'store']);
+            Route::put('/{specialization}', [SpecializationController::class, 'update']);
+            Route::delete('/{specialization}', [SpecializationController::class, 'destroy']);
         });
 
         Route::prefix('v1/doctors')->group(function () {

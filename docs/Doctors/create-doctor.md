@@ -27,7 +27,7 @@
 | `address` | `string` | ❌ | |
 | `gender` | `string` | ✅ | `male` or `female` |
 | `birthday_date` | `date` | ❌ | YYYY-MM-DD |
-| `specialization` | `string` | ✅ | أحد تخصصات SpecializationEnum |
+| `specialization_id` | `string` (UUID) | ✅ | FK → specializations table |
 | `experience_months` | `integer` | ✅ | 0–1200 |
 | `password` | `string` | ✅ | |
 | `file` | `file` | ❌ | صورة (jpg, jpeg, png, webp) |
@@ -74,7 +74,7 @@ public function store(StoreDoctorRequest $request): JsonResponse
 - `first_name`, `last_name` → required, string, max:255
 - `username`, `email` → required, unique
 - `gender` → required, enum (male/female)
-- `specialization` → required, enum (specializations)
+- `specialization_id` → required, exists:specializations,id
 - `experience_months` → required, integer, 0–1200
 - `password` → required, Password defaults
 - `file` → image, max size حسب ImageTypeEnum::User
@@ -101,7 +101,15 @@ public function store(StoreDoctorRequest $request): JsonResponse
         "birthday_date": "1985-03-20",
         "is_active": true,
         "image": null,
-        "specialization": "cardiology",
+        "specialization": {
+                "id": "uuid-here",
+                "slug": "cardiology",
+                "name": {
+                    "ar": "طب القلب",
+                    "en": "Cardiology"
+                },
+                "description": null
+            },
         "experience_months": 60,
         "schedules": []
     }

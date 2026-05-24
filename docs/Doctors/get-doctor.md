@@ -78,7 +78,15 @@ public function show(Doctor $doctor): JsonResponse
         ],
         "is_active": true,
         "image": null,
-        "specialization": "cardiology",
+        "specialization": {
+                "id": "0196f0a0-...",
+                "slug": "cardiology",
+                "name": {
+                    "ar": "طب القلب",
+                    "en": "Cardiology"
+                },
+                "description": null
+            },
         "experience_months": 60,
         "schedules": [
             {

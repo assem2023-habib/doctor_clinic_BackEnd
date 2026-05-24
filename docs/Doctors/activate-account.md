@@ -75,7 +75,15 @@ public function activateAccount(Doctor $doctor): JsonResponse
         "gender": "male",
         "birthday_date": "1985-03-20",
         "is_active": true,
-        "specialization": "cardiology",
+        "specialization": {
+                "id": "0196f0a0-...",
+                "slug": "cardiology",
+                "name": {
+                    "ar": "طب القلب",
+                    "en": "Cardiology"
+                },
+                "description": null
+            },
         "experience_months": 60,
         "schedules": []
     }

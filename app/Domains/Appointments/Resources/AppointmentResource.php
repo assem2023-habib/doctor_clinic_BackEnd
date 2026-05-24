@@ -38,7 +38,11 @@ class AppointmentResource extends JsonResource
                 'first_name' => $doctorUser->first_name,
                 'last_name' => $doctorUser->last_name,
                 'email' => $doctorUser->email,
-                'specialization' => $this->doctor?->specialization?->value,
+                'specialization' => $this->doctor?->specialization ? [
+                    'id' => $this->doctor->specialization->id,
+                    'slug' => $this->doctor->specialization->slug,
+                    'name' => $this->doctor->specialization->name,
+                ] : null,
                 'experience_months' => $this->doctor?->experience_months,
                 'image' => new ImageResource($doctorUser->image),
             ] : null,

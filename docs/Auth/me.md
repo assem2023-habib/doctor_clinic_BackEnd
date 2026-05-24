@@ -120,7 +120,15 @@ public function me(Request $request): JsonResponse
         "is_active": true,
         "doctor": {
             "id": "0196f0a0-...",
-            "specialization": "cardiology",
+            "specialization": {
+                "id": "0196f0a0-...",
+                "slug": "cardiology",
+                "name": {
+                    "ar": "طب القلب",
+                    "en": "Cardiology"
+                },
+                "description": null
+            },
             "experience_months": 120
         },
         "image": null

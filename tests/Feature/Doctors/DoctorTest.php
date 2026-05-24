@@ -4,12 +4,13 @@ namespace Tests\Feature\Doctors;
 
 use App\Domains\Appointments\Models\Appointment;
 use App\Domains\Doctors\Models\Doctor;
+use App\Domains\Doctors\Models\Specialization;
 use App\Domains\Patients\Models\Patient;
 use App\Enums\AppointmentStatusEnum;
 use App\Enums\DayOfWeekEnum;
 use App\Enums\GenderEnum;
-use App\Enums\SpecializationEnum;
 use App\Models\User;
+use Database\Seeders\SpecializationSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
@@ -18,12 +19,20 @@ class DoctorTest extends TestCase
 {
     use RefreshDatabase;
 
+    private Specialization $generalPractitioner;
+    private Specialization $cardiology;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->setupPassportKeys();
         $this->createPasswordGrantClient();
+
+        $this->seed(SpecializationSeeder::class);
+
+        $this->generalPractitioner = Specialization::where('slug', 'general_practitioner')->first();
+        $this->cardiology = Specialization::where('slug', 'cardiology')->first();
     }
 
     private function setupPassportKeys(): void
@@ -67,7 +76,7 @@ class DoctorTest extends TestCase
         $user = User::factory()->create($overrides);
         $user->assignRole('doctor');
         $user->doctor()->create([
-            'specialization' => SpecializationEnum::GeneralPractitioner,
+            'specialization_id' => $this->generalPractitioner->id,
             'experience_months' => 24,
         ]);
 
@@ -193,7 +202,7 @@ class DoctorTest extends TestCase
             'username' => 'johnupdated',
             'email' => 'john.updated@example.com',
             'gender' => GenderEnum::Male->value,
-            'specialization' => SpecializationEnum::Cardiology->value,
+            'specialization_id' => $this->cardiology->id,
             'experience_months' => 36,
         ]);
 
@@ -205,7 +214,7 @@ class DoctorTest extends TestCase
         $json = $response->json();
         $this->assertEquals('John Updated', $json['data']['first_name']);
         $this->assertEquals('john.updated@example.com', $json['data']['email']);
-        $this->assertEquals(SpecializationEnum::Cardiology->value, $json['data']['specialization']);
+        $this->assertEquals('cardiology', $json['data']['specialization']['slug']);
         $this->assertEquals(36, $json['data']['experience_months']);
 
         $this->assertDatabaseHas('users', [
@@ -216,7 +225,7 @@ class DoctorTest extends TestCase
 
         $this->assertDatabaseHas('doctors', [
             'id' => $doctor->doctor->id,
-            'specialization' => SpecializationEnum::Cardiology->value,
+            'specialization_id' => $this->cardiology->id,
             'experience_months' => 36,
         ]);
     }
@@ -235,7 +244,7 @@ class DoctorTest extends TestCase
             'username' => 'hacked',
             'email' => 'hacked@example.com',
             'gender' => GenderEnum::Male->value,
-            'specialization' => SpecializationEnum::Cardiology->value,
+            'specialization_id' => $this->cardiology->id,
             'experience_months' => 12,
         ]);
 
@@ -306,7 +315,7 @@ class DoctorTest extends TestCase
         $user = User::factory()->create(['is_active' => false]);
         $user->assignRole('doctor');
         $user->doctor()->create([
-            'specialization' => SpecializationEnum::GeneralPractitioner,
+            'specialization_id' => $this->generalPractitioner->id,
             'experience_months' => 24,
         ]);
 
@@ -330,7 +339,7 @@ class DoctorTest extends TestCase
         $user = User::factory()->create(['is_active' => false]);
         $user->assignRole('doctor');
         $user->doctor()->create([
-            'specialization' => SpecializationEnum::GeneralPractitioner,
+            'specialization_id' => $this->generalPractitioner->id,
             'experience_months' => 24,
         ]);
         Passport::actingAs($user);
@@ -354,7 +363,7 @@ class DoctorTest extends TestCase
             'username' => 'hacked',
             'email' => 'hacked@example.com',
             'gender' => GenderEnum::Male->value,
-            'specialization' => SpecializationEnum::Cardiology->value,
+            'specialization_id' => $this->cardiology->id,
             'experience_months' => 12,
         ]);
 

@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use App\Domains\Doctors\Models\Doctor;
+use App\Domains\Doctors\Models\Specialization;
 use App\Domains\Patients\Models\Patient;
 use App\Domains\Receptionists\Models\Receptionist;
-use App\Enums\SpecializationEnum;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -14,6 +14,9 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $password = 'password';
+
+        $cardiology = Specialization::where('slug', 'cardiology')->first();
+        $dermatology = Specialization::where('slug', 'dermatology')->first();
 
         // Admin
         $admin = User::create([
@@ -38,7 +41,7 @@ class UserSeeder extends Seeder
         $doctor1->assignRole('doctor');
         Doctor::create([
             'user_id' => $doctor1->id,
-            'specialization' => SpecializationEnum::Cardiology,
+            'specialization_id' => $cardiology->id,
             'experience_months' => 60,
         ]);
 
@@ -54,7 +57,7 @@ class UserSeeder extends Seeder
         $doctor2->assignRole('doctor');
         Doctor::create([
             'user_id' => $doctor2->id,
-            'specialization' => SpecializationEnum::Dermatology,
+            'specialization_id' => $dermatology->id,
             'experience_months' => 36,
         ]);
 

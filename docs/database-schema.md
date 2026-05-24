@@ -39,17 +39,6 @@ doctor_patient, supervision_request
 user, service, center, appointment_system
 ```
 
-### `SpecializationEnum`
-```
-general_practitioner, internal_medicine, cardiology, dermatology,
-pediatrics, orthopedics, neurology, ophthalmology, ent, psychiatry,
-radiology, anesthesiology, emergency_medicine, obstetrics_gynecology,
-oncology, urology, gastroenterology, pulmonology, rheumatology,
-endocrinology, nephrology, hematology, infectious_disease,
-sports_medicine, plastic_surgery, general_surgery, neurosurgery,
-family_medicine
-```
-
 ### `ImageTypeEnum`
 ```
 user, country
@@ -161,7 +150,7 @@ user, country
 |--------|------|-------------|
 | id | uuid | PK |
 | user_id | uuid | FK → users |
-| specialization | enum (SpecializationEnum) | nullable |
+| specialization_id | uuid (FK → specializations) | required |
 | experience_months | integer | unsigned, nullable, months |
 | created_at | timestamp | |
 | updated_at | timestamp | |

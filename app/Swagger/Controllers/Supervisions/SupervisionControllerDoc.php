@@ -146,7 +146,7 @@ class SupervisionControllerDoc
             new OA\Parameter(name: 'limit', in: 'query', schema: new OA\Schema(type: 'integer', default: 20, maximum: 100), description: 'Items per page (max 100)'),
             new OA\Parameter(name: 'page', in: 'query', schema: new OA\Schema(type: 'integer', default: 1), description: 'Page number'),
             new OA\Parameter(name: 'search', in: 'query', schema: new OA\Schema(type: 'string'), description: 'Search by name or email'),
-            new OA\Parameter(name: 'specialization', in: 'query', schema: new OA\Schema(type: 'string'), description: 'Filter by specialization'),
+            new OA\Parameter(name: 'specialization_id', in: 'query', schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Filter by specialization ID'),
         ],
         responses: [
             new OA\Response(response: 200, description: 'Available doctors retrieved successfully'),

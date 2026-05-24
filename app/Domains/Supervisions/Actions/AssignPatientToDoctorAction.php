@@ -13,13 +13,11 @@ class AssignPatientToDoctorAction
     {
         $hasSameSpecialization = Doctor::whereHas('patients', fn($q) => $q->where('patient_id', $patient->id))
             ->where('id', '!=', $doctor->id)
-            ->where('specialization', $doctor->specialization)
+            ->where('specialization_id', $doctor->specialization_id)
             ->exists();
 
         if ($hasSameSpecialization) {
-            abort(409, __('Patient already has a doctor with specialization :specialization', [
-                'specialization' => $doctor->specialization->value ?? $doctor->specialization,
-            ]));
+            abort(409, __('Patient already has a doctor with this specialization'));
         }
 
         $assignedBy = "{$assigner->id}: {$assigner->first_name} {$assigner->last_name}";

@@ -20,6 +20,23 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'roles', type: 'array', items: new OA\Items(type: 'string'), example: ['doctor']),
         new OA\Property(property: 'is_active', type: 'boolean', example: true),
         new OA\Property(
+            property: 'specialization',
+            nullable: true,
+            properties: [
+                new OA\Property(property: 'id', type: 'string', format: 'uuid'),
+                new OA\Property(property: 'slug', type: 'string'),
+                new OA\Property(property: 'name', type: 'object', properties: [
+                    new OA\Property(property: 'ar', type: 'string'),
+                    new OA\Property(property: 'en', type: 'string'),
+                ]),
+                new OA\Property(property: 'description', type: 'object', nullable: true, properties: [
+                    new OA\Property(property: 'ar', type: 'string'),
+                    new OA\Property(property: 'en', type: 'string'),
+                ]),
+            ],
+            type: 'object'
+        ),
+        new OA\Property(
             property: 'schedules',
             type: 'array',
             nullable: true,

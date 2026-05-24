@@ -4,13 +4,14 @@ namespace Tests\Feature\Appointments;
 
 use App\Domains\Appointments\Models\Appointment;
 use App\Domains\Appointments\Models\AppointmentStatusLog;
+use App\Domains\Doctors\Models\Specialization;
 use App\Enums\AppointmentStatusEnum;
 use App\Enums\DayOfWeekEnum;
 use App\Enums\GenderEnum;
 use App\Domains\Appointments\Enums\PatientResponseEnum;
-use App\Enums\SpecializationEnum;
 use App\Models\User;
 use Carbon\Carbon;
+use Database\Seeders\SpecializationSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Laravel\Passport\Passport;
@@ -20,12 +21,18 @@ class AppointmentTest extends TestCase
 {
     use RefreshDatabase;
 
+    private Specialization $generalPractitioner;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->setupPassportKeys();
         $this->createPasswordGrantClient();
+
+        $this->seed(SpecializationSeeder::class);
+
+        $this->generalPractitioner = Specialization::where('slug', 'general_practitioner')->first();
     }
 
     private function setupPassportKeys(): void
@@ -70,7 +77,7 @@ class AppointmentTest extends TestCase
         $user = User::factory()->create();
         $user->assignRole('doctor');
         $user->doctor()->create([
-            'specialization' => SpecializationEnum::GeneralPractitioner,
+            'specialization_id' => $this->generalPractitioner->id,
             'experience_months' => 24,
         ]);
         return $user;

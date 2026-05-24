@@ -8,7 +8,7 @@
 |--------|----------|-----------|-------------|
 | `GET` | `/v1/doctors/{doctor}/patients` | `auth:api`, `active` | List patients assigned to a doctor (doctor themselves or staff) |
 | `GET` | `/v1/patients/{patient}/doctors` | `auth:api`, `active` | List doctors assigned to a patient (patient themselves or staff) |
-| `GET` | `/v1/patients/{patient}/available-doctors` | `auth:api`, `active` | List doctors not assigned to a patient (patient or staff), filter by `specialization` |
+| `GET` | `/v1/patients/{patient}/available-doctors` | `auth:api`, `active` | List doctors not assigned to a patient (patient or staff), filter by `specialization_id` |
 | `POST` | `/v1/doctors/{doctor}/patients` | `auth:api`, `active`, `staff` | Assign a patient to a doctor (staff) |
 | `POST` | `/v1/doctors/{doctor}/patients/self` | `auth:api`, `active` | Doctor self-assign a patient |
 | `POST` | `/v1/doctors/{doctor}/patients/bulk` | `auth:api`, `active`, `staff` | Bulk assign patients to a doctor |
@@ -62,16 +62,16 @@ SupervisionController
  └── doctorPatients()      → SupervisionPatientResource collection
  └── patientDoctors()       → SupervisionDoctorResource collection
  └── availableDoctors()     → DoctorResource collection (excludes assigned)
- └── assign()               → AssignPatientToDoctorAction (with specialization check)
+ └── assign()               → AssignPatientToDoctorAction (with specialization_id check)
  └── selfAssign()           → AssignPatientToDoctorAction (doctor self-assign)
  └── bulkAssign()           → BulkAssignPatientsToDoctorAction (skips conflicts)
  └── remove()               → RemovePatientFromDoctorAction
 
 SupervisionRequestController
- └── store()                → CreateSupervisionRequestAction (checks same-specialization)
+ └── store()                → CreateSupervisionRequestAction (checks same-specialization_id)
  └── indexPatient()         → SupervisionRequestResource collection
  └── indexDoctor()          → SupervisionRequestResource collection
- └── approve()              → ApproveSupervisionRequestAction (creates supervision + cancels same-specialization pending)
+ └── approve()              → ApproveSupervisionRequestAction (creates supervision + cancels same-specialization_id pending)
  └── reject()               → RejectSupervisionRequestAction
  └── cancel()               → CancelSupervisionRequestAction (patient cancels own request)
 ```

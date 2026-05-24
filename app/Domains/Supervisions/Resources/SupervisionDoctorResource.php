@@ -22,7 +22,12 @@ class SupervisionDoctorResource extends JsonResource
             'roles' => $this->whenLoaded('roles')?->pluck('slug'),
             'is_active' => $this->is_active,
             'image' => new ImageResource($this->image),
-            'specialization' => $this->doctor?->specialization?->value,
+            'specialization' => $this->doctor?->specialization ? [
+                'id' => $this->doctor->specialization->id,
+                'slug' => $this->doctor->specialization->slug,
+                'name' => $this->doctor->specialization->name,
+                'description' => $this->doctor->specialization->description,
+            ] : null,
             'experience_months' => $this->doctor?->experience_months,
             'supervision' => [
                 'assigned_by' => $this->pivot?->assigned_by,

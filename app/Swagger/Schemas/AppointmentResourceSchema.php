@@ -41,7 +41,19 @@ use OpenApi\Attributes as OA;
                 new OA\Property(property: 'first_name', type: 'string'),
                 new OA\Property(property: 'last_name', type: 'string'),
                 new OA\Property(property: 'email', type: 'string', format: 'email'),
-                new OA\Property(property: 'specialization', type: 'string', nullable: true),
+                new OA\Property(
+                    property: 'specialization',
+                    nullable: true,
+                    properties: [
+                        new OA\Property(property: 'id', type: 'string', format: 'uuid'),
+                        new OA\Property(property: 'slug', type: 'string'),
+                        new OA\Property(property: 'name', type: 'object', properties: [
+                            new OA\Property(property: 'ar', type: 'string'),
+                            new OA\Property(property: 'en', type: 'string'),
+                        ]),
+                    ],
+                    type: 'object'
+                ),
                 new OA\Property(property: 'experience_months', type: 'integer', nullable: true),
                 new OA\Property(property: 'image', ref: '#/components/schemas/ImageResource', nullable: true),
             ],

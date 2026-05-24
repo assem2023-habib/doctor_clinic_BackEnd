@@ -2,10 +2,11 @@
 
 namespace Tests\Feature\Supervisions;
 
+use App\Domains\Doctors\Models\Specialization;
 use App\Domains\Patients\Models\Patient;
 use App\Enums\GenderEnum;
-use App\Enums\SpecializationEnum;
 use App\Models\User;
+use Database\Seeders\SpecializationSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
@@ -14,12 +15,20 @@ class SupervisionTest extends TestCase
 {
     use RefreshDatabase;
 
+    private Specialization $cardiology;
+    private Specialization $neurology;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->setupPassportKeys();
         $this->createPasswordGrantClient();
+
+        $this->seed(SpecializationSeeder::class);
+
+        $this->cardiology = Specialization::where('slug', 'cardiology')->first();
+        $this->neurology = Specialization::where('slug', 'neurology')->first();
     }
 
     private function setupPassportKeys(): void
@@ -58,12 +67,12 @@ class SupervisionTest extends TestCase
         return $user;
     }
 
-    private function createDoctor(?SpecializationEnum $specialization = null): User
+    private function createDoctor(?Specialization $specialization = null): User
     {
         $user = User::factory()->create();
         $user->assignRole('doctor');
         $user->doctor()->create([
-            'specialization' => $specialization ?? SpecializationEnum::Cardiology,
+            'specialization_id' => ($specialization ?? $this->cardiology)->id,
             'experience_months' => 60,
         ]);
         return $user;
@@ -304,8 +313,8 @@ class SupervisionTest extends TestCase
 
     public function test_cannot_assign_doctor_with_same_specialization(): void
     {
-        $doctor1 = $this->createDoctor(SpecializationEnum::Cardiology);
-        $doctor2 = $this->createDoctor(SpecializationEnum::Cardiology);
+        $doctor1 = $this->createDoctor($this->cardiology);
+        $doctor2 = $this->createDoctor($this->cardiology);
         $patient = $this->createPatient();
         $admin = $this->createAdmin();
 
@@ -323,8 +332,8 @@ class SupervisionTest extends TestCase
 
     public function test_can_assign_doctor_with_different_specialization(): void
     {
-        $doctor1 = $this->createDoctor(SpecializationEnum::Cardiology);
-        $doctor2 = $this->createDoctor(SpecializationEnum::Neurology);
+        $doctor1 = $this->createDoctor($this->cardiology);
+        $doctor2 = $this->createDoctor($this->neurology);
         $patient = $this->createPatient();
         $admin = $this->createAdmin();
 
@@ -440,12 +449,12 @@ class SupervisionTest extends TestCase
 
     public function test_available_doctors_can_filter_by_specialization(): void
     {
-        $cardioDoctor = $this->createDoctor(SpecializationEnum::Cardiology);
-        $neuroDoctor = $this->createDoctor(SpecializationEnum::Neurology);
+        $cardioDoctor = $this->createDoctor($this->cardiology);
+        $neuroDoctor = $this->createDoctor($this->neurology);
         $patient = $this->createPatient();
 
         Passport::actingAs($patient);
-        $response = $this->getJson("/api/v1/patients/{$patient->patient->id}/available-doctors?specialization=" . SpecializationEnum::Cardiology->value);
+        $response = $this->getJson("/api/v1/patients/{$patient->patient->id}/available-doctors?specialization_id={$this->cardiology->id}");
 
         $response->assertStatus(200);
         $ids = collect($response->json()['data'])->pluck('id');
@@ -476,8 +485,8 @@ class SupervisionTest extends TestCase
 
     public function test_bulk_assign_skips_specialization_conflicts(): void
     {
-        $doctor1 = $this->createDoctor(SpecializationEnum::Cardiology);
-        $doctor2 = $this->createDoctor(SpecializationEnum::Cardiology);
+        $doctor1 = $this->createDoctor($this->cardiology);
+        $doctor2 = $this->createDoctor($this->cardiology);
         $patient = $this->createPatient();
         $admin = $this->createAdmin();
         $this->assignPatientToDoctor($patient->patient, $doctor1, $admin);

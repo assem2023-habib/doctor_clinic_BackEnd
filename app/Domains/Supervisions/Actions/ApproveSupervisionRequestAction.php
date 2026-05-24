@@ -39,7 +39,7 @@ class ApproveSupervisionRequestAction
         SupervisionRequest::where('patient_id', $request->patient_id)
             ->where('id', '!=', $request->id)
             ->where('status', SupervisionRequestStatusEnum::Pending)
-            ->whereHas('doctor', fn ($q) => $q->where('specialization', $request->doctor->specialization->value))
+            ->whereHas('doctor', fn ($q) => $q->where('specialization_id', $request->doctor->specialization_id))
             ->update(['status' => SupervisionRequestStatusEnum::Cancelled]);
 
         $this->notificationManager->send('supervision.approved', new NotificationData(

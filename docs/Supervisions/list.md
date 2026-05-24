@@ -106,7 +106,7 @@ Same pattern — queries `User::whereHas('doctor')` with patient's doctor IDs, a
 }
 ```
 
-The doctor variant (`SupervisionDoctorResource`) adds `specialization` and `experience_months` fields.
+The doctor variant (`SupervisionDoctorResource`) adds `specialization` (object with id/slug/name) and `experience_months` fields.
 
 ## Errors
 

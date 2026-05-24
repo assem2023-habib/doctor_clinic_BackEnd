@@ -28,7 +28,7 @@
 | `address` | `string` | اختياري | max:1000 |
 | `gender` | `string` (enum) | **مطلوب** | `male`, `female` |
 | `birthday_date` | `string` (date) | اختياري | صيغة YYYY-MM-DD |
-| `specialization` | `string` (enum) | **مطلوب** | أحد تخصصات `SpecializationEnum` (27 تخصصاً) |
+| `specialization_id` | `string` (UUID) | **مطلوب** | FK → specializations table |
 | `experience_months` | `integer` | **مطلوب** | min:0, max:1200 |
 | `password` | `string` | **مطلوب** | Laravel Password defaults |
 | `file` | `file` (image) | اختياري | max:2MB, mimes:jpg,jpeg,png,webp |
@@ -45,15 +45,11 @@
     "address": "جدة، المملكة العربية السعودية",
     "gender": "female",
     "birthday_date": "1985-06-20",
-    "specialization": "cardiology",
+    "specialization_id": "0196f0a0-...",
     "experience_months": 120,
     "password": "SecureDocPass456!"
 }
 ```
-
-### قيم `specialization` المتاحة:
-
-`cardiology`, `dermatology`, `neurology`, `pediatrics`, `orthopedics`, `ophthalmology`, `ent`, `psychiatry`, `radiology`, `surgery`, `internal_medicine`, `obstetrics_gynecology`, `emergency_medicine`, `anesthesiology`, `pathology`, `urology`, `gastroenterology`, `endocrinology`, `pulmonology`, `rheumatology`, `nephrology`, `hematology`, `oncology`, `infectious_disease`, `genetics`, `immunology`, `sports_medicine`
 
 ---
 
@@ -72,7 +68,7 @@ class RegisterDoctorData
     public readonly ?string $address;
     public readonly GenderEnum $gender;
     public readonly ?string $birthdayDate;
-    public readonly SpecializationEnum $specialization;
+    public readonly string $specializationId;
     public readonly int $experienceMonths;
     public readonly string $password;
     public readonly ?UploadedFile $file;
@@ -83,7 +79,7 @@ class RegisterDoctorData
 
 | مفتاح الـ Request | خاصية الـ DTO | تحويل |
 |-------------------|---------------|-------|
-| `specialization` | `$specialization` | `SpecializationEnum::from($request->specialization)` |
+| `specialization_id` | `$specializationId` | `(string) $request->specialization_id` |
 | `experience_months` | `$experienceMonths` | `(int) $request->experience_months` |
 
 باقي الحقول مثل `RegisterPatientData`.
@@ -104,7 +100,7 @@ RegisterDoctorAction::execute(RegisterDoctorData $data)
 ├── 2. $user->assignRole('doctor')
 │
 ├── 3. $user->doctor()->create([
-│     ├── specialization => $data->specialization,
+│     ├── specialization_id => $data->specializationId,
 │     └── experience_months => $data->experienceMonths
 │     ])
 │
@@ -159,7 +155,7 @@ public function registerDoctor(RegisterDoctorRequest $request): JsonResponse
     "status": 422,
     "message": "Validation failed",
     "errors": {
-        "specialization": ["The selected specialization is invalid."],
+        "specialization_id": ["The selected specialization id is invalid."],
         "experience_months": ["The experience months must be between 0 and 1200."]
     }
 }
@@ -173,7 +169,7 @@ public function registerDoctor(RegisterDoctorRequest $request): JsonResponse
 Client → Controller → RegisterDoctorAction
                          ├── User::create(['is_active' => false])
                          ├── assignRole('doctor')
-                         ├── $user->doctor()->create({specialization, experience_months})
+                         ├── $user->doctor()->create({specialization_id, experience_months})
                          ├── UploadImage (optional)
                          └── return $user
                       → 201 JSON (data: null, message: pending_activation)

@@ -20,7 +20,7 @@
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `search` | `string` | — | فلترة بالاسم أو الإيميل |
-| `specialization` | `string` | — | فلترة بالتخصص (enum) |
+| `specialization_id` | `string` (UUID) | — | فلترة حسب المعرف الفريد للتخصص |
 | `experience_from` | `integer` | — | خبرة من (شهر) |
 | `experience_to` | `integer` | — | خبرة إلى (شهر) |
 | `gender` | `string` | — | فلترة بالجنس (male/female) |
@@ -45,7 +45,7 @@ public function index(Request $request): JsonResponse
               ->orWhere('last_name', 'like', "%{$v}%")
               ->orWhere('email', 'like', "%{$v}%");
         }))
-        ->when($request->specialization, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('specialization', $v)))
+        ->when($request->specialization_id, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('specialization_id', $v)))
         ->when($request->experience_from, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('experience_months', '>=', (int) $v)))
         ->when($request->experience_to, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('experience_months', '<=', (int) $v)))
         ->when($request->gender, fn ($q, $v) => $q->where('gender', $v))
@@ -67,7 +67,7 @@ public function index(Request $request): JsonResponse
 1. User::whereHas('roles', slug=doctor)
 2. with('doctor.schedules', 'roles') — eager load
 3. if search → filter by first_name, last_name, email
-4. if specialization → whereHas doctor.specialization
+4. if specialization_id → whereHas doctor.specialization_id
 5. if experience_from/to → whereHas doctor.experience_months >= / <=
 6. if gender → where gender
 7. if date_from/to → where birthday_date >= / <=
@@ -89,7 +89,12 @@ class DoctorResource extends UserResource
     public function toArray($request): array
     {
         return array_merge(parent::toArray($request), [
-            'specialization' => $this->doctor?->specialization?->value,
+            'specialization' => $this->doctor?->specialization ? [
+                'id' => $this->doctor->specialization->id,
+                'slug' => $this->doctor->specialization->slug,
+                'name' => $this->doctor->specialization->name,
+                'description' => $this->doctor->specialization->description,
+            ] : null,
             'experience_months' => $this->doctor?->experience_months,
             'schedules' => $this->doctor?->schedules->map(fn ($s) => [
                 'id' => $s->id,
@@ -140,7 +145,15 @@ class DoctorResource extends UserResource
             ],
             "is_active": true,
             "image": null,
-            "specialization": "cardiology",
+            "specialization": {
+                "id": "0196f0a0-...",
+                "slug": "cardiology",
+                "name": {
+                    "ar": "طب القلب",
+                    "en": "Cardiology"
+                },
+                "description": null
+            },
             "experience_months": 60,
             "schedules": [
                 {

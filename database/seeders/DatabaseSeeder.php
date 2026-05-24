@@ -10,6 +10,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(LocationSeeder::class);
         $this->call(RbacSeeder::class);
+        $this->call(SpecializationSeeder::class);
         $this->call(UserSeeder::class);
     }
 }

@@ -21,7 +21,7 @@ class CreateSupervisionRequestAction
 
         $hasSameSpecialization = $patient->doctors()
             ->wherePivot('supervision_status', 'active')
-            ->where('specialization', $doctor->specialization->value)
+            ->where('specialization_id', $doctor->specialization_id)
             ->exists();
 
         if ($hasSameSpecialization) {

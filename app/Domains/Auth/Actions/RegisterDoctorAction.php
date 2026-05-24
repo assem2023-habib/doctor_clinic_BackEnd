@@ -32,7 +32,7 @@ class RegisterDoctorAction
         $user->assignRole('doctor');
 
         $user->doctor()->create([
-            'specialization' => $data->specialization,
+            'specialization_id' => $data->specializationId,
             'experience_months' => $data->experienceMonths,
         ]);
 

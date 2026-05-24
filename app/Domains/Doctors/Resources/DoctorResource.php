@@ -2,6 +2,7 @@
 
 namespace App\Domains\Doctors\Resources;
 
+use App\Domains\Doctors\Models\Specialization;
 use App\Domains\Shared\Resources\UserResource;
 
 class DoctorResource extends UserResource
@@ -9,7 +10,12 @@ class DoctorResource extends UserResource
     public function toArray($request): array
     {
         return array_merge(parent::toArray($request), [
-            'specialization' => $this->doctor?->specialization?->value,
+            'specialization' => $this->doctor?->specialization ? [
+                'id' => $this->doctor->specialization->id,
+                'slug' => $this->doctor->specialization->slug,
+                'name' => $this->doctor->specialization->name,
+                'description' => $this->doctor->specialization->description,
+            ] : null,
             'experience_months' => $this->doctor?->experience_months,
             'schedules' => $this->doctor?->schedules->map(fn ($schedule) => [
                 'id' => $schedule->id,

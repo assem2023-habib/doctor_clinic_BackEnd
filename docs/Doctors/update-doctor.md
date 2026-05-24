@@ -28,7 +28,7 @@
 | `address` | `string` | اختياري | max:1000 |
 | `gender` | `string` (enum) | **مطلوب** | `male`, `female` |
 | `birthday_date` | `string` (date) | اختياري | YYYY-MM-DD |
-| `specialization` | `string` (enum) | **مطلوب** | أحد 27 تخصصاً |
+| `specialization_id` | `string` (UUID) | **مطلوب** | FK → specializations table |
 | `experience_months` | `integer` | **مطلوب** | min:0, max:1200 |
 | `file` | `file` (image) | اختياري | max:2MB, jpg,jpeg,png,webp |
 
@@ -44,7 +44,7 @@
     "address": "Aleppo, Syria",
     "gender": "male",
     "birthday_date": "1985-03-20",
-    "specialization": "cardiology",
+    "specialization_id": "0196f0a0-...",
     "experience_months": 72
 }
 ```
@@ -60,7 +60,7 @@
 ```
 fromRequest(UpdateDoctorRequest $request):
 ├── userFields: first_name, last_name, username, email, phone, address, gender, birthday_date
-├── doctorFields: specialization, experience_months
+├── doctorFields: specialization_id, experience_months
 └── file: $request->file('file')
 ```
 
@@ -107,7 +107,15 @@ execute(Doctor $doctor, UpdateDoctorData $data):
                 "updated_at": "..."
             }
         ],
-        "specialization": "cardiology",
+        "specialization": {
+                "id": "0196f0a0-...",
+                "slug": "cardiology",
+                "name": {
+                    "ar": "طب القلب",
+                    "en": "Cardiology"
+                },
+                "description": null
+            },
         "experience_months": 72,
         "schedules": []
     }

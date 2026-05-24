@@ -157,7 +157,7 @@ class SupervisionController
 
         $doctors = User::whereHas('doctor', fn ($q) => $q->whereNotIn('id', $assignedDoctorIds))
             ->with(['doctor', 'image', 'roles'])
-            ->when($request->specialization, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('specialization', $v)))
+            ->when($request->specialization_id, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('specialization_id', $v)))
             ->when($request->search, fn ($q, $v) => $q->where(function ($q) use ($v) {
                 $q->where('first_name', 'like', "%{$v}%")
                   ->orWhere('last_name', 'like', "%{$v}%")

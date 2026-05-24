@@ -5,7 +5,6 @@ namespace App\Domains\Doctors\DTOs;
 use App\Domains\Doctors\Requests\PatchDoctorRequest;
 use App\Domains\Doctors\Requests\UpdateDoctorRequest;
 use App\Enums\GenderEnum;
-use App\Enums\SpecializationEnum;
 use Illuminate\Http\UploadedFile;
 
 class UpdateDoctorData
@@ -32,7 +31,7 @@ class UpdateDoctorData
             'birthday_date' => $request->birthday_date,
         ];
         $dto->doctorFields = [
-            'specialization' => SpecializationEnum::from($request->specialization)->value,
+            'specialization_id' => $request->specialization_id,
             'experience_months' => (int) $request->experience_months,
         ];
         $dto->file = $request->file('file');
@@ -53,8 +52,8 @@ class UpdateDoctorData
             $dto->userFields['gender'] = GenderEnum::from($request->gender)->value;
         }
 
-        if ($request->exists('specialization')) {
-            $dto->doctorFields['specialization'] = SpecializationEnum::from($request->specialization)->value;
+        if ($request->exists('specialization_id')) {
+            $dto->doctorFields['specialization_id'] = $request->specialization_id;
         }
 
         if ($request->exists('experience_months')) {

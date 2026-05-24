@@ -35,7 +35,7 @@ class DoctorController
                   ->orWhere('last_name', 'like', "%{$v}%")
                   ->orWhere('email', 'like', "%{$v}%");
             }))
-            ->when($request->specialization, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('specialization', $v)))
+            ->when($request->specialization_id, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('specialization_id', $v)))
             ->when($request->experience_from, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('experience_months', '>=', (int) $v)))
             ->when($request->experience_to, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('experience_months', '<=', (int) $v)))
             ->when($request->gender, fn ($q, $v) => $q->where('gender', $v))
