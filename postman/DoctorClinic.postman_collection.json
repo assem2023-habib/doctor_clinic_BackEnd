@@ -70,6 +70,11 @@
 			"key": "notification_id",
 			"value": "",
 			"type": "string"
+		},
+		{
+			"key": "rating_id",
+			"value": "",
+			"type": "string"
 		}
 	],
 	"item": [
@@ -4424,6 +4429,242 @@
 							"status": "OK",
 							"code": 200,
 							"body": "{\n    \"status\": 200,\n    \"message\": \"All notifications deleted\",\n    \"data\": null\n}"
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var token = pm.collectionVariables.get('access_token');",
+							"if (token) {",
+							"    pm.request.headers.add({",
+							"        key: 'Authorization',",
+							"        value: 'Bearer ' + token",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "Ratings",
+			"description": "Ratings CRUD.\n\nAll endpoints require authentication.",
+			"item": [
+				{
+					"name": "List Ratings",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/ratings",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "ratings"],
+							"query": [
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Items per page (max 100)"
+								},
+								{
+									"key": "type",
+									"value": "",
+									"description": "Filter by type (user, service, center, appointment_system)"
+								},
+								{
+									"key": "rater_id",
+									"value": "",
+									"description": "Filter by rater ID"
+								},
+								{
+									"key": "rateable_id",
+									"value": "",
+									"description": "Filter by rateable ID"
+								},
+								{
+									"key": "rating",
+									"value": "",
+									"description": "Filter by rating value"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Ratings retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"type\": \"user\",\n            \"rater\": {\n                \"id\": \"019e1d0f-...\",\n                \"first_name\": \"Ahmed\",\n                \"last_name\": \"Ali\",\n                \"email\": \"patient@example.com\"\n            },\n            \"rateable_id\": \"019e1d0f-...\",\n            \"rateable_type\": \"App\\\\Models\\\\User\",\n            \"rating\": 5,\n            \"comment\": \"Excellent doctor\",\n            \"created_at\": \"2026-05-24T00:00:00.000000Z\",\n            \"updated_at\": \"2026-05-24T00:00:00.000000Z\"\n        }\n    ],\n    \"meta\": {\n        \"pagination\": {\n            \"current_page\": 1,\n            \"last_page\": 1,\n            \"per_page\": 20,\n            \"total\": 1,\n            \"from\": 1,\n            \"to\": 1,\n            \"limit\": 20\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Rating",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/ratings/{{rating_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "ratings", "{{rating_id}}"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Rating retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"type\": \"user\",\n        \"rater\": {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Ahmed\",\n            \"last_name\": \"Ali\",\n            \"email\": \"patient@example.com\"\n        },\n        \"rateable_id\": \"019e1d0f-...\",\n        \"rateable_type\": \"App\\\\Models\\\\User\",\n        \"rating\": 5,\n        \"comment\": \"Excellent doctor\",\n        \"created_at\": \"2026-05-24T00:00:00.000000Z\",\n        \"updated_at\": \"2026-05-24T00:00:00.000000Z\"\n    }\n}"
+						},
+						{
+							"name": "Not Found",
+							"status": "Not Found",
+							"code": 404
+						}
+					]
+				},
+				{
+					"name": "Create Rating",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('rating_id', json.data.id);",
+									"    console.log('Rating created:', json.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"type\": \"user\",\n    \"rateable_id\": \"{{doctor_id}}\",\n    \"rateable_type\": \"App\\\\Models\\\\User\",\n    \"rating\": 5,\n    \"comment\": \"Excellent doctor\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/ratings",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "ratings"]
+						}
+					},
+					"response": [
+						{
+							"name": "Created",
+							"status": "Created",
+							"code": 201,
+							"body": "{\n    \"status\": 201,\n    \"message\": \"Rating created successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"type\": \"user\",\n        \"rater\": null,\n        \"rateable_id\": \"019e1d0f-...\",\n        \"rateable_type\": \"App\\\\Models\\\\User\",\n        \"rating\": 5,\n        \"comment\": \"Excellent doctor\",\n        \"created_at\": \"2026-05-24T00:00:00.000000Z\",\n        \"updated_at\": \"2026-05-24T00:00:00.000000Z\"\n    }\n}"
+						},
+						{
+							"name": "Conflict (Duplicate)",
+							"status": "Conflict",
+							"code": 409,
+							"body": "{\n    \"status\": 409,\n    \"message\": \"You have already rated this entity\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Rating",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 4,\n    \"comment\": \"Updated review\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/ratings/{{rating_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "ratings", "{{rating_id}}"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Rating updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"type\": \"user\",\n        \"rater\": null,\n        \"rateable_id\": \"019e1d0f-...\",\n        \"rateable_type\": \"App\\\\Models\\\\User\",\n        \"rating\": 4,\n        \"comment\": \"Updated review\",\n        \"created_at\": \"2026-05-24T00:00:00.000000Z\",\n        \"updated_at\": \"2026-05-24T00:00:00.000000Z\"\n    }\n}"
+						},
+						{
+							"name": "Forbidden",
+							"status": "Forbidden",
+							"code": 403
+						}
+					]
+				},
+				{
+					"name": "Delete Rating",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/ratings/{{rating_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "ratings", "{{rating_id}}"]
+						}
+					},
+					"response": [
+						{
+							"name": "No Content",
+							"status": "No Content",
+							"code": 204
+						},
+						{
+							"name": "Forbidden",
+							"status": "Forbidden",
+							"code": 403
 						}
 					]
 				}
