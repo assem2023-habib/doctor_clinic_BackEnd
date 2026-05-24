@@ -13,13 +13,15 @@ class Medicine extends Model
     protected $fillable = [
         'name',
         'description',
-        'price',
+        'barcode',
+        'manufacturer',
     ];
 
     protected function casts(): array
     {
         return [
-            'price' => 'decimal:2',
+            'name' => 'array',
+            'description' => 'array',
         ];
     }
 

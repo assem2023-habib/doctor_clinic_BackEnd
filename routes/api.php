@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\Image\ImageController;
 use App\Http\Controllers\Api\V1\Patient\PatientController;
 use App\Http\Controllers\Api\V1\Receptionist\ReceptionistController;
 use App\Domains\Doctors\Controllers\SpecializationController;
+use App\Domains\Prescriptions\Controllers\MedicineController;
 use App\Domains\Ratings\Controllers\RatingController;
 use App\Http\Controllers\Api\V1\Location\CityController;
 use App\Http\Controllers\Api\V1\Location\CountryController;
@@ -127,6 +128,17 @@ Route::middleware(['auth:api', 'active'])->group(function () {
         Route::post('/', [RatingController::class, 'store']);
         Route::put('/{rating}', [RatingController::class, 'update']);
         Route::delete('/{rating}', [RatingController::class, 'destroy']);
+    });
+
+    Route::prefix('v1/medicines')->group(function () {
+        Route::get('/', [MedicineController::class, 'index']);
+        Route::get('/{medicine}', [MedicineController::class, 'show']);
+
+        Route::middleware('staff:doctor')->group(function () {
+            Route::post('/', [MedicineController::class, 'store']);
+            Route::put('/{medicine}', [MedicineController::class, 'update']);
+            Route::delete('/{medicine}', [MedicineController::class, 'destroy']);
+        });
     });
 
     Route::middleware('admin')->group(function () {

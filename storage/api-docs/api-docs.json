@@ -4017,6 +4017,313 @@
                 ]
             }
         },
+        "/api/v1/medicines": {
+            "get": {
+                "tags": [
+                    "Medicines"
+                ],
+                "summary": "List all medicines",
+                "operationId": "4938955d71dc1c7fb420a1f7653233a8",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page (max 100)",
+                        "schema": {
+                            "type": "integer",
+                            "default": 20,
+                            "maximum": 100
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by name, description, barcode, or manufacturer",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "manufacturer",
+                        "in": "query",
+                        "description": "Filter by manufacturer",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Medicines retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/MedicineResource"
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Medicines"
+                ],
+                "summary": "Create a new medicine",
+                "operationId": "b3ffd0c458799e16c03d159f6f25ea7c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name_ar": {
+                                        "type": "string",
+                                        "example": "باراسيتامول"
+                                    },
+                                    "name_en": {
+                                        "type": "string",
+                                        "example": "Paracetamol"
+                                    },
+                                    "description_ar": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "example": "مسكن ألم وخافض حرارة"
+                                    },
+                                    "description_en": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "example": "Pain reliever and fever reducer"
+                                    },
+                                    "barcode": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "example": "6281001001001"
+                                    },
+                                    "manufacturer": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "example": "GlaxoSmithKline"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Medicine created successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden (staff:doctor only)"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/medicines/{medicine}": {
+            "get": {
+                "tags": [
+                    "Medicines"
+                ],
+                "summary": "Get a single medicine",
+                "operationId": "ac5ec5b1cc47217ac20164c97a3d771b",
+                "parameters": [
+                    {
+                        "name": "medicine",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Medicine retrieved successfully"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Medicines"
+                ],
+                "summary": "Update a medicine",
+                "operationId": "e1021c1ff5292286ff54cb1a52e6bbf6",
+                "parameters": [
+                    {
+                        "name": "medicine",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name_ar": {
+                                        "type": "string"
+                                    },
+                                    "name_en": {
+                                        "type": "string"
+                                    },
+                                    "description_ar": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    },
+                                    "description_en": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    },
+                                    "barcode": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    },
+                                    "manufacturer": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Medicine updated successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden (staff:doctor only)"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Medicines"
+                ],
+                "summary": "Delete a medicine",
+                "operationId": "c538e6d06b2de2fbd2b98fd83331f3e1",
+                "parameters": [
+                    {
+                        "name": "medicine",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Medicine deleted successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden (staff:doctor only)"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/ratings": {
             "get": {
                 "tags": [
@@ -6169,6 +6476,61 @@
                 },
                 "type": "object"
             },
+            "MedicineResource": {
+                "description": "Medicine resource",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "properties": {
+                            "ar": {
+                                "type": "string"
+                            },
+                            "en": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "description": {
+                        "properties": {
+                            "ar": {
+                                "type": "string"
+                            },
+                            "en": {
+                                "type": "string"
+                            }
+                        },
+                        "type": [
+                            "object",
+                            "null"
+                        ]
+                    },
+                    "barcode": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "manufacturer": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
             "NotificationResource": {
                 "description": "Notification resource",
                 "properties": {
@@ -6567,6 +6929,10 @@
         {
             "name": "Patients",
             "description": "Patients"
+        },
+        {
+            "name": "Medicines",
+            "description": "Medicines"
         },
         {
             "name": "Ratings",

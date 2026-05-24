@@ -10,9 +10,10 @@ return new class extends Migration
     {
         Schema::create('medicines', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('name');
-            $table->text('description')->nullable();
-            $table->decimal('price', 10, 2)->default(0);
+            $table->json('name');
+            $table->json('description')->nullable();
+            $table->string('barcode')->nullable();
+            $table->string('manufacturer')->nullable();
             $table->timestamps();
         });
     }

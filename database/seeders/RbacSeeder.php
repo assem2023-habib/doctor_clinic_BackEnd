@@ -39,6 +39,10 @@ class RbacSeeder extends Seeder
             ['name' => 'Create Cities', 'slug' => 'cities.create', 'group' => 'Locations'],
             ['name' => 'Edit Cities', 'slug' => 'cities.edit', 'group' => 'Locations'],
             ['name' => 'Delete Cities', 'slug' => 'cities.delete', 'group' => 'Locations'],
+            ['name' => 'View Medicines', 'slug' => 'medicines.view', 'group' => 'Medicines'],
+            ['name' => 'Create Medicines', 'slug' => 'medicines.create', 'group' => 'Medicines'],
+            ['name' => 'Edit Medicines', 'slug' => 'medicines.edit', 'group' => 'Medicines'],
+            ['name' => 'Delete Medicines', 'slug' => 'medicines.delete', 'group' => 'Medicines'],
         ];
 
         $allSlugs = collect();
@@ -64,7 +68,7 @@ class RbacSeeder extends Seeder
                 'name' => 'Doctor',
                 'guard_name' => 'api',
                 'is_system' => true,
-                'permission_slugs' => ['appointments.view', 'appointments.edit', 'patients.view', 'doctors.view'],
+                'permission_slugs' => ['appointments.view', 'appointments.edit', 'patients.view', 'doctors.view', 'medicines.view', 'medicines.create', 'medicines.edit', 'medicines.delete'],
             ],
             'patient' => [
                 'name' => 'Patient',
@@ -76,7 +80,7 @@ class RbacSeeder extends Seeder
                 'name' => 'Receptionist',
                 'guard_name' => 'api',
                 'is_system' => false,
-                'permission_slugs' => ['appointments.view', 'appointments.create', 'appointments.edit', 'patients.view', 'patients.create', 'patients.edit', 'doctors.view'],
+                'permission_slugs' => ['appointments.view', 'appointments.create', 'appointments.edit', 'patients.view', 'patients.create', 'patients.edit', 'doctors.view', 'medicines.view', 'medicines.create', 'medicines.edit', 'medicines.delete'],
             ],
         ];
 
