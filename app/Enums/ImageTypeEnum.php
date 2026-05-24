@@ -6,6 +6,7 @@ enum ImageTypeEnum: string
 {
     case User = 'user';
     case Country = 'country';
+    case Specialization = 'specialization';
 
     public static function values(): array
     {

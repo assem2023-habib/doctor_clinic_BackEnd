@@ -13,5 +13,6 @@ return [
     'max_size' => [
         'user' => 2048,
         'country' => 5120,
+        'specialization' => 2048,
     ],
 ];

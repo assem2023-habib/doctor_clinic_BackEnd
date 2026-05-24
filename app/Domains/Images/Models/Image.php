@@ -29,10 +29,10 @@ class Image extends Model
 
     public function isOwnedBy(\App\Models\User $user): bool
     {
-        if ($this->imageable_type !== 'user') {
-            return false;
+        if ($this->imageable_type === 'user') {
+            return $this->imageable_id === $user->id;
         }
 
-        return $this->imageable_id === $user->id;
+        return true;
     }
 }

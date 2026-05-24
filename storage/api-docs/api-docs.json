@@ -2438,7 +2438,7 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
                                 "properties": {
                                     "name_ar": {
@@ -2469,6 +2469,14 @@
                                             "null"
                                         ],
                                         "example": true
+                                    },
+                                    "file": {
+                                        "description": "Specialization image (jpg, jpeg, png, webp, max 2MB)",
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "binary"
                                     }
                                 },
                                 "type": "object"
@@ -2533,7 +2541,7 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
                                 "properties": {
                                     "name_ar": {
@@ -2559,6 +2567,14 @@
                                             "boolean",
                                             "null"
                                         ]
+                                    },
+                                    "file": {
+                                        "description": "Specialization image (jpg, jpeg, png, webp, max 2MB)",
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "binary"
                                     }
                                 },
                                 "type": "object"
@@ -6086,7 +6102,8 @@
                         "type": "string",
                         "enum": [
                             "user",
-                            "country"
+                            "country",
+                            "specialization"
                         ]
                     },
                     "imageable_id": {
@@ -6427,6 +6444,16 @@
                             "null"
                         ],
                         "example": 5
+                    },
+                    "image": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/ImageResource"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
                     },
                     "created_at": {
                         "type": "string",

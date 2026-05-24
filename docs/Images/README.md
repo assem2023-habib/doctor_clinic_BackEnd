@@ -19,8 +19,8 @@ ImageController
  └── destroy() → DeleteImageAction (delete file + record)
 ```
 
-- **Model:** `Image` (UUID v7, polymorphic `imageable` — morphs to User, Country, etc.)
-- **Types:** `ImageTypeEnum` — `user` (max 2048KB), `country` (max 2048KB) — configurable via `config/images.max_size`
+- **Model:** `Image` (UUID v7, polymorphic `imageable` — morphs to User, Country, Specialization, etc.)
+- **Types:** `ImageTypeEnum` — `user` (max 2048KB), `country` (max 5120KB), `specialization` (max 2048KB) — configurable via `config/images.max_size`
 - **Accessor:** `url` attribute returns full URL (`/api/v1/images/{id}`) instead of storage path
 - **Upload Action:** replaces existing image for same `imageable_type + imageable_id`, optimizes to 80% quality via Intervention Image
 - **Storage:** local disk, path: `uploads/{type}/{imageable_id}/{uuid}.{ext}`

@@ -39,6 +39,10 @@
 | `Doctor` | `doctors` | id, user_id, specialization_id, experience_months |
 | `DoctorSchedule` | `doctor_schedules` | id, doctor_id, day_of_week, start_time, end_time, is_active |
 
+### علاقات Specialization:
+- `doctors()` — HasMany → Doctor
+- `image()` — MorphOne → Image (polymorphic, `imageable`)
+
 ### علاقات Doctor:
 - `user()` — BelongsTo → User
 - `schedules()` — HasMany → DoctorSchedule

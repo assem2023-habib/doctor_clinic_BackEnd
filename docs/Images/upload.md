@@ -13,7 +13,7 @@
 | Parameter | Type | Constraints | Description |
 |-----------|------|-------------|-------------|
 | `file` | file | required, image, max per type, jpg/jpeg/png/webp | Image file |
-| `type` | string | required, enum: `user`, `country` | Image type (polymorphic) |
+| `type` | string | required, enum: `user`, `country`, `specialization` | Image type (polymorphic) |
 | `imageable_id` | string | required | UUID of the parent entity |
 
 ### Example
@@ -108,3 +108,4 @@ Client     image.content MW     ImageController    UploadImageAction    Storage 
 |--------|-----------|
 | 401 | Unauthenticated |
 | 422 | Invalid file (type, size, mime), missing fields, or invalid `imageable_id` |
+| 422 | `imageable_id` must exist in `specializations` table when `type = specialization` |

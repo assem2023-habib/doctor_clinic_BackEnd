@@ -24,6 +24,8 @@
 
 ## Store/Update
 
+Content-Type: `multipart/form-data`
+
 | Parameter | Type | Constraints | Description |
 |-----------|------|-------------|-------------|
 | `name_ar` | string | required, max:255 | Arabic name |
@@ -31,16 +33,7 @@
 | `description_ar` | string | nullable | Arabic description |
 | `description_en` | string | nullable | English description |
 | `is_active` | boolean | nullable | Active status (default: true) |
-
-```json
-{
-  "name_ar": "طب القلب",
-  "name_en": "Cardiology",
-  "description_ar": "متخصص بأمراض القلب",
-  "description_en": "Heart disease specialist",
-  "is_active": true
-}
-```
+| `file` | file | nullable, image, max:2048KB, jpg/jpeg/png/webp | Specialization image |
 
 ## Response (SpecializationResource)
 
@@ -52,12 +45,19 @@
   "description": { "ar": "متخصص بأمراض القلب", "en": "Heart disease specialist" },
   "is_active": true,
   "doctors_count": 5,
+  "image": {
+    "id": "019e5936-...",
+    "url": "http://localhost/api/v1/images/019e5936-...",
+    "type": "specialization",
+    "imageable_id": "019e1d0f-...",
+    "created_at": "2026-05-24T00:00:00.000000Z"
+  },
   "created_at": "2026-05-24T00:00:00.000000Z",
   "updated_at": "2026-05-24T00:00:00.000000Z"
 }
 ```
 
-> `doctors_count` appears only in list/show when loaded via `withCount`.
+> `doctors_count` appears only when loaded via `withCount`. `image` appears only when the relationship is loaded (always in `show`, not by default in `index`).
 
 ## Errors
 
@@ -67,4 +67,5 @@
 | 403 | Forbidden (not admin for write ops) |
 | 404 | Specialization not found |
 | 409 | Cannot delete — has associated doctors |
+| 413 | File too large (exceeds 2048KB) |
 | 422 | Validation failed |

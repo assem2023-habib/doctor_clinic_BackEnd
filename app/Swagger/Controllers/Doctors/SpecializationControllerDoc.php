@@ -48,14 +48,18 @@ class SpecializationControllerDoc
         path: '/api/v1/specializations',
         summary: 'Create a new specialization',
         tags: ['Specializations'],
-        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(
-            properties: [
-                new OA\Property(property: 'name_ar', type: 'string', example: 'طب القلب'),
-                new OA\Property(property: 'name_en', type: 'string', example: 'Cardiology'),
-                new OA\Property(property: 'description_ar', type: 'string', nullable: true, example: 'متخصص بأمراض القلب'),
-                new OA\Property(property: 'description_en', type: 'string', nullable: true, example: 'Heart disease specialist'),
-                new OA\Property(property: 'is_active', type: 'boolean', nullable: true, example: true),
-            ]
+        requestBody: new OA\RequestBody(required: true, content: new OA\MediaType(
+            mediaType: 'multipart/form-data',
+            schema: new OA\Schema(
+                properties: [
+                    new OA\Property(property: 'name_ar', type: 'string', example: 'طب القلب'),
+                    new OA\Property(property: 'name_en', type: 'string', example: 'Cardiology'),
+                    new OA\Property(property: 'description_ar', type: 'string', nullable: true, example: 'متخصص بأمراض القلب'),
+                    new OA\Property(property: 'description_en', type: 'string', nullable: true, example: 'Heart disease specialist'),
+                    new OA\Property(property: 'is_active', type: 'boolean', nullable: true, example: true),
+                    new OA\Property(property: 'file', type: 'string', format: 'binary', nullable: true, description: 'Specialization image (jpg, jpeg, png, webp, max 2MB)'),
+                ]
+            )
         )),
         responses: [
             new OA\Response(response: 201, description: 'Specialization created successfully'),
@@ -71,14 +75,18 @@ class SpecializationControllerDoc
         parameters: [
             new OA\Parameter(name: 'specialization', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],
-        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(
-            properties: [
-                new OA\Property(property: 'name_ar', type: 'string'),
-                new OA\Property(property: 'name_en', type: 'string'),
-                new OA\Property(property: 'description_ar', type: 'string', nullable: true),
-                new OA\Property(property: 'description_en', type: 'string', nullable: true),
-                new OA\Property(property: 'is_active', type: 'boolean', nullable: true),
-            ]
+        requestBody: new OA\RequestBody(required: true, content: new OA\MediaType(
+            mediaType: 'multipart/form-data',
+            schema: new OA\Schema(
+                properties: [
+                    new OA\Property(property: 'name_ar', type: 'string'),
+                    new OA\Property(property: 'name_en', type: 'string'),
+                    new OA\Property(property: 'description_ar', type: 'string', nullable: true),
+                    new OA\Property(property: 'description_en', type: 'string', nullable: true),
+                    new OA\Property(property: 'is_active', type: 'boolean', nullable: true),
+                    new OA\Property(property: 'file', type: 'string', format: 'binary', nullable: true, description: 'Specialization image (jpg, jpeg, png, webp, max 2MB)'),
+                ]
+            )
         )),
         responses: [
             new OA\Response(response: 200, description: 'Specialization updated successfully'),

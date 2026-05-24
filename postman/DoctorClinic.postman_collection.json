@@ -1986,7 +1986,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Specializations retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"slug\": \"cardiology\",\n            \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"},\n            \"description\": null,\n            \"is_active\": true,\n            \"doctors_count\": 5,\n            \"created_at\": \"2026-05-24T00:00:00.000000Z\",\n            \"updated_at\": \"2026-05-24T00:00:00.000000Z\"\n        }\n    ],\n    \"meta\": {\n        \"pagination\": {\n            \"current_page\": 1,\n            \"last_page\": 1,\n            \"per_page\": 20,\n            \"total\": 28,\n            \"from\": 1,\n            \"to\": 28,\n            \"limit\": 20\n        }\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Specializations retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"slug\": \"cardiology\",\n            \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"},\n            \"description\": null,\n            \"is_active\": true,\n            \"doctors_count\": 5,\n            \"image\": null,\n            \"created_at\": \"2026-05-24T00:00:00.000000Z\",\n            \"updated_at\": \"2026-05-24T00:00:00.000000Z\"\n        }\n    ],\n    \"meta\": {\n        \"pagination\": {\n            \"current_page\": 1,\n            \"last_page\": 1,\n            \"per_page\": 20,\n            \"total\": 28,\n            \"from\": 1,\n            \"to\": 28,\n            \"limit\": 20\n        }\n    }\n}"
 						}
 					]
 				},
@@ -2011,7 +2011,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Specialization retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"slug\": \"cardiology\",\n        \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"},\n        \"description\": null,\n        \"is_active\": true,\n        \"doctors_count\": 5,\n        \"created_at\": \"2026-05-24T00:00:00.000000Z\",\n        \"updated_at\": \"2026-05-24T00:00:00.000000Z\"\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Specialization retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"slug\": \"cardiology\",\n        \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"},\n        \"description\": null,\n        \"is_active\": true,\n        \"doctors_count\": 5,\n        \"image\": null,\n        \"created_at\": \"2026-05-24T00:00:00.000000Z\",\n        \"updated_at\": \"2026-05-24T00:00:00.000000Z\"\n    }\n}"
 						},
 						{
 							"name": "Not Found",
@@ -2043,20 +2043,43 @@
 							{
 								"key": "Accept",
 								"value": "application/json"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name_ar\": \"طب القلب\",\n    \"name_en\": \"Cardiology\",\n    \"description_ar\": \"متخصص بأمراض القلب\",\n    \"description_en\": \"Heart disease specialist\",\n    \"is_active\": true\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name_ar",
+									"value": "طب القلب",
+									"type": "text"
+								},
+								{
+									"key": "name_en",
+									"value": "Cardiology",
+									"type": "text"
+								},
+								{
+									"key": "description_ar",
+									"value": "متخصص بأمراض القلب",
+									"type": "text"
+								},
+								{
+									"key": "description_en",
+									"value": "Heart disease specialist",
+									"type": "text"
+								},
+								{
+									"key": "is_active",
+									"value": "true",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": [],
+									"description": "Specialization image (jpg, jpeg, png, webp, max 2MB)"
 								}
-							}
+							]
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/specializations",
@@ -2069,7 +2092,7 @@
 							"name": "Created",
 							"status": "Created",
 							"code": 201,
-							"body": "{\n    \"status\": 201,\n    \"message\": \"Specialization created successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"slug\": \"cardiology\",\n        \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"},\n        \"description\": {\"ar\": \"متخصص بأمراض القلب\", \"en\": \"Heart disease specialist\"},\n        \"is_active\": true,\n        \"doctors_count\": 0,\n        \"created_at\": \"2026-05-24T00:00:00.000000Z\",\n        \"updated_at\": \"2026-05-24T00:00:00.000000Z\"\n    }\n}"
+							"body": "{\n    \"status\": 201,\n    \"message\": \"Specialization created successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"slug\": \"cardiology\",\n        \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"},\n        \"description\": {\"ar\": \"متخصص بأمراض القلب\", \"en\": \"Heart disease specialist\"},\n        \"is_active\": true,\n        \"doctors_count\": 0,\n        \"image\": null,\n        \"created_at\": \"2026-05-24T00:00:00.000000Z\",\n        \"updated_at\": \"2026-05-24T00:00:00.000000Z\"\n    }\n}"
 						},
 						{
 							"name": "Validation Error",
@@ -2086,20 +2109,43 @@
 							{
 								"key": "Accept",
 								"value": "application/json"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name_ar\": \"طب القلب\",\n    \"name_en\": \"Cardiology\",\n    \"description_ar\": \"متخصص بأمراض القلب والشرايين\",\n    \"description_en\": \"Heart and vascular disease specialist\",\n    \"is_active\": true\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name_ar",
+									"value": "طب القلب",
+									"type": "text"
+								},
+								{
+									"key": "name_en",
+									"value": "Cardiology",
+									"type": "text"
+								},
+								{
+									"key": "description_ar",
+									"value": "متخصص بأمراض القلب والشرايين",
+									"type": "text"
+								},
+								{
+									"key": "description_en",
+									"value": "Heart and vascular disease specialist",
+									"type": "text"
+								},
+								{
+									"key": "is_active",
+									"value": "true",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": [],
+									"description": "Specialization image (jpg, jpeg, png, webp, max 2MB)"
 								}
-							}
+							]
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/specializations/{{specialization_id}}",
@@ -2112,7 +2158,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Specialization updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"slug\": \"cardiology\",\n        \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"},\n        \"description\": {\"ar\": \"متخصص بأمراض القلب والشرايين\", \"en\": \"Heart and vascular disease specialist\"},\n        \"is_active\": true,\n        \"created_at\": \"2026-05-24T00:00:00.000000Z\",\n        \"updated_at\": \"2026-05-24T00:00:00.000000Z\"\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Specialization updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"slug\": \"cardiology\",\n        \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"},\n        \"description\": {\"ar\": \"متخصص بأمراض القلب والشرايين\", \"en\": \"Heart and vascular disease specialist\"},\n        \"is_active\": true,\n        \"image\": null,\n        \"created_at\": \"2026-05-24T00:00:00.000000Z\",\n        \"updated_at\": \"2026-05-24T00:00:00.000000Z\"\n    }\n}"
 						},
 						{
 							"name": "Validation Error",

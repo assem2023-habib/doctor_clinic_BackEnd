@@ -44,7 +44,7 @@ class SpecializationController
 
     public function show(Specialization $specialization): JsonResponse
     {
-        $specialization->loadCount('doctors');
+        $specialization->loadCount('doctors')->load('image');
 
         return ApiResponse::success(
             new SpecializationResource($specialization),
@@ -55,7 +55,7 @@ class SpecializationController
     public function store(StoreSpecializationRequest $request): JsonResponse
     {
         $dto = SpecializationData::fromStoreRequest($request);
-        $specialization = $this->createSpecializationAction->execute($dto);
+        $specialization = $this->createSpecializationAction->execute($dto, $request->file('file'));
 
         return ApiResponse::created(
             new SpecializationResource($specialization),
@@ -66,7 +66,7 @@ class SpecializationController
     public function update(UpdateSpecializationRequest $request, Specialization $specialization): JsonResponse
     {
         $dto = SpecializationData::fromUpdateRequest($request);
-        $specialization = $this->updateSpecializationAction->execute($specialization, $dto);
+        $specialization = $this->updateSpecializationAction->execute($specialization, $dto, $request->file('file'));
 
         return ApiResponse::success(
             new SpecializationResource($specialization),

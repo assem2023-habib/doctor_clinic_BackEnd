@@ -20,6 +20,7 @@ use OpenApi\Attributes as OA;
         ]),
         new OA\Property(property: 'is_active', type: 'boolean', example: true),
         new OA\Property(property: 'doctors_count', type: 'integer', example: 5, nullable: true),
+        new OA\Property(property: 'image', ref: '#/components/schemas/ImageResource', nullable: true),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
         new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
     ],

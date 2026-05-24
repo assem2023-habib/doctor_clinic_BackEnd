@@ -2,10 +2,12 @@
 
 namespace App\Domains\Doctors\Models;
 
+use App\Domains\Images\Models\Image;
 use App\Enums\SpecializationEnum;
 use App\Traits\HasUuidV7;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Specialization extends Model
 {
@@ -30,6 +32,11 @@ class Specialization extends Model
     public function doctors(): HasMany
     {
         return $this->hasMany(Doctor::class);
+    }
+
+    public function image(): MorphOne
+    {
+        return $this->morphOne(Image::class, 'imageable');
     }
 
     public static function seedFromEnum(): void

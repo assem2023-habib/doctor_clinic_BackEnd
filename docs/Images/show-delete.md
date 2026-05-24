@@ -14,7 +14,7 @@
 Serves the raw image content with the correct MIME type. Access control:
 
 - **Admin** — can view any image
-- **Other users** — can only view images they own (checked via `$image->isOwnedBy($user)` which verifies `imageable_type === 'user'` and `imageable_id === $user->id`)
+- **Other users** — can only view user images they own; non-user images (`specialization`, `country`) are publicly viewable by any authenticated user (checked via `$image->isOwnedBy($user)`)
 
 ### Ownership Check
 
@@ -22,10 +22,10 @@ Serves the raw image content with the correct MIME type. Access control:
 // Image.php
 public function isOwnedBy(\App\Models\User $user): bool
 {
-    if ($this->imageable_type !== 'user') {
-        return false;
+    if ($this->imageable_type === 'user') {
+        return $this->imageable_id === $user->id;
     }
-    return $this->imageable_id === $user->id;
+    return true; // non-user images are public
 }
 ```
 
