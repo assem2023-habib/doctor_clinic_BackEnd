@@ -4220,7 +4220,7 @@
 		},
 		{
 			"name": "Medicines",
-			"description": "Medicines CRUD.\n\nRead endpoints (GET) are available to all authenticated users. Write endpoints (POST, PUT, DELETE) require admin, doctor, or receptionist role.",
+			"description": "Medicines CRUD.\n\nRead endpoints (GET) and Create (POST) are available to all authenticated users. Update (PUT) and Delete (DELETE) require admin, doctor, or receptionist role.\n\nPatients are limited to creating 15 medicines per day.",
 			"item": [
 				{
 					"name": "List Medicines",
@@ -4277,7 +4277,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Medicines retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"name\": {\"ar\": \"باراسيتامول\", \"en\": \"Paracetamol\"},\n            \"description\": {\"ar\": \"مسكن ألم\", \"en\": \"Pain reliever\"},\n            \"barcode\": \"6281001001001\",\n            \"manufacturer\": \"GSK\",\n            \"created_at\": \"2026-05-24T...\",\n            \"updated_at\": \"2026-05-24T...\"\n        }\n    ]\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Medicines retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"name\": {\"ar\": \"باراسيتامول\", \"en\": \"Paracetamol\"},\n            \"description\": {\"ar\": \"مسكن ألم\", \"en\": \"Pain reliever\"},\n            \"barcode\": \"6281001001001\",\n            \"manufacturer\": \"GSK\",\n            \"created_by\": \"019e1d0f-... | John Doe\",\n            \"created_at\": \"2026-05-24T...\",\n            \"updated_at\": \"2026-05-24T...\"\n        }\n    ]\n}"
 						}
 					]
 				},
@@ -4302,7 +4302,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Medicine retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"name\": {\"ar\": \"باراسيتامول\", \"en\": \"Paracetamol\"},\n        \"description\": {\"ar\": \"مسكن ألم\", \"en\": \"Pain reliever\"},\n        \"barcode\": \"6281001001001\",\n        \"manufacturer\": \"GSK\",\n        \"created_at\": \"2026-05-24T...\",\n        \"updated_at\": \"2026-05-24T...\"\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Medicine retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"name\": {\"ar\": \"باراسيتامول\", \"en\": \"Paracetamol\"},\n        \"description\": {\"ar\": \"مسكن ألم\", \"en\": \"Pain reliever\"},\n        \"barcode\": \"6281001001001\",\n                    \"manufacturer\": \"GSK\",\n        \"created_by\": \"019e1d0f-... | John Doe\",\n        \"created_at\": \"2026-05-24T...\",\n        \"updated_at\": \"2026-05-24T...\"\n    }\n}"
 						}
 					]
 				},
@@ -4355,7 +4355,7 @@
 							"name": "Created",
 							"status": "Created",
 							"code": 201,
-							"body": "{\n    \"status\": 201,\n    \"message\": \"Medicine created successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"name\": {\"ar\": \"باراسيتامول\", \"en\": \"Paracetamol\"},\n        \"description\": {\"ar\": \"مسكن ألم\", \"en\": \"Pain reliever\"},\n        \"barcode\": \"6281001001001\",\n        \"manufacturer\": \"GSK\",\n        \"created_at\": \"2026-05-24T...\",\n        \"updated_at\": \"2026-05-24T...\"\n    }\n}"
+							"body": "{\n    \"status\": 201,\n    \"message\": \"Medicine created successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"name\": {\"ar\": \"باراسيتامول\", \"en\": \"Paracetamol\"},\n        \"description\": {\"ar\": \"مسكن ألم\", \"en\": \"Pain reliever\"},\n        \"barcode\": \"6281001001001\",\n                    \"manufacturer\": \"GSK\",\n        \"created_by\": \"019e1d0f-... | John Doe\",\n        \"created_at\": \"2026-05-24T...\",\n        \"updated_at\": \"2026-05-24T...\"\n    }\n}"
 						}
 					]
 				},
@@ -4393,7 +4393,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Medicine updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"name\": {\"ar\": \"باراسيتامول محدث\", \"en\": \"Paracetamol Updated\"},\n        \"description\": {\"ar\": \"مسكن ألم محدث\", \"en\": \"Pain reliever updated\"},\n        \"barcode\": \"6281001001002\",\n        \"manufacturer\": \"Bayer\",\n        \"created_at\": \"2026-05-24T...\",\n        \"updated_at\": \"2026-05-24T...\"\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Medicine updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"name\": {\"ar\": \"باراسيتامول محدث\", \"en\": \"Paracetamol Updated\"},\n        \"description\": {\"ar\": \"مسكن ألم محدث\", \"en\": \"Pain reliever updated\"},\n        \"barcode\": \"6281001001002\",\n                    \"manufacturer\": \"Bayer\",\n        \"created_by\": \"019e1d0f-... | John Doe\",\n        \"created_at\": \"2026-05-24T...\",\n        \"updated_at\": \"2026-05-24T...\"\n    }\n}"
 						}
 					]
 				},
