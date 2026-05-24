@@ -3,6 +3,7 @@
 namespace App\Domains\Appointments\Models;
 
 use App\Domains\Doctors\Models\Doctor;
+use App\Domains\MedicalRecords\Models\MedicalRecord;
 use App\Domains\Patients\Models\Patient;
 use App\Enums\AppointmentStatusEnum;
 use App\Models\User;
@@ -25,6 +26,7 @@ class Appointment extends Model
         'reason',
         'notes',
         'created_by',
+        'medical_record_id',
     ];
 
     protected function casts(): array
@@ -50,6 +52,11 @@ class Appointment extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function medicalRecord(): BelongsTo
+    {
+        return $this->belongsTo(MedicalRecord::class);
     }
 
     public function statusLogs(): HasMany

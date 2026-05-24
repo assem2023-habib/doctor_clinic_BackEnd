@@ -12,10 +12,11 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('patient_id')->constrained('patients')->cascadeOnDelete();
             $table->uuid('doctor_id')->nullable();
-            $table->foreignUuid('appointment_id')->constrained('appointments')->cascadeOnDelete();
             $table->text('diagnosis');
             $table->text('notes')->nullable();
             $table->timestamp('created_at')->nullable();
+
+            $table->unique(['patient_id', 'doctor_id']);
         });
     }
 

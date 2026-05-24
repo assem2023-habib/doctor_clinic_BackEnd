@@ -5,7 +5,6 @@ namespace App\Domains\Doctors\Services;
 use App\Domains\Appointments\Models\Appointment;
 use App\Domains\Doctors\Models\Doctor;
 use App\Domains\MedicalRecords\Models\MedicalRecord;
-use App\Domains\Prescriptions\Models\Prescription;
 use App\Enums\AppointmentStatusEnum;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -35,18 +34,7 @@ class DoctorDeletionService
         DB::transaction(function () use ($doctor, $user, $actingLabel) {
             Appointment::where('doctor_id', $doctor->id)
                 ->whereIn('status', [AppointmentStatusEnum::Confirmed, AppointmentStatusEnum::Completed, AppointmentStatusEnum::Cancelled])
-                ->each(function (Appointment $appointment) use ($doctor) {
-                    MedicalRecord::where('appointment_id', $appointment->id)
-                        ->where('doctor_id', $doctor->id)
-                        ->update(['doctor_id' => null]);
-
-                    Prescription::whereIn('medical_record_id',
-                        MedicalRecord::where('appointment_id', $appointment->id)->pluck('id')
-                    )->where('doctor_id', $doctor->id)
-                        ->update(['doctor_id' => null]);
-
-                    $appointment->update(['doctor_id' => null]);
-                });
+                ->update(['doctor_id' => null]);
 
             Appointment::where('doctor_id', $doctor->id)
                 ->whereIn('status', [AppointmentStatusEnum::Pending, AppointmentStatusEnum::InProgress])
@@ -56,6 +44,9 @@ class DoctorDeletionService
 
             Appointment::where('created_by', 'like', $user->id . ':%')
                 ->update(['created_by' => $actingLabel]);
+
+            MedicalRecord::where('doctor_id', $doctor->id)
+                ->update(['doctor_id' => null]);
 
             if ($user->image) {
                 Storage::disk('local')->delete($user->image->getRawOriginal('url'));
