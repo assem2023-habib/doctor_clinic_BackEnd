@@ -41,18 +41,39 @@ public function __construct(
 ## Action: `RequestAppointmentAction`
 
 ```php
-$appointment = Appointment::create([
-    'doctor_id' => $data->doctorId,
-    'patient_id' => $data->patientId,
-    'medical_record_id' => $medicalRecordId,
-    'status' => AppointmentStatusEnum::Requested,
-    'reason' => $data->reason,
-    'notes' => $data->preferredDate ? "Preferred date: {$data->preferredDate}" : null,
-    'created_by' => $data->createdBy,
-]);
+public function __construct(
+    private readonly FindOrCreateMedicalRecordAction $findOrCreateMedicalRecord,
+) {}
+
+public function execute(RequestAppointmentData $data): Appointment
+{
+    $medicalRecord = $this->findOrCreateMedicalRecord->execute(
+        patientId: $data->patientId,
+        doctorId: $data->doctorId,
+    );
+
+    $appointment = Appointment::create([
+        'doctor_id' => $data->doctorId,
+        'patient_id' => $data->patientId,
+        'medical_record_id' => $medicalRecord->id,
+        'status' => AppointmentStatusEnum::Requested,
+        'reason' => $data->reason,
+        'notes' => $data->preferredDate ? "Preferred date: {$data->preferredDate}" : null,
+        'created_by' => $data->createdBy,
+    ]);
+
+    return $appointment;
+}
 ```
 
 Stores preferred date in the `notes` field as `"Preferred date: Y-m-d"`.
+
+When a patient requests an appointment, the system automatically:
+1. Searches for an existing `MedicalRecord` for this **patient + doctor's specialization**
+2. If found → links the appointment to it (`medical_record_id`)
+3. If not found → creates a new `MedicalRecord` and links it
+
+This is handled by **`FindOrCreateMedicalRecordAction`** (`app/Domains/MedicalRecords/Actions/FindOrCreateMedicalRecordAction.php`), keeping the logic outside the controller.
 
 ## Notification
 
@@ -94,19 +115,29 @@ $this->notificationManager->send('appointment.requested', new NotificationData(
 ## Sequence Diagram
 
 ```
-Patient     AppointmentController    RequestAppointmentAction    NotificationManager
-  │                   │                       │                       │
-  │── POST /appointments ──>│                 │                       │
-  │                   │── guard: only patient ─│                       │
-  │                   │── RequestAppointmentData::fromRequest()       │
-  │                   │── execute(data) ──────>│                      │
-  │                   │                       │── Appointment::create │
-  │                   │                       │── status: Requested   │
-  │                   │<── Appointment ───────│                       │
-  │                   │── load(patient, doctor, image)                │
-  │                   │── send 'appointment.requested' ─────────────>│
-  │                   │<── 201 Created ───────│                       │
-  │<── 201 OK ────────│                       │                       │
+Patient     AppointmentController    RequestAppointmentAction    FindOrCreateMedicalRecord    NotificationManager
+  │                   │                       │                           │                       │
+  │── POST /appointments ──>│                 │                           │                       │
+  │                   │── guard: only patient ─│                           │                       │
+  │                   │── RequestAppointmentData::fromRequest()            │                       │
+  │                   │── execute(data) ──────>│                          │                       │
+  │                   │                       │── findOrCreate(patientId, │                       │
+  │                   │                       │    doctorId) ────────────>│                       │
+  │                   │                       │                           │── Doctor::findOrFail   │
+  │                   │                       │                           │── MedicalRecord::      │
+  │                   │                       │                           │   whereHas(doctor,     │
+  │                   │                       │                           │     specialization)    │
+  │                   │                       │                           │── ?? create new        │
+  │                   │                       │<── MedicalRecord ─────────│                       │
+  │                   │                       │                                                  │
+  │                   │                       │── Appointment::create(                            │
+  │                   │                       │     medical_record_id)                            │
+  │                   │                       │── status: Requested                               │
+  │                   │<── Appointment ───────│                                                  │
+  │                   │── load(patient, doctor, image)                                           │
+  │                   │── send 'appointment.requested' ─────────────────────────────────────────>│
+  │                   │<── 201 Created ───────│                                                  │
+  │<── 201 OK ────────│                       │                                                  │
 ```
 
 ## Errors
