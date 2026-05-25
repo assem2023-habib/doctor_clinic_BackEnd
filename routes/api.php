@@ -15,6 +15,8 @@ use App\Http\Controllers\Api\V1\Patient\PatientController;
 use App\Http\Controllers\Api\V1\Receptionist\ReceptionistController;
 use App\Domains\Doctors\Controllers\SpecializationController;
 use App\Domains\Prescriptions\Controllers\MedicineController;
+use App\Domains\Prescriptions\Controllers\PrescriptionController;
+use App\Domains\Prescriptions\Controllers\PrescriptionItemController;
 use App\Domains\Ratings\Controllers\RatingController;
 use App\Http\Controllers\Api\V1\Location\CityController;
 use App\Http\Controllers\Api\V1\Location\CountryController;
@@ -142,6 +144,18 @@ Route::middleware(['auth:api', 'active'])->group(function () {
             Route::delete('/{medicine}', [MedicineController::class, 'destroy']);
         });
     });
+
+    Route::get('/v1/medical-records/{medical_record}/prescriptions', [PrescriptionController::class, 'index']);
+    Route::post('/v1/medical-records/{medical_record}/prescriptions', [PrescriptionController::class, 'store']);
+    Route::get('/v1/prescriptions/{prescription}', [PrescriptionController::class, 'show']);
+    Route::put('/v1/prescriptions/{prescription}', [PrescriptionController::class, 'update']);
+    Route::delete('/v1/prescriptions/{prescription}', [PrescriptionController::class, 'destroy']);
+
+    Route::get('/v1/prescriptions/{prescription}/items', [PrescriptionItemController::class, 'index']);
+    Route::post('/v1/prescriptions/{prescription}/items', [PrescriptionItemController::class, 'store']);
+    Route::get('/v1/prescription-items/{prescription_item}', [PrescriptionItemController::class, 'show']);
+    Route::put('/v1/prescription-items/{prescription_item}', [PrescriptionItemController::class, 'update']);
+    Route::delete('/v1/prescription-items/{prescription_item}', [PrescriptionItemController::class, 'destroy']);
 
     Route::middleware('admin')->group(function () {
         Route::prefix('v1/countries')->group(function () {

@@ -6192,6 +6192,154 @@
                     }
                 ]
             }
+        },
+        "/api/v1/medical-records/{medical_record}/prescriptions": {
+            "get": {
+                "tags": ["Prescriptions"],
+                "summary": "List prescriptions for a medical record",
+                "description": "Requires authentication. Role-scoped: admin/receptionist see all, doctors see their patients, patients see their own.",
+                "operationId": "listPrescriptions",
+                "parameters": [
+                    {
+                        "name": "medical_record",
+                        "in": "path",
+                        "description": "Medical record UUID",
+                        "required": true,
+                        "schema": { "type": "string", "format": "uuid" }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page (max 100)",
+                        "schema": { "type": "integer", "default": 20, "maximum": 100 }
+                    }
+                ],
+                "responses": {
+                    "200": { "description": "Prescriptions retrieved successfully" },
+                    "401": { "description": "Unauthenticated" },
+                    "403": { "description": "Forbidden" }
+                },
+                "security": [{ "bearerAuth": [] }]
+            },
+            "post": {
+                "tags": ["Prescriptions"],
+                "summary": "Create a prescription",
+                "description": "Admin or doctor only. Doctor must own the medical record.",
+                "operationId": "createPrescription",
+                "parameters": [
+                    {
+                        "name": "medical_record",
+                        "in": "path",
+                        "description": "Medical record UUID",
+                        "required": true,
+                        "schema": { "type": "string", "format": "uuid" }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "prescription_date": { "type": "string", "format": "date", "description": "Optional, defaults to today" },
+                                    "status": { "type": "string", "enum": ["active", "archived", "expired"], "description": "Optional, defaults to active" },
+                                    "notes": { "type": "string", "description": "Optional notes, max 5000" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": { "description": "Prescription created successfully" },
+                    "401": { "description": "Unauthenticated" },
+                    "403": { "description": "Forbidden" },
+                    "422": { "description": "Validation error" }
+                },
+                "security": [{ "bearerAuth": [] }]
+            }
+        },
+        "/api/v1/prescriptions/{prescription}": {
+            "get": {
+                "tags": ["Prescriptions"],
+                "summary": "Get a single prescription",
+                "description": "Requires authentication. Role-scoped: admin/receptionist see all, doctors see their patients, patients see their own.",
+                "operationId": "showPrescription",
+                "parameters": [
+                    {
+                        "name": "prescription",
+                        "in": "path",
+                        "description": "Prescription UUID",
+                        "required": true,
+                        "schema": { "type": "string", "format": "uuid" }
+                    }
+                ],
+                "responses": {
+                    "200": { "description": "Prescription retrieved successfully" },
+                    "401": { "description": "Unauthenticated" },
+                    "403": { "description": "Forbidden" },
+                    "404": { "description": "Prescription not found" }
+                },
+                "security": [{ "bearerAuth": [] }]
+            },
+            "put": {
+                "tags": ["Prescriptions"],
+                "summary": "Update a prescription",
+                "description": "Admin or doctor only. Doctor must own the prescription's medical record.",
+                "operationId": "updatePrescription",
+                "parameters": [
+                    {
+                        "name": "prescription",
+                        "in": "path",
+                        "description": "Prescription UUID",
+                        "required": true,
+                        "schema": { "type": "string", "format": "uuid" }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "prescription_date": { "type": "string", "format": "date" },
+                                    "status": { "type": "string", "enum": ["active", "archived", "expired"] },
+                                    "notes": { "type": "string" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Prescription updated successfully" },
+                    "401": { "description": "Unauthenticated" },
+                    "403": { "description": "Forbidden" },
+                    "404": { "description": "Prescription not found" },
+                    "422": { "description": "Validation error" }
+                },
+                "security": [{ "bearerAuth": [] }]
+            },
+            "delete": {
+                "tags": ["Prescriptions"],
+                "summary": "Delete a prescription",
+                "description": "Admin or doctor only. Doctor must own the prescription's medical record.",
+                "operationId": "deletePrescription",
+                "parameters": [
+                    {
+                        "name": "prescription",
+                        "in": "path",
+                        "description": "Prescription UUID",
+                        "required": true,
+                        "schema": { "type": "string", "format": "uuid" }
+                    }
+                ],
+                "responses": {
+                    "204": { "description": "No content - deleted successfully" },
+                    "401": { "description": "Unauthenticated" },
+                    "403": { "description": "Forbidden" },
+                    "404": { "description": "Prescription not found" }
+                },
+                "security": [{ "bearerAuth": [] }]
+            }
         }
     },
     "components": {
@@ -6891,6 +7039,19 @@
                 },
                 "type": "object"
             },
+            "PrescriptionResource": {
+                "description": "Prescription resource",
+                "properties": {
+                    "id": { "type": "string", "format": "uuid" },
+                    "medical_record_id": { "type": "string", "format": "uuid" },
+                    "prescription_date": { "type": ["string", "null"], "format": "date" },
+                    "status": { "type": "string", "enum": ["active", "archived", "expired"] },
+                    "notes": { "type": ["string", "null"] },
+                    "created_at": { "type": "string", "format": "date-time" },
+                    "updated_at": { "type": "string", "format": "date-time" }
+                },
+                "type": "object"
+            },
             "ReceptionistResource": {
                 "description": "Receptionist resource",
                 "properties": {
@@ -7103,6 +7264,10 @@
         {
             "name": "Medical Records",
             "description": "Medical Records"
+        },
+        {
+            "name": "Prescriptions",
+            "description": "Prescriptions"
         },
         {
             "name": "Ratings",

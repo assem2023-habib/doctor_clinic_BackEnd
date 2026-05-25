@@ -13,9 +13,15 @@ return new class extends Migration
             return;
         }
 
-        Schema::table('medical_records', function (Blueprint $table) {
-            $table->dropUnique(['patient_id', 'doctor_id']);
-        });
+        $indexExists = collect(DB::select('SHOW INDEX FROM medical_records'))
+            ->pluck('Key_name')
+            ->contains('medical_records_patient_id_doctor_id_unique');
+
+        if ($indexExists) {
+            Schema::table('medical_records', function (Blueprint $table) {
+                $table->dropUnique(['patient_id', 'doctor_id']);
+            });
+        }
     }
 
     public function down(): void

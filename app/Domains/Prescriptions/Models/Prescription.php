@@ -3,6 +3,7 @@
 namespace App\Domains\Prescriptions\Models;
 
 use App\Domains\MedicalRecords\Models\MedicalRecord;
+use App\Domains\Prescriptions\Enums\PrescriptionStatusEnum;
 use App\Traits\HasUuidV7;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,8 +15,18 @@ class Prescription extends Model
 
     protected $fillable = [
         'medical_record_id',
+        'prescription_date',
+        'status',
         'notes',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'prescription_date' => 'date',
+            'status' => PrescriptionStatusEnum::class,
+        ];
+    }
 
     public function items(): HasMany
     {

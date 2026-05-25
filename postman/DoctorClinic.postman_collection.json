@@ -85,6 +85,11 @@
 			"key": "medical_record_id",
 			"value": "",
 			"type": "string"
+		},
+		{
+			"key": "prescription_id",
+			"value": "",
+			"type": "string"
 		}
 	],
 	"item": [
@@ -4595,6 +4600,256 @@
 							"status": "OK",
 							"code": 200,
 							"body": "{\n    \"status\": 200,\n    \"message\": \"Appointments retrieved successfully\",\n    \"data\": [],\n    \"meta\": {\n        \"pagination\": {\n            \"current_page\": 1,\n            \"last_page\": 0,\n            \"per_page\": 20,\n            \"total\": 0,\n            \"from\": null,\n            \"to\": null,\n            \"limit\": 20\n        }\n    }\n}"
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var token = pm.collectionVariables.get('access_token');",
+							"if (token) {",
+							"    pm.request.headers.add({",
+							"        key: 'Authorization',",
+							"        value: 'Bearer ' + token",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "Prescriptions",
+			"description": "Prescription CRUD nested under medical records.\n\nRead endpoints (GET) are available to all authenticated users with role-based scoping (doctors see only their patients, patients see only their own). Write endpoints (POST, PUT, DELETE) require admin or doctor role.\n\nEvery request in this folder automatically attaches `Authorization: Bearer {{access_token}}` via the Pre-request Script.",
+			"item": [
+				{
+					"name": "List Prescriptions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    if (json.data && json.data.length > 0) {",
+									"        pm.collectionVariables.set('prescription_id', json.data[0].id);",
+									"        console.log('Prescription ID stored:', json.data[0].id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/medical-records/{{medical_record_id}}/prescriptions?limit=20",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "medical-records", "{{medical_record_id}}", "prescriptions"],
+							"query": [
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Items per page (max 100)"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Prescriptions retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"medical_record_id\": \"019e1d0f-...\",\n            \"prescription_date\": \"2026-05-25\",\n            \"status\": \"active\",\n            \"notes\": \"Take twice daily\",\n            \"created_at\": \"2026-05-25T00:00:00.000000Z\",\n            \"updated_at\": \"2026-05-25T00:00:00.000000Z\"\n        }\n    ],\n    \"meta\": {\n        \"pagination\": {\n            \"current_page\": 1,\n            \"last_page\": 1,\n            \"limit\": 20,\n            \"total\": 1,\n            \"hasNextPage\": false,\n            \"hasPreviousPage\": false\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Create Prescription",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('prescription_id', json.data.id);",
+									"    console.log('Prescription created:', json.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"prescription_date\": \"2026-05-25\",\n    \"status\": \"active\",\n    \"notes\": \"Take twice daily with meals\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/medical-records/{{medical_record_id}}/prescriptions",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "medical-records", "{{medical_record_id}}", "prescriptions"]
+						}
+					},
+					"response": [
+						{
+							"name": "Created",
+							"status": "Created",
+							"code": 201,
+							"body": "{\n    \"status\": 201,\n    \"message\": \"Prescription created successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"medical_record_id\": \"019e1d0f-...\",\n        \"prescription_date\": \"2026-05-25\",\n        \"status\": \"active\",\n        \"notes\": \"Take twice daily with meals\",\n        \"created_at\": \"2026-05-25T00:00:00.000000Z\",\n        \"updated_at\": \"2026-05-25T00:00:00.000000Z\"\n    }\n}"
+						},
+						{
+							"name": "Forbidden",
+							"status": "Forbidden",
+							"code": 403,
+							"body": "{\n    \"status\": 403,\n    \"message\": \"You can only add prescriptions to your own patients\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Prescription",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('prescription_id', json.data.id);",
+									"    console.log('Prescription ID stored:', json.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/prescriptions/{{prescription_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "prescriptions", "{{prescription_id}}"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Prescription retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"medical_record_id\": \"019e1d0f-...\",\n        \"prescription_date\": \"2026-05-25\",\n        \"status\": \"active\",\n        \"notes\": \"Take twice daily\",\n        \"created_at\": \"2026-05-25T00:00:00.000000Z\",\n        \"updated_at\": \"2026-05-25T00:00:00.000000Z\"\n    }\n}"
+						},
+						{
+							"name": "Not Found",
+							"status": "Not Found",
+							"code": 404
+						}
+					]
+				},
+				{
+					"name": "Update Prescription",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"prescription_date\": \"2026-05-26\",\n    \"status\": \"active\",\n    \"notes\": \"Updated notes - take three times daily\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/prescriptions/{{prescription_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "prescriptions", "{{prescription_id}}"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Prescription updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"medical_record_id\": \"019e1d0f-...\",\n        \"prescription_date\": \"2026-05-26\",\n        \"status\": \"active\",\n        \"notes\": \"Updated notes - take three times daily\",\n        \"created_at\": \"2026-05-25T00:00:00.000000Z\",\n        \"updated_at\": \"2026-05-26T00:00:00.000000Z\"\n    }\n}"
+						},
+						{
+							"name": "Forbidden",
+							"status": "Forbidden",
+							"code": 403,
+							"body": "{\n    \"status\": 403,\n    \"message\": \"Forbidden\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete Prescription",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/prescriptions/{{prescription_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "prescriptions", "{{prescription_id}}"]
+						}
+					},
+					"response": [
+						{
+							"name": "No Content",
+							"status": "No Content",
+							"code": 204
+						},
+						{
+							"name": "Forbidden",
+							"status": "Forbidden",
+							"code": 403,
+							"body": "{\n    \"status\": 403,\n    \"message\": \"Forbidden\"\n}"
 						}
 					]
 				}
