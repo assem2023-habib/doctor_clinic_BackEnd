@@ -185,7 +185,7 @@
 							"name": "Created",
 							"status": "Created",
 							"code": 201,
-							"body": "{\n    \"status\": 201,\n    \"message\": \"Registered successfully\",\n    \"data\": {\n        \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n        \"refresh_token\": \"def50200...\",\n        \"expires_in\": 31536000,\n        \"token_type\": \"Bearer\",\n        \"user\": {\n            \"id\": \"019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009\",\n            \"first_name\": \"Ahmed\",\n            \"last_name\": \"Ali\",\n            \"email\": \"patient@example.com\",\n            \"roles\": [\"patient\"],\n            \"phone\": \"+963912345678\",\n            \"address\": \"Damascus, Syria\",\n            \"gender\": \"male\",\n            \"birthday_date\": \"1995-06-15\",\n            \"is_active\": true\n        }\n    }\n}"
+							"body": "{\n    \"status\": 201,\n    \"message\": \"Registered successfully\",\n    \"data\": {\n        \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n        \"refresh_token\": \"def50200...\",\n        \"expires_in\": 86400,\n        \"token_type\": \"Bearer\",\n        \"user\": {\n            \"id\": \"019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009\",\n            \"first_name\": \"Ahmed\",\n            \"last_name\": \"Ali\",\n            \"email\": \"patient@example.com\",\n            \"roles\": [\"patient\"],\n            \"phone\": \"+963912345678\",\n            \"address\": \"Damascus, Syria\",\n            \"gender\": \"male\",\n            \"birthday_date\": \"1995-06-15\",\n            \"is_active\": true\n        }\n    }\n}"
 						}
 					]
 				},
@@ -420,7 +420,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Login successful\",\n    \"data\": {\n        \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n        \"refresh_token\": \"def50200...\",\n        \"expires_in\": 31536000,\n        \"token_type\": \"Bearer\",\n        \"user\": {\n            \"id\": \"019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009\",\n            \"first_name\": \"Admin\",\n            \"last_name\": \"User\",\n            \"email\": \"admin@gmail.com\",\n            \"roles\": [\"admin\"],\n            \"is_active\": true\n        }\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Login successful\",\n    \"data\": {\n        \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n        \"refresh_token\": \"def50200...\",\n        \"expires_in\": 86400,\n        \"token_type\": \"Bearer\",\n        \"user\": {\n            \"id\": \"019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009\",\n            \"first_name\": \"Admin\",\n            \"last_name\": \"User\",\n            \"email\": \"admin@gmail.com\",\n            \"roles\": [\"admin\"],\n            \"is_active\": true\n        }\n    }\n}"
 						}
 					]
 				},
@@ -498,7 +498,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Token refreshed successfully\",\n    \"data\": {\n        \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n        \"refresh_token\": \"def50200...\",\n        \"expires_in\": 31536000,\n        \"token_type\": \"Bearer\"\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Token refreshed successfully\",\n    \"data\": {\n        \"access_token\": \"eyJ0eXAiOiJKV1Qi...\",\n        \"refresh_token\": \"def50200...\",\n        \"expires_in\": 86400,\n        \"token_type\": \"Bearer\"\n    }\n}"
 						}
 					]
 				},

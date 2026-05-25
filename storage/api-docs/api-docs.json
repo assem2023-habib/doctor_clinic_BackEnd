@@ -777,7 +777,7 @@
                                         "expires_in": {
                                             "description": "Token expiration in seconds",
                                             "type": "integer",
-                                            "example": 31536000
+                                            "example": 86400
                                         },
                                         "token_type": {
                                             "description": "Token type",
@@ -1201,7 +1201,7 @@
                                         "expires_in": {
                                             "description": "Token expiration in seconds",
                                             "type": "integer",
-                                            "example": 31536000
+                                            "example": 86400
                                         },
                                         "token_type": {
                                             "description": "Token type",
@@ -1409,7 +1409,7 @@
                                         "expires_in": {
                                             "description": "Token expiration in seconds",
                                             "type": "integer",
-                                            "example": 31536000
+                                            "example": 86400
                                         },
                                         "token_type": {
                                             "description": "Token type",
