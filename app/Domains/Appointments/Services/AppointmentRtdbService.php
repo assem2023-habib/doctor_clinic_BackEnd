@@ -29,11 +29,13 @@ class AppointmentRtdbService
         }
 
         $doctorId = $appointment->doctor_id;
-        $path = "doctors/{$doctorId}/booked-appointments/{$appointment->id}";
+        $date = $appointment->appointment_date?->format('Y-m-d');
+        $path = "doctors/{$doctorId}/booked-appointments/{$date}/{$appointment->id}";
 
         $data = $this->buildAppointmentData($appointment);
 
         $this->rtdb->setValue($path, $data);
+        $this->syncDoctorName($appointment);
     }
 
     public function removeAppointment(Appointment $appointment): void
@@ -43,7 +45,8 @@ class AppointmentRtdbService
         }
 
         $doctorId = $appointment->doctor_id;
-        $path = "doctors/{$doctorId}/booked-appointments/{$appointment->id}";
+        $date = $appointment->appointment_date?->format('Y-m-d');
+        $path = "doctors/{$doctorId}/booked-appointments/{$date}/{$appointment->id}";
 
         $this->rtdb->removeValue($path);
     }
@@ -54,6 +57,18 @@ class AppointmentRtdbService
             $this->syncAppointment($appointment);
         } else {
             $this->removeAppointment($appointment);
+        }
+    }
+
+    private function syncDoctorName(Appointment $appointment): void
+    {
+        $doctor = $appointment->doctor;
+        $doctorUser = $doctor?->user;
+        $name = $doctorUser ? trim($doctorUser->first_name . ' ' . $doctorUser->last_name) : null;
+
+        if ($name) {
+            $path = "doctors/{$appointment->doctor_id}/doctor_name";
+            $this->rtdb->setValue($path, $name);
         }
     }
 

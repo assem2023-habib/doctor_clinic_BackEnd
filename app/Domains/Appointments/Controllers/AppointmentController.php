@@ -106,7 +106,52 @@ class AppointmentController
             $query->whereDate('appointment_date', $request->date);
         }
 
+        if ($request->doctor_id && $user->hasAnyRole(['admin', 'receptionist'])) {
+            $query->where('doctor_id', $request->doctor_id);
+        }
+
         $appointments = $query->orderBy('created_at', 'desc')
+            ->paginate(min($limit, 100));
+
+        return ApiResponse::success(
+            AppointmentResource::collection($appointments),
+            __('Appointments retrieved successfully'),
+            pagination: ApiResponse::pagination($appointments)
+        );
+    }
+
+    public function doctorAppointments(Request $request, Doctor $doctor): JsonResponse
+    {
+        $validated = $request->validate([
+            'date' => ['nullable', 'date'],
+            'from_date' => ['nullable', 'date'],
+            'to_date' => ['nullable', 'date'],
+            'status' => ['nullable', new \App\Enums\AppointmentStatusEnum],
+            'limit' => ['nullable', 'integer', 'min:1', 'max:100'],
+        ]);
+
+        $limit = (int) $request->integer('limit', 20);
+
+        $query = Appointment::with(['patient.user.image', 'doctor.user.image', 'doctor.schedules'])
+            ->where('doctor_id', $doctor->id);
+
+        if ($request->date) {
+            $query->whereDate('appointment_date', $request->date);
+        } else {
+            if ($request->from_date) {
+                $query->whereDate('appointment_date', '>=', $request->from_date);
+            }
+            if ($request->to_date) {
+                $query->whereDate('appointment_date', '<=', $request->to_date);
+            }
+        }
+
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
+
+        $appointments = $query->orderBy('appointment_date', 'desc')
+            ->orderBy('start_time', 'desc')
             ->paginate(min($limit, 100));
 
         return ApiResponse::success(

@@ -71,6 +71,7 @@ Route::prefix('v1/cities')->group(function () {
 Route::get('/v1/doctors/{doctor}/booked-slots', [AppointmentController::class, 'bookedSlots']);
 
 Route::middleware(['auth:api', 'active'])->group(function () {
+    Route::get('/v1/doctors/{doctor}/appointments', [AppointmentController::class, 'doctorAppointments']);
     Route::get('/v1/doctors/{doctor}/patients', [SupervisionController::class, 'doctorPatients']);
     Route::get('/v1/patients/{patient}/doctors', [SupervisionController::class, 'patientDoctors']);
 

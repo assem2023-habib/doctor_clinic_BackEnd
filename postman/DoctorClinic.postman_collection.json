@@ -2358,6 +2358,16 @@
 									"key": "limit",
 									"value": "20",
 									"description": "Items per page (max 100)"
+								},
+								{
+									"key": "date",
+									"value": "",
+									"description": "Filter by date (Y-m-d)"
+								},
+								{
+									"key": "doctor_id",
+									"value": "",
+									"description": "Filter by doctor UUID (admin/receptionist only)"
 								}
 							]
 						}
@@ -4505,6 +4515,86 @@
 							"status": "Forbidden",
 							"code": 403,
 							"body": "{\n    \"status\": 403,\n    \"message\": \"Forbidden\"\n}"
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var token = pm.collectionVariables.get('access_token');",
+							"if (token) {",
+							"    pm.request.headers.add({",
+							"        key: 'Authorization',",
+							"        value: 'Bearer ' + token",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "Doctor Appointments",
+			"description": "Doctor-specific appointment endpoints with date filtering.\n\nEvery request in this folder automatically attaches `Authorization: Bearer {{access_token}}` via the Pre-request Script.",
+			"item": [
+				{
+					"name": "List Doctor Appointments",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/doctors/{{doctor_id}}/appointments?date=2026-05-25&limit=20&page=1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "doctors", "{{doctor_id}}", "appointments"],
+							"query": [
+								{
+									"key": "date",
+									"value": "",
+									"description": "Filter by exact date (Y-m-d)"
+								},
+								{
+									"key": "from_date",
+									"value": "",
+									"description": "Filter from date (Y-m-d)"
+								},
+								{
+									"key": "to_date",
+									"value": "",
+									"description": "Filter to date (Y-m-d)"
+								},
+								{
+									"key": "status",
+									"value": "",
+									"description": "Filter by status"
+								},
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Items per page (max 100)"
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Appointments retrieved successfully\",\n    \"data\": [],\n    \"meta\": {\n        \"pagination\": {\n            \"current_page\": 1,\n            \"last_page\": 0,\n            \"per_page\": 20,\n            \"total\": 0,\n            \"from\": null,\n            \"to\": null,\n            \"limit\": 20\n        }\n    }\n}"
 						}
 					]
 				}
