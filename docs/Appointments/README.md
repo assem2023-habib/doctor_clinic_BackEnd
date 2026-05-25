@@ -19,7 +19,8 @@ Set → Auto-Confirmed (after response window expires via Job)
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
 | GET | `/v1/doctors/{doctor}/booked-slots` | None | Get booked slots for a doctor (future only, optional date range) |
-| GET | `/v1/appointments` | `auth:api` | List appointments (role-scoped) |
+| GET | `/v1/doctors/{doctor}/appointments` | `auth:api` | List doctor appointments (filtered by date, role-scoped) |
+| GET | `/v1/appointments` | `auth:api` | List appointments (role-scoped, supports `doctor_id` filter) |
 | GET | `/v1/appointments/{appointment}` | `auth:api` | Get a single appointment |
 | POST | `/v1/appointments` | `auth:api` | Request a new appointment (patient only) |
 | POST | `/v1/appointments/{appointment}/set-time` | `auth:api` | Set appointment time (staff/doctor) |
@@ -47,7 +48,7 @@ AppointmentController
 
 ## Models
 
-- **`Appointment`** (UUID v7): `doctor_id`, `patient_id`, `appointment_date`, `start_time`, `end_time`, `status`, `reason`, `notes`, `created_by`
+- **`Appointment`** (UUID v7): `doctor_id`, `patient_id`, `appointment_date`, `start_time`, `end_time`, `status`, `reason`, `notes`, `created_by`, `medical_record_id`
 - **`AppointmentStatusLog`** (UUID v7): `appointment_id`, `old_status`, `new_status`, `changed_by`, `created_at` (immutable audit trail)
 
 ## Keys
@@ -67,7 +68,10 @@ Appointments are synchronized to Firebase RTDB so the frontend can display real-
 ### Structure
 
 ```
-/doctors/{doctorId}/booked-appointments/{appointmentId}: {
+/doctors/{doctorId}: {
+  "doctor_name": "Jane Smith"
+}
+/doctors/{doctorId}/booked-appointments/{date}/{appointmentId}: {
   "id": "uuid",
   "doctor_id": "uuid",
   "patient_id": "uuid",
@@ -84,6 +88,8 @@ Appointments are synchronized to Firebase RTDB so the frontend can display real-
 }
 ```
 
+The path includes the **date** (Y-m-d) between `booked-appointments` and the appointment ID, grouping appointments by day. The `doctor_name` is stored once at the doctor level (`/doctors/{doctorId}/doctor_name`), not inside each appointment.
+
 ### Sync Rules
 
 | Transition | Status After | RTDB Action |
@@ -98,7 +104,7 @@ Appointments are synchronized to Firebase RTDB so the frontend can display real-
 ### Services
 
 - **`FirebaseRtdbService`** (`app/Domains/Notifications/Services/FirebaseRtdbService.php`): Low-level wrapper around the Kreait Firebase RTDB client. Provides `setValue()`, `removeValue()`, `getValue()` for any path. Registered as a singleton.
-- **`AppointmentRtdbService`** (`app/Domains/Appointments/Services/AppointmentRtdbService.php`): Domain-specific service that builds appointment payloads, determines the correct RTDB path (`doctors/{doctorId}/booked-appointments/{appointmentId}`), and delegates writes/removes to `FirebaseRtdbService`.
+- **`AppointmentRtdbService`** (`app/Domains/Appointments/Services/AppointmentRtdbService.php`): Domain-specific service that builds appointment payloads, determines the correct RTDB path (`doctors/{doctorId}/booked-appointments/{date}/{appointmentId}`), and delegates writes/removes to `FirebaseRtdbService`. Also syncs `doctor_name` at `/doctors/{doctorId}/doctor_name`.
 
 ### Cleanup
 
@@ -152,9 +158,10 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 await signInWithCustomToken(auth, firebaseToken);
 
-// 3. اقرأ المواعيد
+// 3. اقرأ المواعيد ليوم معين
 const db = getDatabase(app);
-const appointmentsRef = ref(db, `doctors/${doctorId}/booked-appointments`);
+const date = "2026-06-01";
+const appointmentsRef = ref(db, `doctors/${doctorId}/booked-appointments/${date}`);
 onValue(appointmentsRef, (snapshot) => {
   const data = snapshot.val();
   // data = { appointmentId1: {...}, appointmentId2: {...}, ... }
@@ -172,9 +179,15 @@ onValue(appointmentsRef, (snapshot) => {
     ".write": false,
     "doctors": {
       "$doctorId": {
-        "booked-appointments": {
+        "doctor_name": {
           ".read": "auth !== null",
           ".write": false
+        },
+        "booked-appointments": {
+          "$date": {
+            ".read": "auth !== null",
+            ".write": false
+          }
         }
       }
     }

@@ -44,6 +44,7 @@ public function __construct(
 $appointment = Appointment::create([
     'doctor_id' => $data->doctorId,
     'patient_id' => $data->patientId,
+    'medical_record_id' => $medicalRecordId,
     'status' => AppointmentStatusEnum::Requested,
     'reason' => $data->reason,
     'notes' => $data->preferredDate ? "Preferred date: {$data->preferredDate}" : null,

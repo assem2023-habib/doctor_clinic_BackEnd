@@ -19,6 +19,7 @@
 | 7 | `PUT` | `/api/v1/doctors/{doctor}/activate-account` | ✅ admin | تفعيل حساب الدكتور ([توثيق](activate-account.md)) |
 | 8 | `POST` | `/api/v1/doctors/{doctor}/patients/self` | ✅ auth:api | تعيين مريض للدكتور لنفسه |
 | 9 | `GET` | `/api/v1/doctors/{doctor}/supervision-requests` | ✅ auth:api | طلبات الإشراف الواردة للدكتور |
+| 10 | `GET` | `/api/v1/doctors/{doctor}/appointments` | ✅ auth:api | مواعيد الدكتور مع فلترة بالتاريخ ([توثيق](../Appointments/list-get-appointments.md)) |
 
 ### Specializations
 

@@ -2,25 +2,44 @@
 
 > Retrieve appointments. `index` is role-scoped (patients see only their own, doctors see theirs, staff see all). `show` is access-checked via `canAccess()`.
 
-## Route Information
+## Routes
 
 | Method | Path | Middleware |
 |--------|------|------------|
 | GET | `/v1/appointments` | `auth:api` |
 | GET | `/v1/appointments/{appointment}` | `auth:api` |
+| GET | `/v1/doctors/{doctor}/appointments` | `auth:api` |
 
-## List Request
+## List Request (`/v1/appointments`)
 
 | Parameter | Type | Default | Constraints | Description |
 |-----------|------|---------|-------------|-------------|
 | `limit` | integer | 20 | 1–100 | Items per page |
 | `status` | string | — | enum `AppointmentStatusEnum` | Filter by status |
 | `date` | string | — | date (Y-m-d) | Filter by appointment date |
+| `doctor_id` | string | — | uuid | Filter by doctor (admin/receptionist only) |
 
 ### Example
 
 ```
-GET /v1/appointments?status=requested&date=2026-06-01&limit=10
+GET /v1/appointments?status=requested&date=2026-06-01&limit=10&doctor_id=uuid
+```
+
+## Doctor Appointments (`/v1/doctors/{doctor}/appointments`)
+
+| Parameter | Type | Default | Constraints | Description |
+|-----------|------|---------|-------------|-------------|
+| `date` | string | — | date (Y-m-d) | Filter by exact date |
+| `from_date` | string | — | date (Y-m-d) | Filter from date |
+| `to_date` | string | — | date (Y-m-d) | Filter to date |
+| `status` | string | — | enum `AppointmentStatusEnum` | Filter by status |
+| `limit` | integer | 20 | 1–100 | Items per page |
+| `page` | integer | 1 | min:1 | Page number |
+
+### Example
+
+```
+GET /v1/doctors/{doctor}/appointments?date=2026-06-01&status=accepted&limit=10&page=1
 ```
 
 ## Role-Based Scoping (`index`)

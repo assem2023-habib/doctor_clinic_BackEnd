@@ -98,7 +98,7 @@ AuthService::refreshToken(string $refreshToken): TokenData
     "data": {
         "access_token": "eyJ0eXAiOiJKV1Qi...",
         "refresh_token": "def50200...",
-        "expires_in": 31536000,
+        "expires_in": 86400,
         "token_type": "Bearer"
     }
 }

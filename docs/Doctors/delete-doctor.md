@@ -43,7 +43,6 @@ deleteDoctor(Doctor $doctor, User $actingUser):
 ├── 2. DB::transaction:
 │     ├── المواعيد confirmed/completed/cancelled:
 │     │     ├── MedicalRecord → doctor_id = null
-│     │     ├── Prescription → doctor_id = null
 │     │     └── Appointment → doctor_id = null
 │     ├── المواعيد pending: حذف كامل
 │     ├── remaining appointments → doctor_id = null

@@ -180,7 +180,7 @@ public function login(LoginRequest $request): JsonResponse
     "data": {
         "access_token": "eyJ0eXAiOiJKV1Qi...",
         "refresh_token": "def50200...",
-        "expires_in": 31536000,
+        "expires_in": 86400,
         "token_type": "Bearer",
         "user": {
             "id": "0196f0a0-1234-7abc-def0-123456789abc",

@@ -4,7 +4,7 @@
 
 | Token | Type | Lifetime | Usage |
 |-------|------|----------|-------|
-| `access_token` | Bearer JWT | 1 year (configurable) | Sent in `Authorization: Bearer <token>` header |
+| `access_token` | Bearer JWT | 1 day (configurable) | Sent in `Authorization: Bearer <token>` header |
 | `refresh_token` | Opaque string | 2 years (configurable) | Used to get new tokens when `access_token` expires |
 
 ## All Endpoints
@@ -34,7 +34,7 @@
     "data": {
         "access_token": "eyJ0eXAiOiJKV1Qi...",
         "refresh_token": "def50200...",
-        "expires_in": 31536000,
+        "expires_in": 86400,
         "token_type": "Bearer",
         "user": { ... }
     }
@@ -59,7 +59,7 @@
 {
     "access_token": "eyJ0eXAiOiJKV1Qi...",
     "refresh_token": "def50200...",
-    "expires_in": 31536000,
+    "expires_in": 86400,
     "token_type": "Bearer"
 }
 ```
@@ -174,4 +174,4 @@ export default api;
 2. **Concurrent Requests**: If multiple requests fail with 401 at the same time, only ONE refresh call is made (the `isRefreshing` flag). The others are queued and replayed once the new token arrives.
 3. **Refresh Token Expired**: If `/refresh` itself fails (401), it means the refresh token is also expired. Clear all tokens and redirect to login page.
 4. **No User Data on Refresh**: The `/refresh` endpoint returns only tokens. After refreshing, call `/me` to get the current user profile.
-5. **Security**: Tokens are effectively long-lived (1 year). For better security, implement shorter token lifetimes with more frequent refresh cycles, or use httpOnly cookies instead of localStorage.
+5. **Security**: Tokens are effectively short-lived (1 day). For better security, implement even shorter token lifetimes with more frequent refresh cycles, or use httpOnly cookies instead of localStorage.
