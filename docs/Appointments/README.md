@@ -108,7 +108,12 @@ The path includes the **date** (Y-m-d) between `booked-appointments` and the app
 
 ### Cleanup
 
-- **`appointments:cleanup-rtdb`** — Artisan command (`app/Console/Commands/CleanupExpiredRtdbAppointments.php`) that scans for booked appointments (Set, Accepted, InProgress, Confirmed) whose `appointment_date + end_time` has passed and removes them from RTDB.
+- **`appointments:cleanup-rtdb`** — Artisan command (`app/Console/Commands/CleanupExpiredRtdbAppointments.php`) that:
+  1. Removes expired booked appointments from RTDB (old behavior).
+  2. Auto-cancels/completes appointments **24 hours after their end time**:
+     - `Set` / `Accepted` → `Cancelled` + remove from RTDB
+     - `InProgress` → `Completed` + remove from RTDB
+     - Creates `AppointmentStatusLog` with `changed_by: "system: auto-cleanup"`
 - Runs every 5 minutes via the scheduler (`routes/console.php`).
 
 ### Firebase Authentication Flow
