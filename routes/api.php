@@ -1,6 +1,7 @@
 <?php
 
 use App\Domains\Appointments\Controllers\AppointmentController;
+use App\Domains\MedicalRecords\Controllers\MedicalRecordController;
 use App\Domains\Notifications\Controllers\NotificationController;
 use App\Domains\RBAC\Controllers\PermissionController;
 use App\Domains\RBAC\Controllers\RoleController;
@@ -182,6 +183,8 @@ Route::middleware(['auth:api', 'active'])->group(function () {
             Route::patch('/{patient}', [PatientController::class, 'updatePartial']);
             Route::delete('/{patient}', [PatientController::class, 'destroy']);
         });
+
+        Route::post('/v1/medical-records/{medical_record}/transfer', [MedicalRecordController::class, 'transfer']);
     });
 
     Route::prefix('v1/images')->group(function () {

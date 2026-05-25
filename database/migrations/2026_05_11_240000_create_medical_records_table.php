@@ -15,8 +15,6 @@ return new class extends Migration
             $table->text('diagnosis');
             $table->text('notes')->nullable();
             $table->timestamp('created_at')->nullable();
-
-            $table->unique(['patient_id', 'doctor_id']);
         });
     }
 

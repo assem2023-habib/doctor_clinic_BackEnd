@@ -2,6 +2,8 @@
 
 namespace App\Domains\Supervisions\Actions;
 
+use App\Domains\MedicalRecords\Actions\TransferMedicalRecordAction;
+use App\Domains\MedicalRecords\Models\MedicalRecord;
 use App\Domains\Notifications\DTOs\NotificationData;
 use App\Domains\Notifications\Services\NotificationManager;
 use App\Domains\Supervisions\Enums\SupervisionRequestStatusEnum;
@@ -12,6 +14,7 @@ class ApproveSupervisionRequestAction
 {
     public function __construct(
         private readonly AssignPatientToDoctorAction $assignAction,
+        private readonly TransferMedicalRecordAction $transferAction,
         private readonly NotificationManager $notificationManager,
     ) {}
 
@@ -41,6 +44,20 @@ class ApproveSupervisionRequestAction
             ->where('status', SupervisionRequestStatusEnum::Pending)
             ->whereHas('doctor', fn ($q) => $q->where('specialization_id', $request->doctor->specialization_id))
             ->update(['status' => SupervisionRequestStatusEnum::Cancelled]);
+
+        $oldRecord = MedicalRecord::where('patient_id', $request->patient_id)
+            ->where('doctor_id', '!=', $request->doctor->id)
+            ->whereHas('doctor', fn ($q) => $q->where('specialization_id', $request->doctor->specialization_id))
+            ->first();
+
+        if ($oldRecord) {
+            $this->transferAction->execute(
+                medicalRecord: $oldRecord,
+                toDoctor: $request->doctor,
+                transferredBy: $approver,
+                role: 'doctor',
+            );
+        }
 
         $this->notificationManager->send('supervision.approved', new NotificationData(
             topic: 'supervision.approved',

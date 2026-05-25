@@ -142,7 +142,8 @@ class SupervisionController
             return ApiResponse::forbidden(__('Unauthorized to remove patients'));
         }
 
-        $this->removeAction->execute($doctor, $patient);
+        $role = $isDoctor ? 'doctor' : 'receptionist';
+        $this->removeAction->execute($doctor, $patient, $user, $role);
 
         return ApiResponse::success(null, __('Patient removed from doctor successfully'));
     }
@@ -165,7 +166,7 @@ class SupervisionController
             'responded_at' => now(),
         ]);
 
-        $this->removeAction->execute($doctor, $patient);
+        $this->removeAction->execute($doctor, $patient, $user, 'patient');
 
         $this->notificationManager->send('supervision.cancelled', new NotificationData(
             topic: 'supervision.cancelled',
