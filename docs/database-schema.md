@@ -220,6 +220,7 @@ user, country
 | id | uuid | PK |
 | doctor_id | uuid | nullable, no FK |
 | patient_id | uuid | FK → patients |
+| medical_record_id | uuid | nullable, no FK |
 | appointment_date | date | |
 | start_time | time | |
 | end_time | time | |
@@ -248,20 +249,17 @@ user, country
 | id | uuid | PK |
 | patient_id | uuid | FK → patients |
 | doctor_id | uuid | nullable, no FK |
-| appointment_id | uuid | FK → appointments |
 | diagnosis | text | |
 | notes | text | nullable |
 | created_at | timestamp | nullable |
 
-> No `updated_at` — immutable record.
+> No `updated_at` — immutable record. One file per specialization is enforced at the code level (no DB unique constraint).
 
 ### 16. `prescriptions`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
 | medical_record_id | uuid | FK → medical_records |
-| doctor_id | uuid | nullable, no FK |
-| patient_id | uuid | FK → patients |
 | notes | text | nullable |
 | created_at | timestamp | |
 | updated_at | timestamp | |
@@ -289,7 +287,23 @@ user, country
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 19. `notifications`
+### 19. `medical_record_transfers`
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | uuid | PK |
+| medical_record_id | uuid | FK → medical_records |
+| from_doctor_id | uuid | nullable (null when unknown/suspended) |
+| to_doctor_id | uuid | FK → doctors (null when record is pending after detach) |
+| patient_id | uuid | FK → patients |
+| transferred_by | uuid | FK → users (who executed the transfer) |
+| initiated_by_role | string | `doctor`, `receptionist`, `patient` |
+| reason | text | nullable |
+| created_at | timestamp | |
+| updated_at | timestamp | |
+
+> Tracks all medical record transfers: on doctor disassociation (to_doctor_id = null), on approval of new supervision request, and on admin direct transfer.
+
+### 20. `notifications`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -374,18 +388,17 @@ doctors 1──N supervision_requests
     └── polymorphic: (doctor_id)
 doctors 1──N appointments        (doctor_id is nullable, no FK — nulled on doctor delete)
 doctors 1──N medical_records     (doctor_id is nullable, no FK — nulled on doctor delete)
-doctors 1──N prescriptions       (doctor_id is nullable, no FK — nulled on doctor delete)
 
 patients N──M doctors  (pivot: doctor_patient)
     └── pivot: assigned_by, notes, supervision_status, supervision_start, supervision_end
 patients 1──N supervision_requests
 patients 1──N medical_records
-patients 1──N prescriptions
+
+medical_records 1──N appointments
+medical_records 1──N prescriptions
+medical_records 1──N medical_record_transfers
 
 appointments 1──N appointment_status_logs
-appointments 1──N medical_records
-
-medical_records 1──N prescriptions
 
 prescriptions 1──N prescription_items
 
@@ -417,11 +430,12 @@ countries 1──1 images (morph — imageable)
 
 > **Notes**
 > - `appointments.created_by` and `appointment_status_logs.changed_by` are plain strings (`"{uuid}: {name}"`), not foreign keys — they preserve audit history when users/doctors are deleted.
-> - `appointments.doctor_id`, `medical_records.doctor_id`, and `prescriptions.doctor_id` are nullable with no FK constraint — set to `null` when a doctor is deleted for non-pending records.
+> - `appointments.doctor_id` and `medical_records.doctor_id` are nullable with no FK constraint — set to `null` when a doctor is deleted for non-pending records.
+> - Prescriptions do not have `doctor_id` or `patient_id` — they derive doctor/patient through `medical_record_id`.
 
 ---
 
-> Total custom tables: 25
+> Total custom tables: 26
 
 ## Laravel Default Tables
 
