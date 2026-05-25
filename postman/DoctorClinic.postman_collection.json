@@ -80,6 +80,11 @@
 			"key": "medicine_id",
 			"value": "",
 			"type": "string"
+		},
+		{
+			"key": "medical_record_id",
+			"value": "",
+			"type": "string"
 		}
 	],
 	"item": [
@@ -4418,6 +4423,88 @@
 							"name": "No Content",
 							"status": "No Content",
 							"code": 204
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var token = pm.collectionVariables.get('access_token');",
+							"if (token) {",
+							"    pm.request.headers.add({",
+							"        key: 'Authorization',",
+							"        value: 'Bearer ' + token",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "Medical Records",
+			"description": "Medical record management.\n\nAdmin-only endpoints for transferring medical records between doctors.",
+			"item": [
+				{
+					"name": "Transfer Medical Record",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    pm.collectionVariables.set('medical_record_id', json.data.id);",
+									"    console.log('Medical record transferred:', json.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"doctor_id\": \"{{doctor_id}}\",\n    \"reason\": \"Transferring to new doctor\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/medical-records/{{medical_record_id}}/transfer",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "medical-records", "{{medical_record_id}}", "transfer"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Medical record transferred successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"patient_id\": \"019e1d0f-...\",\n        \"doctor_id\": \"019e1d0f-...\",\n        \"diagnosis\": \"...\",\n        \"notes\": \"...\",\n        \"created_at\": \"2026-05-24T00:00:00.000000Z\"\n    }\n}"
+						},
+						{
+							"name": "Forbidden",
+							"status": "Forbidden",
+							"code": 403,
+							"body": "{\n    \"status\": 403,\n    \"message\": \"Forbidden\"\n}"
 						}
 					]
 				}
