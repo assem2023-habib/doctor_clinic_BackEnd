@@ -6026,6 +6026,71 @@
                     }
                 ]
             }
+        },
+        "/api/v1/medical-records/{medical_record}/transfer": {
+            "post": {
+                "tags": [
+                    "Medical Records"
+                ],
+                "summary": "Transfer medical record to another doctor",
+                "description": "Admin only. Transfers a medical record from its current doctor to a new doctor.",
+                "operationId": "transferMedicalRecord",
+                "parameters": [
+                    {
+                        "name": "medical_record",
+                        "in": "path",
+                        "description": "Medical record UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "doctor_id": {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "description": "New doctor UUID"
+                                    },
+                                    "reason": {
+                                        "type": "string",
+                                        "description": "Optional reason for transfer"
+                                    }
+                                },
+                                "required": ["doctor_id"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Medical record transferred successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden (admin only)"
+                    },
+                    "404": {
+                        "description": "Medical record not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -6933,6 +6998,10 @@
         {
             "name": "Medicines",
             "description": "Medicines"
+        },
+        {
+            "name": "Medical Records",
+            "description": "Medical Records"
         },
         {
             "name": "Ratings",
