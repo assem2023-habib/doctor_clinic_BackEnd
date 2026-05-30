@@ -1847,6 +1847,63 @@
                 ]
             }
         },
+        "/api/v1/dashboard": {
+            "get": {
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Get role-based dashboard statistics",
+                "description": "Returns statistics based on the authenticated user role (admin, doctor, patient, receptionist)",
+                "operationId": "bc978de7f5ac52ca88096b43eb92aea0",
+                "responses": {
+                    "200": {
+                        "description": "Dashboard data retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Dashboard retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "oneOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/AdminDashboard"
+                                                },
+                                                {
+                                                    "$ref": "#/components/schemas/DoctorDashboard"
+                                                },
+                                                {
+                                                    "$ref": "#/components/schemas/PatientDashboard"
+                                                },
+                                                {
+                                                    "$ref": "#/components/schemas/ReceptionistDashboard"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/device-tokens": {
             "post": {
                 "tags": [
@@ -7042,6 +7099,370 @@
     },
     "components": {
         "schemas": {
+            "AdminDashboard": {
+                "description": "Admin dashboard statistics",
+                "properties": {
+                    "users": {
+                        "properties": {
+                            "total": {
+                                "type": "integer",
+                                "example": 150
+                            },
+                            "doctors": {
+                                "type": "integer",
+                                "example": 25
+                            },
+                            "patients": {
+                                "type": "integer",
+                                "example": 100
+                            },
+                            "receptionists": {
+                                "type": "integer",
+                                "example": 10
+                            },
+                            "admins": {
+                                "type": "integer",
+                                "example": 5
+                            },
+                            "active": {
+                                "type": "integer",
+                                "example": 140
+                            },
+                            "inactive": {
+                                "type": "integer",
+                                "example": 10
+                            },
+                            "new_today": {
+                                "type": "integer",
+                                "example": 3
+                            },
+                            "new_this_week": {
+                                "type": "integer",
+                                "example": 15
+                            },
+                            "new_this_month": {
+                                "type": "integer",
+                                "example": 50
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "appointments": {
+                        "properties": {
+                            "total": {
+                                "type": "integer",
+                                "example": 500
+                            },
+                            "today": {
+                                "type": "integer",
+                                "example": 12
+                            },
+                            "this_week": {
+                                "type": "integer",
+                                "example": 60
+                            },
+                            "this_month": {
+                                "type": "integer",
+                                "example": 200
+                            },
+                            "by_status": {
+                                "properties": {
+                                    "pending": {
+                                        "type": "integer",
+                                        "example": 30
+                                    },
+                                    "confirmed": {
+                                        "type": "integer",
+                                        "example": 100
+                                    },
+                                    "completed": {
+                                        "type": "integer",
+                                        "example": 350
+                                    },
+                                    "cancelled": {
+                                        "type": "integer",
+                                        "example": 20
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "medical_records": {
+                        "properties": {
+                            "total": {
+                                "type": "integer",
+                                "example": 300
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "prescriptions": {
+                        "properties": {
+                            "total": {
+                                "type": "integer",
+                                "example": 450
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "specializations": {
+                        "properties": {
+                            "total": {
+                                "type": "integer",
+                                "example": 15
+                            },
+                            "top": {
+                                "type": "array",
+                                "items": {
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Cardiology"
+                                        },
+                                        "doctors_count": {
+                                            "type": "integer",
+                                            "example": 5
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "ratings": {
+                        "properties": {
+                            "average": {
+                                "type": "number",
+                                "format": "float",
+                                "example": 4.2
+                            },
+                            "total": {
+                                "type": "integer",
+                                "example": 80
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "DoctorDashboard": {
+                "description": "Doctor dashboard statistics",
+                "properties": {
+                    "patients": {
+                        "properties": {
+                            "total": {
+                                "type": "integer",
+                                "example": 50
+                            },
+                            "new_this_month": {
+                                "type": "integer",
+                                "example": 5
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "appointments": {
+                        "properties": {
+                            "total": {
+                                "type": "integer",
+                                "example": 200
+                            },
+                            "today": {
+                                "type": "integer",
+                                "example": 8
+                            },
+                            "upcoming": {
+                                "type": "integer",
+                                "example": 15
+                            },
+                            "by_status": {
+                                "properties": {
+                                    "pending": {
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "confirmed": {
+                                        "type": "integer",
+                                        "example": 15
+                                    },
+                                    "completed": {
+                                        "type": "integer",
+                                        "example": 175
+                                    },
+                                    "cancelled": {
+                                        "type": "integer",
+                                        "example": 5
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "medical_records": {
+                        "properties": {
+                            "total": {
+                                "type": "integer",
+                                "example": 180
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "prescriptions": {
+                        "properties": {
+                            "total": {
+                                "type": "integer",
+                                "example": 250
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "ratings": {
+                        "properties": {
+                            "average": {
+                                "type": "number",
+                                "format": "float",
+                                "example": 4.5
+                            },
+                            "total": {
+                                "type": "integer",
+                                "example": 30
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "PatientDashboard": {
+                "description": "Patient dashboard statistics",
+                "properties": {
+                    "doctors": {
+                        "properties": {
+                            "total": {
+                                "type": "integer",
+                                "example": 3
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "appointments": {
+                        "properties": {
+                            "total": {
+                                "type": "integer",
+                                "example": 15
+                            },
+                            "upcoming": {
+                                "type": "integer",
+                                "example": 2
+                            },
+                            "by_status": {
+                                "properties": {
+                                    "pending": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "confirmed": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "completed": {
+                                        "type": "integer",
+                                        "example": 10
+                                    },
+                                    "cancelled": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "medical_records": {
+                        "properties": {
+                            "total": {
+                                "type": "integer",
+                                "example": 5
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "prescriptions": {
+                        "properties": {
+                            "total": {
+                                "type": "integer",
+                                "example": 8
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "ReceptionistDashboard": {
+                "description": "Receptionist dashboard statistics",
+                "properties": {
+                    "appointments": {
+                        "properties": {
+                            "today_total": {
+                                "type": "integer",
+                                "example": 20
+                            },
+                            "by_status": {
+                                "properties": {
+                                    "pending": {
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "confirmed": {
+                                        "type": "integer",
+                                        "example": 8
+                                    },
+                                    "completed": {
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "cancelled": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "patients": {
+                        "properties": {
+                            "registered_today": {
+                                "type": "integer",
+                                "example": 3
+                            },
+                            "total": {
+                                "type": "integer",
+                                "example": 100
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "doctors": {
+                        "properties": {
+                            "total": {
+                                "type": "integer",
+                                "example": 25
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
             "AppointmentResource": {
                 "description": "Appointment resource",
                 "properties": {
@@ -8108,6 +8529,10 @@
         {
             "name": "Auth",
             "description": "Auth"
+        },
+        {
+            "name": "Dashboard",
+            "description": "Dashboard"
         },
         {
             "name": "Device Tokens",

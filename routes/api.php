@@ -1,6 +1,7 @@
 <?php
 
 use App\Domains\Appointments\Controllers\AppointmentController;
+use App\Domains\Dashboard\Controllers\DashboardController;
 use App\Domains\MedicalRecords\Controllers\MedicalRecordController;
 use App\Domains\Notifications\Controllers\NotificationController;
 use App\Domains\RBAC\Controllers\PermissionController;
@@ -106,6 +107,8 @@ Route::middleware(['auth:api', 'active'])->group(function () {
     Route::delete('/v1/patients/{patient}/doctors/{doctor}', [SupervisionController::class, 'patientRemoveDoctor']);
 
     Route::post('/v1/device-tokens', [DeviceTokenController::class, 'update']);
+
+    Route::get('/v1/dashboard', DashboardController::class);
 
     Route::prefix('v1/roles')->group(function () {
         Route::get('/', [RoleController::class, 'index']);
