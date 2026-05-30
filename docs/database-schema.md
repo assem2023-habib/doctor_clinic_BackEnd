@@ -52,6 +52,8 @@ user, country
 
 ## Tables
 
+> `country_id` column was removed from `users` table because the relationship is now `HasOneThrough(Country::class, City::class)` — country is accessed through the user's city.
+
 ### 1. `users`
 | Column | Type | Constraints |
 |--------|------|-------------|
@@ -66,7 +68,6 @@ user, country
 | birthday_date | date | nullable |
 | fcm_tokens | json | nullable |
 | is_active | boolean | default true |
-| country_id | uuid | FK → countries, nullable |
 | city_id | uuid | FK → cities, nullable |
 | email_verified_at | timestamp | nullable |
 | password | string | hashed |
@@ -112,11 +113,12 @@ user, country
 ### 6. `password_reset_tokens`
 | Column | Type | Constraints |
 |--------|------|-------------|
+| id | uuid | PK |
 | email | string | PK |
 | token | string | |
 | created_at | timestamp | nullable |
 
-### 3. `countries`
+### 7. `countries`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -126,7 +128,7 @@ user, country
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 4. `cities`
+### 8. `cities`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -135,7 +137,7 @@ user, country
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 5. `sessions`
+### 9. `sessions`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | string | PK |
@@ -145,7 +147,7 @@ user, country
 | payload | longText | |
 | last_activity | integer | indexed |
 
-### 6. `doctors`
+### 10. `doctors`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -155,7 +157,7 @@ user, country
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 7. `receptionists`
+### 11. `receptionists`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -165,7 +167,7 @@ user, country
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 8. `doctor_schedules`
+### 12. `doctor_schedules`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -177,7 +179,7 @@ user, country
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 9. `patients`
+### 13. `patients`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -185,7 +187,7 @@ user, country
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 10. `doctor_patient` (pivot)
+### 14. `doctor_patient` (pivot)
 | Column | Type | Constraints |
 |--------|------|-------------|
 | doctor_id | uuid | FK → doctors |
@@ -201,7 +203,7 @@ user, country
 
 > Default `supervision_status` is `active`. When a supervision request is approved, the assign action creates a row here with `supervision_status=active`.
 
-### 11. `supervision_requests`
+### 15. `supervision_requests`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -214,7 +216,7 @@ user, country
 | Index | | `(patient_id, status)` |
 | Index | | `(doctor_id, status)` |
 
-### 13. `appointments`
+### 16. `appointments`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -231,7 +233,7 @@ user, country
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 14. `appointment_status_logs`
+### 17. `appointment_status_logs`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -243,7 +245,7 @@ user, country
 
 > No `updated_at` — immutable log.
 
-### 15. `medical_records`
+### 18. `medical_records`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -255,7 +257,7 @@ user, country
 
 > No `updated_at` — immutable record. One file per specialization is enforced at the code level (no DB unique constraint).
 
-### 16. `prescriptions`
+### 19. `prescriptions`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -264,7 +266,7 @@ user, country
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 17. `prescription_items`
+### 20. `prescription_items`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -277,7 +279,7 @@ user, country
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 18. `medicines`
+### 21. `medicines`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -287,7 +289,7 @@ user, country
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 19. `medical_record_transfers`
+### 22. `medical_record_transfers`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -303,7 +305,7 @@ user, country
 
 > Tracks all medical record transfers: on doctor disassociation (to_doctor_id = null), on approval of new supervision request, and on admin direct transfer.
 
-### 20. `notifications`
+### 23. `notifications`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -313,7 +315,7 @@ user, country
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 20. `notification_user` (pivot)
+### 24. `notification_user` (pivot)
 | Column | Type | Constraints |
 |--------|------|-------------|
 | notification_id | uuid | FK → notifications, PK |
@@ -322,7 +324,7 @@ user, country
 | created_at | timestamp | |
 | updated_at | timestamp | |
 
-### 21. `ratings`
+### 25. `ratings`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -339,7 +341,7 @@ user, country
 
 > `rateable_id` + `rateable_type` are nullable — only used when `type = user`.
 
-### 22. `activity_logs`
+### 26. `activity_logs`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -353,7 +355,7 @@ user, country
 
 > Polymorphic reference: `model_type` + `model_id` point to any table.
 
-### 23. `images`
+### 27. `images`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | uuid | PK |
@@ -374,8 +376,8 @@ user, country
 ```
 countries 1──N cities
 
-users N──1 countries
 users N──1 cities
+users 1──1 countries (through cities — HasOneThrough)
 
 users 1──1 doctors
 users 1──1 receptionists
@@ -435,7 +437,7 @@ countries 1──1 images (morph — imageable)
 
 ---
 
-> Total custom tables: 26
+> Total custom tables: 27
 
 ## Laravel Default Tables
 
