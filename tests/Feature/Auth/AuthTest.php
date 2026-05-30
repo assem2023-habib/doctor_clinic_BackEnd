@@ -127,7 +127,7 @@ class AuthTest extends TestCase
         $this->assertEquals(201, $json['status']);
         $this->assertEquals(__('auth.register_success'), $json['message']);
         $this->assertEquals('john@example.com', $json['data']['user']['email']);
-        $this->assertEquals('patient', $json['data']['user']['roles'][0]['slug']);
+        $this->assertEquals('Patient', $json['data']['user']['roles'][0]);
 
         $this->assertDatabaseHas('users', ['email' => 'john@example.com']);
         $this->assertDatabaseHas('patients', ['user_id' => User::where('email', 'john@example.com')->first()->id]);

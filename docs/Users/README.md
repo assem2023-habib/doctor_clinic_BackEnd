@@ -79,7 +79,7 @@
             "address": null,
             "gender": "male",
             "birthday_date": null,
-            "roles": [{"slug": "admin"}],
+            "roles": ["Admin"],
             "is_active": true,
             "city_id": null,
             "city": null,

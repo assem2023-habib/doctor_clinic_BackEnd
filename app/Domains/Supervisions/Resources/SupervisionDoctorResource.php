@@ -19,7 +19,7 @@ class SupervisionDoctorResource extends JsonResource
             'address' => $this->address,
             'gender' => $this->gender?->value,
             'birthday_date' => $this->birthday_date?->format('Y-m-d'),
-            'roles' => $this->whenLoaded('roles')?->pluck('slug'),
+            'roles' => $this->whenLoaded('roles')?->pluck('name'),
             'is_active' => $this->is_active,
             'image' => new ImageResource($this->image),
             'specialization' => $this->doctor?->specialization ? [

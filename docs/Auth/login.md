@@ -188,18 +188,7 @@ public function login(LoginRequest $request): JsonResponse
             "last_name": "محمد",
             "username": "ahmed_m",
             "email": "ahmed@example.com",
-            "roles": [
-                {
-                    "id": "...",
-                    "name": "Patient",
-                    "slug": "patient",
-                    "description": null,
-                    "guard_name": "api",
-                    "is_system": true,
-                    "created_at": "...",
-                    "updated_at": "..."
-                }
-            ],
+            "roles": ["Patient"],
             "is_active": true,
             "patient": { "id": "..." },
             "image": null

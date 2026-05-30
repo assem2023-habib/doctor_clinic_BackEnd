@@ -119,18 +119,7 @@ The action updates `User` model fields, then optionally uploads a new profile im
     "address": "456 Oak Ave",
     "gender": "male",
     "birthday_date": "1990-06-20",
-    "roles": [
-      {
-        "id": "...",
-        "name": "Patient",
-        "slug": "patient",
-        "description": null,
-        "guard_name": "api",
-        "is_system": true,
-        "created_at": "...",
-        "updated_at": "..."
-      }
-    ],
+    "roles": ["Patient"],
     "is_active": true,
     "image": {
       "id": "0194f1e2-5b9c-8f01-0e8f-9a7b6c5d4e3f",

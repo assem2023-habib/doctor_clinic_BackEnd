@@ -5,7 +5,6 @@ namespace App\Domains\Shared\Resources;
 use App\Domains\Images\Resources\ImageResource;
 use App\Domains\Locations\Resources\CityResource;
 use App\Domains\Locations\Resources\CountryResource;
-use App\Domains\RBAC\Resources\RoleResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserResource extends JsonResource
@@ -22,7 +21,7 @@ class UserResource extends JsonResource
             'address' => $this->address,
             'gender' => $this->gender?->value,
             'birthday_date' => $this->birthday_date?->format('Y-m-d'),
-            'roles' => RoleResource::collection($this->whenLoaded('roles')),
+            'roles' => $this->whenLoaded('roles', fn() => $this->roles->pluck('name')),
             'is_active' => $this->is_active,
             'city_id' => $this->city_id,
             'city' => new CityResource($this->whenLoaded('city')),

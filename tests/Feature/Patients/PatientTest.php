@@ -162,7 +162,7 @@ class PatientTest extends TestCase
         $json = $response->json();
         $this->assertEquals(200, $json['status']);
         $this->assertEquals('john@example.com', $json['data']['email']);
-        $this->assertEquals('patient', $json['data']['roles'][0]['slug']);
+        $this->assertEquals('Patient', $json['data']['roles'][0]);
     }
 
     public function test_show_returns_404_for_nonexistent_patient(): void

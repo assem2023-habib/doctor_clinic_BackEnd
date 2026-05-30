@@ -175,18 +175,7 @@ public function registerPatient(RegisterPatientRequest $request): JsonResponse
             "address": "الرياض، المملكة العربية السعودية",
             "gender": "male",
             "birthday_date": "1990-01-15",
-            "roles": [
-                {
-                    "id": "...",
-                    "name": "Patient",
-                    "slug": "patient",
-                    "description": null,
-                    "guard_name": "api",
-                    "is_system": true,
-                    "created_at": "...",
-                    "updated_at": "..."
-                }
-            ],
+            "roles": ["Patient"],
             "is_active": true,
             "city_id": null,
             "city": null,

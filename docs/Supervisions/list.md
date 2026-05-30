@@ -72,18 +72,7 @@ Same pattern — queries `User::whereHas('doctor')` with patient's doctor IDs, a
       "address": "123 Main St",
       "gender": "male",
       "birthday_date": "1990-01-15",
-      "roles": [
-        {
-          "id": "...",
-          "name": "Patient",
-          "slug": "patient",
-          "description": null,
-          "guard_name": "api",
-          "is_system": true,
-          "created_at": "...",
-          "updated_at": "..."
-        }
-      ],
+      "roles": ["Patient"],
       "is_active": true,
       "image": { ... },
       "supervision": {

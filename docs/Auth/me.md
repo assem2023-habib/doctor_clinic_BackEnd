@@ -68,18 +68,7 @@ public function me(Request $request): JsonResponse
         "address": "الرياض، المملكة العربية السعودية",
         "gender": "male",
         "birthday_date": "1990-01-15",
-        "roles": [
-            {
-                "id": "...",
-                "name": "Patient",
-                "slug": "patient",
-                "description": null,
-                "guard_name": "api",
-                "is_system": true,
-                "created_at": "...",
-                "updated_at": "..."
-            }
-        ],
+        "roles": ["Patient"],
         "is_active": true,
         "city_id": null,
         "city": null,
@@ -108,18 +97,7 @@ public function me(Request $request): JsonResponse
         "address": "جدة، المملكة العربية السعودية",
         "gender": "female",
         "birthday_date": "1985-06-20",
-        "roles": [
-            {
-                "id": "...",
-                "name": "Doctor",
-                "slug": "doctor",
-                "description": null,
-                "guard_name": "api",
-                "is_system": true,
-                "created_at": "...",
-                "updated_at": "..."
-            }
-        ],
+        "roles": ["Doctor"],
         "is_active": true,
         "doctor": {
             "id": "0196f0a0-...",
@@ -155,18 +133,7 @@ public function me(Request $request): JsonResponse
         "address": "الدمام، المملكة العربية السعودية",
         "gender": "male",
         "birthday_date": "1995-03-10",
-        "roles": [
-            {
-                "id": "...",
-                "name": "Receptionist",
-                "slug": "receptionist",
-                "description": null,
-                "guard_name": "api",
-                "is_system": true,
-                "created_at": "...",
-                "updated_at": "..."
-            }
-        ],
+        "roles": ["Receptionist"],
         "is_active": true,
         "city_id": null,
         "city": null,
@@ -197,18 +164,7 @@ public function me(Request $request): JsonResponse
         "address": null,
         "gender": "male",
         "birthday_date": null,
-        "roles": [
-            {
-                "id": "...",
-                "name": "Admin",
-                "slug": "admin",
-                "description": null,
-                "guard_name": "api",
-                "is_system": true,
-                "created_at": "...",
-                "updated_at": "..."
-            }
-        ],
+        "roles": ["Admin"],
         "is_active": true,
         "city_id": null,
         "city": null,
@@ -233,7 +189,7 @@ public function me(Request $request): JsonResponse
 | `address` | `string?` | العنوان |
 | `gender` | `string` | الجنس (`male`/`female`) |
 | `birthday_date` | `string?` | تاريخ الميلاد |
-| `roles` | `array` | قائمة الأدوار (`patient`/`doctor`/`receptionist`/`admin`) |
+| `roles` | `array` | قائمة الأدوار (`Admin`/`Doctor`/`Patient`/`Receptionist`) |
 | `is_active` | `boolean` | هل الحساب مفعّل |
 | `city_id` | `string?` | UUID المدينة (إن وجدت) |
 | `city` | `object?` | كائن المدينة (يحوي `id`, `name`, `country_id`) |

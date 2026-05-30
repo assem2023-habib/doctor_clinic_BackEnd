@@ -62,15 +62,7 @@ public function activateAccount(Receptionist $receptionist): JsonResponse
         "first_name": "Layla",
         "last_name": "Hassan",
         "email": "receptionist@example.com",
-        "roles": [
-            {
-                "id": "...",
-                "name": "Receptionist",
-                "slug": "receptionist",
-                "guard_name": "api",
-                "is_system": false
-            }
-        ],
+        "roles": ["Receptionist"],
         "shift_start": "09:00",
         "shift_end": "17:00",
         "phone": "+963912345680",

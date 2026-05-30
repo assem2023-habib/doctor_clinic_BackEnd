@@ -62,15 +62,7 @@ public function activateAccount(Doctor $doctor): JsonResponse
         "first_name": "Khaled",
         "last_name": "Suleiman",
         "email": "doctor@example.com",
-        "roles": [
-            {
-                "id": "...",
-                "name": "Doctor",
-                "slug": "doctor",
-                "guard_name": "api",
-                "is_system": true
-            }
-        ],
+        "roles": ["Doctor"],
         "phone": "+963912345679",
         "gender": "male",
         "birthday_date": "1985-03-20",

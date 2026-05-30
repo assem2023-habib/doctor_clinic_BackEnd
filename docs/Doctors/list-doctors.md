@@ -131,18 +131,7 @@ class DoctorResource extends UserResource
             "address": "Aleppo, Syria",
             "gender": "male",
             "birthday_date": "1985-03-20",
-            "roles": [
-                {
-                    "id": "...",
-                    "name": "Doctor",
-                    "slug": "doctor",
-                    "description": null,
-                    "guard_name": "api",
-                    "is_system": true,
-                    "created_at": "...",
-                    "updated_at": "..."
-                }
-            ],
+            "roles": ["Doctor"],
             "is_active": true,
             "image": null,
             "specialization": {

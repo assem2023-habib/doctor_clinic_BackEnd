@@ -146,7 +146,7 @@ class DoctorTest extends TestCase
         $json = $response->json();
         $this->assertEquals(200, $json['status']);
         $this->assertEquals('john@example.com', $json['data']['email']);
-        $this->assertEquals('doctor', $json['data']['roles'][0]['slug']);
+        $this->assertEquals('Doctor', $json['data']['roles'][0]);
         $this->assertCount(1, $json['data']['schedules']);
         $this->assertEquals('monday', $json['data']['schedules'][0]['day_of_week']);
     }
