@@ -1,17 +1,16 @@
 <?php
 
-namespace App\Domains\Auth\Requests;
+namespace App\Domains\Users\Requests;
 
 use App\Enums\GenderEnum;
-use App\Enums\ImageTypeEnum;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateProfileRequest extends FormRequest
+class UpdateUserRequest extends FormRequest
 {
     public function rules(): array
     {
-        $userId = $this->user()->id;
+        $userId = $this->route('user')->id ?? $this->user;
 
         return [
             'first_name' => ['sometimes', 'required', 'string', 'max:255'],
@@ -23,7 +22,6 @@ class UpdateProfileRequest extends FormRequest
             'gender' => ['sometimes', 'required', Rule::enum(GenderEnum::class)],
             'birthday_date' => ['sometimes', 'nullable', 'date'],
             'city_id' => ['sometimes', 'nullable', 'string', 'exists:cities,id'],
-            'file' => ['sometimes', 'nullable', 'image', 'max:' . ImageTypeEnum::User->maxSize(), 'mimes:jpg,jpeg,png,webp'],
         ];
     }
 }

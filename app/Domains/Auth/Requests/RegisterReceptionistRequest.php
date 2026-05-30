@@ -21,6 +21,7 @@ class RegisterReceptionistRequest extends FormRequest
             'address' => ['nullable', 'string', 'max:1000'],
             'gender' => ['required', Rule::enum(GenderEnum::class)],
             'birthday_date' => ['nullable', 'date'],
+            'city_id' => ['nullable', 'string', 'exists:cities,id'],
             'password' => ['required', Password::defaults()],
             'shift_start' => ['nullable', 'date_format:H:i'],
             'shift_end' => ['nullable', 'date_format:H:i'],

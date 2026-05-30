@@ -3,6 +3,8 @@
 namespace App\Domains\Shared\Resources;
 
 use App\Domains\Images\Resources\ImageResource;
+use App\Domains\Locations\Resources\CityResource;
+use App\Domains\Locations\Resources\CountryResource;
 use App\Domains\RBAC\Resources\RoleResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -22,6 +24,9 @@ class UserResource extends JsonResource
             'birthday_date' => $this->birthday_date?->format('Y-m-d'),
             'roles' => RoleResource::collection($this->whenLoaded('roles')),
             'is_active' => $this->is_active,
+            'city_id' => $this->city_id,
+            'city' => new CityResource($this->whenLoaded('city')),
+            'country' => new CountryResource($this->whenLoaded('country')),
             'image' => new ImageResource($this->image),
         ];
     }

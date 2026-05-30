@@ -53,7 +53,7 @@ class AuthController
     {
         $dto = RegisterPatientData::fromRequest($request);
         $user = $this->registerPatientAction->execute($dto);
-        $user->load('roles');
+        $user->load('roles', 'city', 'country');
         $tokenData = $this->loginAction->execute(LoginData::fromCredentials($dto->email, $dto->password));
 
         return ApiResponse::created(
@@ -83,7 +83,7 @@ class AuthController
         try {
             $dto = LoginData::fromRequest($request);
             $tokenData = $this->loginAction->execute($dto);
-            $user = User::where('email', $dto->email)->with('roles')->firstOrFail();
+            $user = User::where('email', $dto->email)->with('roles', 'city', 'country')->firstOrFail();
 
             return ApiResponse::success(
                 new AuthResource((object) compact('user', 'tokenData')),
@@ -138,7 +138,7 @@ class AuthController
 
     public function me(Request $request): JsonResponse
     {
-        $user = $request->user()->load('roles');
+        $user = $request->user()->load('roles', 'city', 'country');
 
         $resource = match (true) {
             $user->hasRole('patient') => new PatientResource($user),
@@ -154,7 +154,7 @@ class AuthController
     {
         $user = $request->user();
         $dto = UpdateProfileData::fromRequest($request);
-        $user = $this->updateProfileAction->execute($user, $dto)->load('roles');
+        $user = $this->updateProfileAction->execute($user, $dto)->load('roles', 'city', 'country');
 
         $resource = match (true) {
             $user->hasRole('patient') => new PatientResource($user),

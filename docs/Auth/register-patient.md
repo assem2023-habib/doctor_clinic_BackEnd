@@ -28,6 +28,7 @@
 | `address` | `string` | اختياري | max:1000 |
 | `gender` | `string` (enum) | **مطلوب** | `male`, `female` |
 | `birthday_date` | `string` (date) | اختياري | صيغة YYYY-MM-DD |
+| `city_id` | `string` (UUID) | اختياري | exists:cities,id |
 | `password` | `string` | **مطلوب** | Laravel Password defaults |
 | `file` | `file` (image) | اختياري | max:2MB, mimes:jpg,jpeg,png,webp |
 
@@ -43,6 +44,7 @@
     "address": "الرياض، المملكة العربية السعودية",
     "gender": "male",
     "birthday_date": "1990-01-15",
+    "city_id": "019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009",
     "password": "SecurePass123!"
 }
 ```
@@ -64,6 +66,7 @@ class RegisterPatientData
     public readonly ?string $address;
     public readonly GenderEnum $gender;
     public readonly ?string $birthdayDate;
+    public readonly ?string $cityId;
     public readonly string $password;
     public readonly ?UploadedFile $file;
 }
@@ -81,6 +84,7 @@ class RegisterPatientData
 | `address` | `$address` | مباشر |
 | `gender` | `$gender` | `GenderEnum::from($request->gender)` |
 | `birthday_date` | `$birthdayDate` | مباشر |
+| `city_id` | `$cityId` | مباشر |
 | `password` | `$password` | مباشر |
 | `file` | `$file` | `$request->file('file')` |
 
@@ -97,7 +101,7 @@ RegisterPatientAction::execute(RegisterPatientData $data)
 │
 ├── 1. User::create([...])
 │     ├── first_name, last_name, username, email
-│     ├── phone, address, gender, birthday_date
+│     ├── phone, address, gender, birthday_date, city_id
 │     ├── is_active = true
 │     └── password = bcrypt($data->password)
 │
@@ -184,6 +188,9 @@ public function registerPatient(RegisterPatientRequest $request): JsonResponse
                 }
             ],
             "is_active": true,
+            "city_id": null,
+            "city": null,
+            "country": null,
             "patient": {
                 "id": "0196f0a0-5678-7def-abcd-987654321abc"
             },

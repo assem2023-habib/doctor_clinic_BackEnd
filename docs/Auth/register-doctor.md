@@ -28,6 +28,7 @@
 | `address` | `string` | اختياري | max:1000 |
 | `gender` | `string` (enum) | **مطلوب** | `male`, `female` |
 | `birthday_date` | `string` (date) | اختياري | صيغة YYYY-MM-DD |
+| `city_id` | `string` (UUID) | اختياري | exists:cities,id |
 | `specialization_id` | `string` (UUID) | **مطلوب** | FK → specializations table |
 | `experience_months` | `integer` | **مطلوب** | min:0, max:1200 |
 | `password` | `string` | **مطلوب** | Laravel Password defaults |

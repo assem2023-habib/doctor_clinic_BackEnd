@@ -17,6 +17,7 @@ use App\Enums\GenderEnum;
 use App\Traits\HasUuidV7;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -37,7 +38,6 @@ use Laravel\Passport\HasApiTokens;
     'birthday_date',
     'is_active',
     'password',
-    'country_id',
     'city_id',
     'fcm_tokens',
 ])]
@@ -96,9 +96,16 @@ class User extends Authenticatable
         return $this->morphMany(Rating::class, 'rateable');
     }
 
-    public function country(): BelongsTo
+    public function country(): HasOneThrough
     {
-        return $this->belongsTo(Country::class);
+        return $this->hasOneThrough(
+            Country::class,
+            City::class,
+            'id',
+            'id',
+            'city_id',
+            'country_id'
+        );
     }
 
     public function city(): BelongsTo

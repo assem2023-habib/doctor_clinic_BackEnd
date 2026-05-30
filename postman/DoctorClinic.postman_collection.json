@@ -172,6 +172,12 @@
 									"type": "text"
 								},
 								{
+									"key": "city_id",
+									"value": "",
+									"type": "text",
+									"description": "City UUID - optional"
+								},
+								{
 									"key": "password",
 									"value": "Password@123",
 									"type": "text"
@@ -265,6 +271,12 @@
 									"description": "Experience in months"
 								},
 								{
+									"key": "city_id",
+									"value": "",
+									"type": "text",
+									"description": "City UUID - optional"
+								},
+								{
 									"key": "password",
 									"value": "Password@123",
 									"type": "text"
@@ -344,6 +356,12 @@
 									"key": "birthday_date",
 									"value": "1998-11-05",
 									"type": "text"
+								},
+								{
+									"key": "city_id",
+									"value": "",
+									"type": "text",
+									"description": "City UUID - optional"
 								},
 								{
 									"key": "password",
@@ -655,6 +673,12 @@
 									"key": "birthday_date",
 									"value": "1995-06-15",
 									"type": "text"
+								},
+								{
+									"key": "city_id",
+									"value": "",
+									"type": "text",
+									"description": "City UUID - optional"
 								},
 								{
 									"key": "file",
@@ -4525,6 +4549,180 @@
 							"status": "Forbidden",
 							"code": 403,
 							"body": "{\n    \"status\": 403,\n    \"message\": \"Forbidden\"\n}"
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var token = pm.collectionVariables.get('access_token');",
+							"if (token) {",
+							"    pm.request.headers.add({",
+							"        key: 'Authorization',",
+							"        value: 'Bearer ' + token",
+							"    });",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"description": "Admin user management.\n\nAll endpoints require `admin` role.\n\nEvery request in this folder automatically attaches `Authorization: Bearer {{access_token}}` via the Pre-request Script.",
+			"item": [
+				{
+					"name": "List Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/users?role=&search=&gender=&is_active=&date_from=&date_to=&limit=20&page=1&sort=created_at&order=desc",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "users"],
+							"query": [
+								{ "key": "role", "value": "", "description": "Filter by role slug (patient, doctor, receptionist, admin)" },
+								{ "key": "search", "value": "", "description": "Search by name, email, or username" },
+								{ "key": "gender", "value": "", "description": "Filter by gender (male, female)" },
+								{ "key": "is_active", "value": "", "description": "Filter by active status (true, false)" },
+								{ "key": "date_from", "value": "", "description": "Filter by created_at from (Y-m-d)" },
+								{ "key": "date_to", "value": "", "description": "Filter by created_at to (Y-m-d)" },
+								{ "key": "limit", "value": "20", "description": "Items per page (max 100)" },
+								{ "key": "page", "value": "1" },
+								{ "key": "sort", "value": "created_at" },
+								{ "key": "order", "value": "desc", "description": "Sort order (asc, desc)" }
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Users retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Admin\",\n            \"last_name\": \"User\",\n            \"username\": \"admin\",\n            \"email\": \"admin@gmail.com\",\n            \"phone\": null,\n            \"address\": null,\n            \"gender\": \"male\",\n            \"birthday_date\": null,\n            \"roles\": [{\"slug\": \"admin\"}],\n            \"is_active\": true,\n            \"city_id\": null,\n            \"city\": null,\n            \"country\": null,\n            \"image\": null\n        }\n    ],\n    \"pagination\": {\"total\": 1, \"per_page\": 20, \"current_page\": 1, \"last_page\": 1}\n}"
+						}
+					]
+				},
+				{
+					"name": "Get User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/{{user_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "users", "{{user_id}}"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"User retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Admin\",\n        \"last_name\": \"User\",\n        \"username\": \"admin\",\n        \"email\": \"admin@gmail.com\",\n        \"phone\": null,\n        \"address\": null,\n        \"gender\": \"male\",\n        \"birthday_date\": null,\n        \"roles\": [{\"slug\": \"admin\"}],\n        \"is_active\": true,\n        \"city_id\": null,\n        \"city\": null,\n        \"country\": null,\n        \"image\": null\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{ "key": "first_name", "value": "John", "type": "text" },
+								{ "key": "last_name", "value": "Doe", "type": "text" },
+								{ "key": "username", "value": "johndoe", "type": "text" },
+								{ "key": "email", "value": "john@example.com", "type": "text" },
+								{ "key": "phone", "value": "+963911111111", "type": "text" },
+								{ "key": "address", "value": "Damascus, Syria", "type": "text" },
+								{ "key": "gender", "value": "male", "type": "text" },
+								{ "key": "birthday_date", "value": "1995-06-15", "type": "text" },
+								{ "key": "city_id", "value": "", "type": "text", "description": "City UUID - optional" }
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/{{user_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "users", "{{user_id}}"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"User updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"John\",\n        \"last_name\": \"Doe\",\n        \"username\": \"johndoe\",\n        \"email\": \"john@example.com\",\n        \"phone\": \"+963911111111\",\n        \"address\": \"Damascus, Syria\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1995-06-15\",\n        \"roles\": [{\"slug\": \"patient\"}],\n        \"is_active\": true,\n        \"city_id\": null,\n        \"city\": null,\n        \"country\": null,\n        \"image\": null\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Toggle User Active",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/{{user_id}}/toggle-active",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "users", "{{user_id}}", "toggle-active"]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"User activated successfully\",\n    \"data\": {\"is_active\": true}\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/{{user_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "users", "{{user_id}}"]
+						}
+					},
+					"response": [
+						{
+							"name": "No Content",
+							"status": "No Content",
+							"code": 204,
+							"body": ""
 						}
 					]
 				}

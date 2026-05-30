@@ -18,7 +18,7 @@ class UpdateProfileData
     {
         $dto = new self;
 
-        foreach (['first_name', 'last_name', 'username', 'email', 'phone', 'address', 'birthday_date'] as $field) {
+        foreach (['first_name', 'last_name', 'username', 'email', 'phone', 'address', 'birthday_date', 'city_id'] as $field) {
             if ($request->exists($field)) {
                 $dto->fields[$field] = $request->$field;
             }

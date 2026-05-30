@@ -21,6 +21,7 @@ class RegisterPatientRequest extends FormRequest
             'address' => ['nullable', 'string', 'max:1000'],
             'gender' => ['required', Rule::enum(GenderEnum::class)],
             'birthday_date' => ['nullable', 'date'],
+            'city_id' => ['nullable', 'string', 'exists:cities,id'],
             'password' => ['required', Password::defaults()],
             'file' => ['nullable', 'image', 'max:' . ImageTypeEnum::User->maxSize(), 'mimes:jpg,jpeg,png,webp'],
         ];

@@ -199,6 +199,14 @@ Route::middleware(['auth:api', 'active'])->group(function () {
             Route::delete('/{patient}', [PatientController::class, 'destroy']);
         });
 
+        Route::prefix('v1/users')->group(function () {
+            Route::get('/', [\App\Domains\Users\Controllers\UserController::class, 'index']);
+            Route::get('/{user}', [\App\Domains\Users\Controllers\UserController::class, 'show']);
+            Route::put('/{user}', [\App\Domains\Users\Controllers\UserController::class, 'update']);
+            Route::put('/{user}/toggle-active', [\App\Domains\Users\Controllers\UserController::class, 'toggleActive']);
+            Route::delete('/{user}', [\App\Domains\Users\Controllers\UserController::class, 'destroy']);
+        });
+
         Route::post('/v1/medical-records/{medical_record}/transfer', [MedicalRecordController::class, 'transfer']);
     });
 

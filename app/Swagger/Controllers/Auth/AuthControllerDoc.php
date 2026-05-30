@@ -19,6 +19,7 @@ use OpenApi\Attributes as OA;
             new OA\Property(property: 'address', description: 'Address', type: 'string', example: 'Damascus, Syria'),
             new OA\Property(property: 'gender', description: 'Gender', type: 'string', enum: ['male', 'female'], example: 'male'),
             new OA\Property(property: 'birthday_date', description: 'Birthday date', type: 'string', format: 'date', example: '1995-06-15'),
+            new OA\Property(property: 'city_id', description: 'City UUID', type: 'string', format: 'uuid', example: '019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009'),
             new OA\Property(property: 'password', description: 'Password (min 8 characters)', type: 'string', format: 'password', example: 'Password@123'),
         ])
     ),
@@ -39,6 +40,9 @@ use OpenApi\Attributes as OA;
                 new OA\Property(property: 'gender', type: 'string', enum: ['male', 'female'], example: 'male'),
                 new OA\Property(property: 'birthday_date', type: 'string', format: 'date', example: '1995-06-15'),
                 new OA\Property(property: 'is_active', type: 'boolean', example: true),
+                new OA\Property(property: 'city_id', type: 'string', format: 'uuid', nullable: true),
+                new OA\Property(property: 'city', ref: '#/components/schemas/CityResource', nullable: true),
+                new OA\Property(property: 'country', ref: '#/components/schemas/CountryResource', nullable: true),
             ]),
         ])),
         new OA\Response(response: 422, description: 'Validation error', content: new OA\JsonContent(properties: [
@@ -63,6 +67,7 @@ use OpenApi\Attributes as OA;
             new OA\Property(property: 'address', description: 'Address', type: 'string', example: 'Aleppo, Syria'),
             new OA\Property(property: 'gender', description: 'Gender', type: 'string', enum: ['male', 'female'], example: 'male'),
             new OA\Property(property: 'birthday_date', description: 'Birthday date', type: 'string', format: 'date', example: '1985-03-20'),
+            new OA\Property(property: 'city_id', description: 'City UUID', type: 'string', format: 'uuid', example: '019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009'),
             new OA\Property(property: 'password', description: 'Password (min 8 characters)', type: 'string', format: 'password', example: 'Password@123'),
         ])
     ),
@@ -95,6 +100,7 @@ use OpenApi\Attributes as OA;
             new OA\Property(property: 'address', description: 'Address', type: 'string', example: 'Homs, Syria'),
             new OA\Property(property: 'gender', description: 'Gender', type: 'string', enum: ['male', 'female'], example: 'female'),
             new OA\Property(property: 'birthday_date', description: 'Birthday date', type: 'string', format: 'date', example: '1998-11-05'),
+            new OA\Property(property: 'city_id', description: 'City UUID', type: 'string', format: 'uuid', example: '019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009'),
             new OA\Property(property: 'password', description: 'Password (min 8 characters)', type: 'string', format: 'password', example: 'Password@123'),
             new OA\Property(property: 'shift_start', description: 'Shift start time', type: 'string', format: 'time', example: '09:00'),
             new OA\Property(property: 'shift_end', description: 'Shift end time', type: 'string', format: 'time', example: '17:00'),
@@ -141,6 +147,9 @@ use OpenApi\Attributes as OA;
                 new OA\Property(property: 'gender', type: 'string', enum: ['male', 'female']),
                 new OA\Property(property: 'birthday_date', type: 'string', format: 'date'),
                 new OA\Property(property: 'is_active', type: 'boolean', example: true),
+                new OA\Property(property: 'city_id', type: 'string', format: 'uuid', nullable: true),
+                new OA\Property(property: 'city', ref: '#/components/schemas/CityResource', nullable: true),
+                new OA\Property(property: 'country', ref: '#/components/schemas/CountryResource', nullable: true),
             ]),
         ])),
         new OA\Response(response: 401, description: 'Invalid credentials', content: new OA\JsonContent(properties: [
@@ -248,6 +257,9 @@ use OpenApi\Attributes as OA;
             new OA\Property(property: 'gender', type: 'string', enum: ['male', 'female']),
             new OA\Property(property: 'birthday_date', type: 'string', format: 'date'),
             new OA\Property(property: 'is_active', type: 'boolean', example: true),
+            new OA\Property(property: 'city_id', type: 'string', format: 'uuid', nullable: true),
+            new OA\Property(property: 'city', ref: '#/components/schemas/CityResource', nullable: true),
+            new OA\Property(property: 'country', ref: '#/components/schemas/CountryResource', nullable: true),
         ])),
         new OA\Response(response: 401, description: 'Unauthenticated', content: new OA\JsonContent(properties: [
             new OA\Property(property: 'message', type: 'string', example: 'Unauthenticated'),
@@ -270,6 +282,7 @@ use OpenApi\Attributes as OA;
             new OA\Property(property: 'address', description: 'Address', type: 'string', example: 'Damascus, Syria'),
             new OA\Property(property: 'gender', description: 'Gender', type: 'string', enum: ['male', 'female'], example: 'male'),
             new OA\Property(property: 'birthday_date', description: 'Birthday date', type: 'string', format: 'date', example: '1995-06-15'),
+            new OA\Property(property: 'city_id', description: 'City UUID', type: 'string', format: 'uuid', example: '019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009'),
         ])
     ),
     responses: [

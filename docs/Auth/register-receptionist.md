@@ -28,6 +28,7 @@
 | `address` | `string` | اختياري | max:1000 |
 | `gender` | `string` (enum) | **مطلوب** | `male`, `female` |
 | `birthday_date` | `string` (date) | اختياري | صيغة YYYY-MM-DD |
+| `city_id` | `string` (UUID) | اختياري | exists:cities,id |
 | `password` | `string` | **مطلوب** | Laravel Password defaults |
 | `shift_start` | `string` (time) | اختياري | صيغة `H:i` (مثال: 08:00) |
 | `shift_end` | `string` (time) | اختياري | صيغة `H:i` (مثال: 16:00) |

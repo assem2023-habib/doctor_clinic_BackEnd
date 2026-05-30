@@ -25,6 +25,7 @@ class RegisterDoctorAction
             'address' => $data->address,
             'gender' => $data->gender,
             'birthday_date' => $data->birthdayDate,
+            'city_id' => $data->cityId,
             'is_active' => false,
             'password' => bcrypt($data->password),
         ]);

@@ -85,98 +85,6 @@
                 }
             }
         },
-        "/api/v1/doctors/{doctor}/appointments": {
-            "get": {
-                "tags": [
-                    "Appointments"
-                ],
-                "summary": "List doctor appointments (filtered by date)",
-                "description": "Requires authentication. Returns full appointment data for a specific doctor with optional date filters and pagination.",
-                "operationId": "doctorAppointments",
-                "parameters": [
-                    {
-                        "name": "doctor",
-                        "in": "path",
-                        "description": "Doctor UUID",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    },
-                    {
-                        "name": "date",
-                        "in": "query",
-                        "description": "Filter by exact date (Y-m-d)",
-                        "schema": {
-                            "type": "string",
-                            "format": "date"
-                        }
-                    },
-                    {
-                        "name": "from_date",
-                        "in": "query",
-                        "description": "Filter from date (Y-m-d)",
-                        "schema": {
-                            "type": "string",
-                            "format": "date"
-                        }
-                    },
-                    {
-                        "name": "to_date",
-                        "in": "query",
-                        "description": "Filter to date (Y-m-d)",
-                        "schema": {
-                            "type": "string",
-                            "format": "date"
-                        }
-                    },
-                    {
-                        "name": "status",
-                        "in": "query",
-                        "description": "Filter by status",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "limit",
-                        "in": "query",
-                        "description": "Items per page (max 100)",
-                        "schema": {
-                            "type": "integer",
-                            "default": 20,
-                            "maximum": 100
-                        }
-                    },
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Page number",
-                        "schema": {
-                            "type": "integer",
-                            "default": 1
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Appointments retrieved successfully"
-                    },
-                    "401": {
-                        "description": "Unauthenticated"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
         "/api/v1/appointments": {
             "get": {
                 "tags": [
@@ -220,15 +128,6 @@
                         "schema": {
                             "type": "string",
                             "format": "date"
-                        }
-                    },
-                    {
-                        "name": "doctor_id",
-                        "in": "query",
-                        "description": "Filter by doctor UUID (admin/receptionist only)",
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
                         }
                     }
                 ],
@@ -745,6 +644,12 @@
                                         "format": "date",
                                         "example": "1995-06-15"
                                     },
+                                    "city_id": {
+                                        "description": "City UUID",
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "example": "019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009"
+                                    },
                                     "password": {
                                         "description": "Password (min 8 characters)",
                                         "type": "string",
@@ -777,7 +682,7 @@
                                         "expires_in": {
                                             "description": "Token expiration in seconds",
                                             "type": "integer",
-                                            "example": 86400
+                                            "example": 31536000
                                         },
                                         "token_type": {
                                             "description": "Token type",
@@ -839,6 +744,33 @@
                                                 "is_active": {
                                                     "type": "boolean",
                                                     "example": true
+                                                },
+                                                "city_id": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "format": "uuid"
+                                                },
+                                                "city": {
+                                                    "oneOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/CityResource"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "country": {
+                                                    "oneOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/CountryResource"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
                                                 }
                                             },
                                             "type": "object"
@@ -937,6 +869,12 @@
                                         "type": "string",
                                         "format": "date",
                                         "example": "1985-03-20"
+                                    },
+                                    "city_id": {
+                                        "description": "City UUID",
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "example": "019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009"
                                     },
                                     "password": {
                                         "description": "Password (min 8 characters)",
@@ -1067,6 +1005,12 @@
                                         "type": "string",
                                         "format": "date",
                                         "example": "1998-11-05"
+                                    },
+                                    "city_id": {
+                                        "description": "City UUID",
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "example": "019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009"
                                     },
                                     "password": {
                                         "description": "Password (min 8 characters)",
@@ -1201,7 +1145,7 @@
                                         "expires_in": {
                                             "description": "Token expiration in seconds",
                                             "type": "integer",
-                                            "example": 86400
+                                            "example": 31536000
                                         },
                                         "token_type": {
                                             "description": "Token type",
@@ -1261,6 +1205,33 @@
                                                 "is_active": {
                                                     "type": "boolean",
                                                     "example": true
+                                                },
+                                                "city_id": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "format": "uuid"
+                                                },
+                                                "city": {
+                                                    "oneOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/CityResource"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "country": {
+                                                    "oneOf": [
+                                                        {
+                                                            "$ref": "#/components/schemas/CountryResource"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
                                                 }
                                             },
                                             "type": "object"
@@ -1409,7 +1380,7 @@
                                         "expires_in": {
                                             "description": "Token expiration in seconds",
                                             "type": "integer",
-                                            "example": 86400
+                                            "example": 31536000
                                         },
                                         "token_type": {
                                             "description": "Token type",
@@ -1675,6 +1646,33 @@
                                         "is_active": {
                                             "type": "boolean",
                                             "example": true
+                                        },
+                                        "city_id": {
+                                            "type": [
+                                                "string",
+                                                "null"
+                                            ],
+                                            "format": "uuid"
+                                        },
+                                        "city": {
+                                            "oneOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/CityResource"
+                                                },
+                                                {
+                                                    "type": "null"
+                                                }
+                                            ]
+                                        },
+                                        "country": {
+                                            "oneOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/CountryResource"
+                                                },
+                                                {
+                                                    "type": "null"
+                                                }
+                                            ]
                                         }
                                     },
                                     "type": "object"
@@ -1762,6 +1760,12 @@
                                         "type": "string",
                                         "format": "date",
                                         "example": "1995-06-15"
+                                    },
+                                    "city_id": {
+                                        "description": "City UUID",
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "example": "019e1d0f-1ec6-7289-8cb3-eb9bdb0f1009"
                                     }
                                 },
                                 "type": "object"
@@ -4425,6 +4429,592 @@
                 ]
             }
         },
+        "/api/v1/medical-records/{medical_record}/prescriptions": {
+            "get": {
+                "tags": [
+                    "Prescriptions"
+                ],
+                "summary": "List prescriptions for a medical record",
+                "operationId": "72b840b0ac5d8892db2655744708da6d",
+                "parameters": [
+                    {
+                        "name": "medical_record",
+                        "in": "path",
+                        "description": "Medical record UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page (max 100)",
+                        "schema": {
+                            "type": "integer",
+                            "default": 20,
+                            "maximum": 100
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Prescriptions retrieved successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Prescriptions"
+                ],
+                "summary": "Create a prescription with optional inline items",
+                "operationId": "ae8b74b170763e3aa23272dd266a473b",
+                "parameters": [
+                    {
+                        "name": "medical_record",
+                        "in": "path",
+                        "description": "Medical record UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "prescription_date": {
+                                        "description": "Optional, defaults to today",
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "date"
+                                    },
+                                    "status": {
+                                        "description": "Optional, defaults to active",
+                                        "type": "string",
+                                        "enum": [
+                                            "active",
+                                            "archived",
+                                            "expired"
+                                        ]
+                                    },
+                                    "notes": {
+                                        "description": "Optional notes, max 5000",
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    },
+                                    "items": {
+                                        "description": "Optional items to create inline (max 50)",
+                                        "type": [
+                                            "array",
+                                            "null"
+                                        ],
+                                        "items": {
+                                            "required": [
+                                                "medicine_id",
+                                                "dosage",
+                                                "frequency",
+                                                "duration"
+                                            ],
+                                            "properties": {
+                                                "medicine_id": {
+                                                    "description": "Medicine UUID",
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "dosage": {
+                                                    "description": "e.g. 500mg",
+                                                    "type": "string"
+                                                },
+                                                "frequency": {
+                                                    "description": "e.g. 3 times daily",
+                                                    "type": "string"
+                                                },
+                                                "duration": {
+                                                    "description": "e.g. 7 days",
+                                                    "type": "string"
+                                                },
+                                                "instructions": {
+                                                    "description": "Optional, max 5000",
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Prescription created successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/prescriptions/{prescription}": {
+            "get": {
+                "tags": [
+                    "Prescriptions"
+                ],
+                "summary": "Get a single prescription",
+                "operationId": "36889f491015c7c6220bcec27e44404f",
+                "parameters": [
+                    {
+                        "name": "prescription",
+                        "in": "path",
+                        "description": "Prescription UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Prescription retrieved successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Prescription not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Prescriptions"
+                ],
+                "summary": "Update a prescription",
+                "operationId": "2be8a586ca4d03aa2e1de4d860a46545",
+                "parameters": [
+                    {
+                        "name": "prescription",
+                        "in": "path",
+                        "description": "Prescription UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "prescription_date": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "date"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "active",
+                                            "archived",
+                                            "expired"
+                                        ]
+                                    },
+                                    "notes": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Prescription updated successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Prescription not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Prescriptions"
+                ],
+                "summary": "Delete a prescription",
+                "description": "Cannot delete if archived/expired or older than 2 days. Cascades to delete all items.",
+                "operationId": "552922675d7e547772e3abb136af94fd",
+                "parameters": [
+                    {
+                        "name": "prescription",
+                        "in": "path",
+                        "description": "Prescription UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content - deleted successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Prescription not found"
+                    },
+                    "422": {
+                        "description": "Cannot delete an archived or expired prescription, or a prescription older than 2 days"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/prescriptions/{prescription}/items": {
+            "get": {
+                "tags": [
+                    "Prescriptions"
+                ],
+                "summary": "List items for a prescription",
+                "operationId": "319b069e8a5a50f319c8d99c3de866a2",
+                "parameters": [
+                    {
+                        "name": "prescription",
+                        "in": "path",
+                        "description": "Prescription UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Prescription items retrieved successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Prescriptions"
+                ],
+                "summary": "Create a prescription item",
+                "operationId": "915a8321565af80c37ce9829fbd36884",
+                "parameters": [
+                    {
+                        "name": "prescription",
+                        "in": "path",
+                        "description": "Prescription UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "medicine_id",
+                                    "dosage",
+                                    "frequency",
+                                    "duration"
+                                ],
+                                "properties": {
+                                    "medicine_id": {
+                                        "description": "Medicine UUID",
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "dosage": {
+                                        "description": "e.g. 500mg",
+                                        "type": "string"
+                                    },
+                                    "frequency": {
+                                        "description": "e.g. 3 times daily",
+                                        "type": "string"
+                                    },
+                                    "duration": {
+                                        "description": "e.g. 7 days",
+                                        "type": "string"
+                                    },
+                                    "instructions": {
+                                        "description": "Optional, max 5000",
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Prescription item created successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/prescription-items/{prescription_item}": {
+            "get": {
+                "tags": [
+                    "Prescriptions"
+                ],
+                "summary": "Get a single prescription item",
+                "operationId": "2434ef0acc12516f023dc5dbcfb116a5",
+                "parameters": [
+                    {
+                        "name": "prescription_item",
+                        "in": "path",
+                        "description": "Prescription item UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Prescription item retrieved successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Prescription item not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Prescriptions"
+                ],
+                "summary": "Update a prescription item",
+                "operationId": "17dcf6ce974d99748fb2fc417aaf2a8e",
+                "parameters": [
+                    {
+                        "name": "prescription_item",
+                        "in": "path",
+                        "description": "Prescription item UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "medicine_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "dosage": {
+                                        "type": "string"
+                                    },
+                                    "frequency": {
+                                        "type": "string"
+                                    },
+                                    "duration": {
+                                        "type": "string"
+                                    },
+                                    "instructions": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Prescription item updated successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Prescription item not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Prescriptions"
+                ],
+                "summary": "Delete a prescription item",
+                "operationId": "190a527a54e61f0c0d63897f12aea2f2",
+                "parameters": [
+                    {
+                        "name": "prescription_item",
+                        "in": "path",
+                        "description": "Prescription item UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content - deleted successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Prescription item not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/ratings": {
             "get": {
                 "tags": [
@@ -6128,19 +6718,174 @@
                 ]
             }
         },
-        "/api/v1/medical-records/{medical_record}/transfer": {
-            "post": {
+        "/api/v1/users": {
+            "get": {
                 "tags": [
-                    "Medical Records"
+                    "Users"
                 ],
-                "summary": "Transfer medical record to another doctor",
-                "description": "Admin only. Transfers a medical record from its current doctor to a new doctor.",
-                "operationId": "transferMedicalRecord",
+                "summary": "List all users (admin)",
+                "operationId": "6fbe6bb8f630874a085521ce9764c10f",
                 "parameters": [
                     {
-                        "name": "medical_record",
+                        "name": "role",
+                        "in": "query",
+                        "description": "Filter by role slug",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by name/email/username",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "gender",
+                        "in": "query",
+                        "description": "Filter by gender",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "male",
+                                "female"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "is_active",
+                        "in": "query",
+                        "description": "Filter by active status",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "date_from",
+                        "in": "query",
+                        "description": "Filter by created_at from",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "date_to",
+                        "in": "query",
+                        "description": "Filter by created_at to",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 20,
+                            "maximum": 100
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort field",
+                        "schema": {
+                            "type": "string",
+                            "default": "created_at"
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "description": "Sort order",
+                        "schema": {
+                            "type": "string",
+                            "default": "desc",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Users retrieved successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/users/{user}": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get a single user (admin)",
+                "operationId": "0f3170e4a28a64e88197515c9a439b20",
+                "parameters": [
+                    {
+                        "name": "user",
                         "in": "path",
-                        "description": "Medical record UUID",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User retrieved successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update a user (admin)",
+                "operationId": "bcd060eaa4756d4f0268a8e0507ebe7c",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -6149,38 +6894,69 @@
                     }
                 ],
                 "requestBody": {
+                    "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "type": "object",
                                 "properties": {
-                                    "doctor_id": {
+                                    "first_name": {
+                                        "type": "string",
+                                        "example": "John"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "example": "Doe"
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "example": "johndoe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john@example.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+963912345678"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "Damascus, Syria"
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "example": "male",
+                                        "enum": [
+                                            "male",
+                                            "female"
+                                        ]
+                                    },
+                                    "birthday_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1995-06-15"
+                                    },
+                                    "city_id": {
                                         "type": "string",
                                         "format": "uuid",
-                                        "description": "New doctor UUID"
-                                    },
-                                    "reason": {
-                                        "type": "string",
-                                        "description": "Optional reason for transfer"
+                                        "example": "019e1d0f-..."
                                     }
                                 },
-                                "required": ["doctor_id"]
+                                "type": "object"
                             }
                         }
                     }
                 },
                 "responses": {
                     "200": {
-                        "description": "Medical record transferred successfully"
+                        "description": "User updated successfully"
                     },
                     "401": {
                         "description": "Unauthenticated"
                     },
                     "403": {
-                        "description": "Forbidden (admin only)"
-                    },
-                    "404": {
-                        "description": "Medical record not found"
+                        "description": "Forbidden"
                     },
                     "422": {
                         "description": "Validation error"
@@ -6191,316 +6967,76 @@
                         "bearerAuth": []
                     }
                 ]
-            }
-        },
-        "/api/v1/medical-records/{medical_record}/prescriptions": {
-            "get": {
-                "tags": ["Prescriptions"],
-                "summary": "List prescriptions for a medical record",
-                "description": "Requires authentication. Role-scoped: admin/receptionist see all, doctors see their patients, patients see their own.",
-                "operationId": "listPrescriptions",
+            },
+            "delete": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Delete a user (admin)",
+                "operationId": "caff1b23a4152d085a5e2f13839cf6be",
                 "parameters": [
                     {
-                        "name": "medical_record",
+                        "name": "user",
                         "in": "path",
-                        "description": "Medical record UUID",
                         "required": true,
-                        "schema": { "type": "string", "format": "uuid" }
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "User deleted successfully"
                     },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden - cannot delete admin users"
+                    }
+                },
+                "security": [
                     {
-                        "name": "limit",
-                        "in": "query",
-                        "description": "Items per page (max 100)",
-                        "schema": { "type": "integer", "default": 20, "maximum": 100 }
+                        "bearerAuth": []
                     }
-                ],
-                "responses": {
-                    "200": { "description": "Prescriptions retrieved successfully" },
-                    "401": { "description": "Unauthenticated" },
-                    "403": { "description": "Forbidden" }
-                },
-                "security": [{ "bearerAuth": [] }]
-            },
-            "post": {
-                "tags": ["Prescriptions"],
-                "summary": "Create a prescription",
-                "description": "Admin or doctor only. Doctor must own the medical record.",
-                "operationId": "createPrescription",
-                "parameters": [
-                    {
-                        "name": "medical_record",
-                        "in": "path",
-                        "description": "Medical record UUID",
-                        "required": true,
-                        "schema": { "type": "string", "format": "uuid" }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "prescription_date": { "type": "string", "format": "date", "description": "Optional, defaults to today" },
-                                    "status": { "type": "string", "enum": ["active", "archived", "expired"], "description": "Optional, defaults to active" },
-                                    "notes": { "type": "string", "description": "Optional notes, max 5000" },
-                                    "items": {
-                                        "type": "array",
-                                        "description": "Optional items to create inline (max 50)",
-                                        "items": {
-                                            "type": "object",
-                                            "properties": {
-                                                "medicine_id": { "type": "string", "format": "uuid", "description": "Medicine UUID" },
-                                                "dosage": { "type": "string", "description": "e.g. 500mg" },
-                                                "frequency": { "type": "string", "description": "e.g. 3 times daily" },
-                                                "duration": { "type": "string", "description": "e.g. 7 days" },
-                                                "instructions": { "type": "string", "description": "Optional, max 5000" }
-                                            },
-                                            "required": ["medicine_id", "dosage", "frequency", "duration"]
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": { "description": "Prescription created successfully" },
-                    "401": { "description": "Unauthenticated" },
-                    "403": { "description": "Forbidden" },
-                    "422": { "description": "Validation error" }
-                },
-                "security": [{ "bearerAuth": [] }]
+                ]
             }
         },
-        "/api/v1/prescriptions/{prescription}": {
-            "get": {
-                "tags": ["Prescriptions"],
-                "summary": "Get a single prescription",
-                "description": "Requires authentication. Role-scoped: admin/receptionist see all, doctors see their patients, patients see their own.",
-                "operationId": "showPrescription",
-                "parameters": [
-                    {
-                        "name": "prescription",
-                        "in": "path",
-                        "description": "Prescription UUID",
-                        "required": true,
-                        "schema": { "type": "string", "format": "uuid" }
-                    }
-                ],
-                "responses": {
-                    "200": { "description": "Prescription retrieved successfully" },
-                    "401": { "description": "Unauthenticated" },
-                    "403": { "description": "Forbidden" },
-                    "404": { "description": "Prescription not found" }
-                },
-                "security": [{ "bearerAuth": [] }]
-            },
+        "/api/v1/users/{user}/toggle-active": {
             "put": {
-                "tags": ["Prescriptions"],
-                "summary": "Update a prescription",
-                "description": "Admin or doctor only. Doctor must own the prescription's medical record.",
-                "operationId": "updatePrescription",
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Toggle user active status (admin)",
+                "operationId": "5c32cf83464b4ec470685076c463434b",
                 "parameters": [
                     {
-                        "name": "prescription",
+                        "name": "user",
                         "in": "path",
-                        "description": "Prescription UUID",
                         "required": true,
-                        "schema": { "type": "string", "format": "uuid" }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "prescription_date": { "type": "string", "format": "date" },
-                                    "status": { "type": "string", "enum": ["active", "archived", "expired"] },
-                                    "notes": { "type": "string" }
-                                }
-                            }
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
                         }
                     }
-                },
-                "responses": {
-                    "200": { "description": "Prescription updated successfully" },
-                    "401": { "description": "Unauthenticated" },
-                    "403": { "description": "Forbidden" },
-                    "404": { "description": "Prescription not found" },
-                    "422": { "description": "Validation error" }
-                },
-                "security": [{ "bearerAuth": [] }]
-            },
-            "delete": {
-                "tags": ["Prescriptions"],
-                "summary": "Delete a prescription",
-                "description": "Admin or doctor only. Doctor must own the prescription's medical record.",
-                "operationId": "deletePrescription",
-                "parameters": [
-                    {
-                        "name": "prescription",
-                        "in": "path",
-                        "description": "Prescription UUID",
-                        "required": true,
-                        "schema": { "type": "string", "format": "uuid" }
-                    }
                 ],
                 "responses": {
-                    "204": { "description": "No content - deleted successfully" },
-                    "401": { "description": "Unauthenticated" },
-                    "403": { "description": "Forbidden" },
-                    "404": { "description": "Prescription not found" }
+                    "200": {
+                        "description": "User activated/deactivated successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
                 },
-                "security": [{ "bearerAuth": [] }]
-            }
-        },
-        "/api/v1/prescriptions/{prescription}/items": {
-            "get": {
-                "tags": ["Prescriptions"],
-                "summary": "List items for a prescription",
-                "description": "Requires authentication. Role-scoped: admin/receptionist see all, doctors see their patients, patients see their own.",
-                "operationId": "listPrescriptionItems",
-                "parameters": [
+                "security": [
                     {
-                        "name": "prescription",
-                        "in": "path",
-                        "description": "Prescription UUID",
-                        "required": true,
-                        "schema": { "type": "string", "format": "uuid" }
+                        "bearerAuth": []
                     }
-                ],
-                "responses": {
-                    "200": { "description": "Prescription items retrieved successfully" },
-                    "401": { "description": "Unauthenticated" },
-                    "403": { "description": "Forbidden" }
-                },
-                "security": [{ "bearerAuth": [] }]
-            },
-            "post": {
-                "tags": ["Prescriptions"],
-                "summary": "Create a prescription item",
-                "description": "Admin or doctor only. Doctor must own the prescription's medical record.",
-                "operationId": "createPrescriptionItem",
-                "parameters": [
-                    {
-                        "name": "prescription",
-                        "in": "path",
-                        "description": "Prescription UUID",
-                        "required": true,
-                        "schema": { "type": "string", "format": "uuid" }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "medicine_id": { "type": "string", "format": "uuid", "description": "Medicine UUID" },
-                                    "dosage": { "type": "string", "description": "e.g. 500mg" },
-                                    "frequency": { "type": "string", "description": "e.g. 3 times daily" },
-                                    "duration": { "type": "string", "description": "e.g. 7 days" },
-                                    "instructions": { "type": "string", "description": "Optional, max 5000" }
-                                },
-                                "required": ["medicine_id", "dosage", "frequency", "duration"]
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": { "description": "Prescription item created successfully" },
-                    "401": { "description": "Unauthenticated" },
-                    "403": { "description": "Forbidden" },
-                    "422": { "description": "Validation error" }
-                },
-                "security": [{ "bearerAuth": [] }]
-            }
-        },
-        "/api/v1/prescription-items/{prescription_item}": {
-            "get": {
-                "tags": ["Prescriptions"],
-                "summary": "Get a single prescription item",
-                "description": "Requires authentication. Role-scoped: admin/receptionist see all, doctors see their patients, patients see their own.",
-                "operationId": "showPrescriptionItem",
-                "parameters": [
-                    {
-                        "name": "prescription_item",
-                        "in": "path",
-                        "description": "Prescription item UUID",
-                        "required": true,
-                        "schema": { "type": "string", "format": "uuid" }
-                    }
-                ],
-                "responses": {
-                    "200": { "description": "Prescription item retrieved successfully" },
-                    "401": { "description": "Unauthenticated" },
-                    "403": { "description": "Forbidden" },
-                    "404": { "description": "Prescription item not found" }
-                },
-                "security": [{ "bearerAuth": [] }]
-            },
-            "put": {
-                "tags": ["Prescriptions"],
-                "summary": "Update a prescription item",
-                "description": "Admin or doctor only. Doctor must own the prescription's medical record.",
-                "operationId": "updatePrescriptionItem",
-                "parameters": [
-                    {
-                        "name": "prescription_item",
-                        "in": "path",
-                        "description": "Prescription item UUID",
-                        "required": true,
-                        "schema": { "type": "string", "format": "uuid" }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "medicine_id": { "type": "string", "format": "uuid" },
-                                    "dosage": { "type": "string" },
-                                    "frequency": { "type": "string" },
-                                    "duration": { "type": "string" },
-                                    "instructions": { "type": "string" }
-                                }
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": { "description": "Prescription item updated successfully" },
-                    "401": { "description": "Unauthenticated" },
-                    "403": { "description": "Forbidden" },
-                    "404": { "description": "Prescription item not found" },
-                    "422": { "description": "Validation error" }
-                },
-                "security": [{ "bearerAuth": [] }]
-            },
-            "delete": {
-                "tags": ["Prescriptions"],
-                "summary": "Delete a prescription item",
-                "description": "Admin or doctor only. Doctor must own the prescription's medical record.",
-                "operationId": "deletePrescriptionItem",
-                "parameters": [
-                    {
-                        "name": "prescription_item",
-                        "in": "path",
-                        "description": "Prescription item UUID",
-                        "required": true,
-                        "schema": { "type": "string", "format": "uuid" }
-                    }
-                ],
-                "responses": {
-                    "204": { "description": "No content - deleted successfully" },
-                    "401": { "description": "Unauthenticated" },
-                    "403": { "description": "Forbidden" },
-                    "404": { "description": "Prescription item not found" }
-                },
-                "security": [{ "bearerAuth": [] }]
+                ]
             }
         }
     },
@@ -7133,6 +7669,96 @@
                 },
                 "type": "object"
             },
+            "PrescriptionItemResource": {
+                "description": "Prescription item resource",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "prescription_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "medicine_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "dosage": {
+                        "type": "string"
+                    },
+                    "frequency": {
+                        "type": "string"
+                    },
+                    "duration": {
+                        "type": "string"
+                    },
+                    "instructions": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "PrescriptionResource": {
+                "description": "Prescription resource",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "medical_record_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "prescription_date": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "active",
+                            "archived",
+                            "expired"
+                        ]
+                    },
+                    "notes": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PrescriptionItemResource"
+                        }
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
             "RatingResource": {
                 "description": "Rating resource",
                 "properties": {
@@ -7198,38 +7824,6 @@
                         "type": "string",
                         "format": "date-time"
                     }
-                },
-                "type": "object"
-            },
-            "PrescriptionResource": {
-                "description": "Prescription resource",
-                "properties": {
-                    "id": { "type": "string", "format": "uuid" },
-                    "medical_record_id": { "type": "string", "format": "uuid" },
-                    "prescription_date": { "type": ["string", "null"], "format": "date" },
-                    "status": { "type": "string", "enum": ["active", "archived", "expired"] },
-                    "notes": { "type": ["string", "null"] },
-                    "items": {
-                        "type": "array",
-                        "items": { "$ref": "#/components/schemas/PrescriptionItemResource" }
-                    },
-                    "created_at": { "type": "string", "format": "date-time" },
-                    "updated_at": { "type": "string", "format": "date-time" }
-                },
-                "type": "object"
-            },
-            "PrescriptionItemResource": {
-                "description": "Prescription item resource",
-                "properties": {
-                    "id": { "type": "string", "format": "uuid" },
-                    "prescription_id": { "type": "string", "format": "uuid" },
-                    "medicine_id": { "type": "string", "format": "uuid" },
-                    "dosage": { "type": "string" },
-                    "frequency": { "type": "string" },
-                    "duration": { "type": "string" },
-                    "instructions": { "type": ["string", "null"] },
-                    "created_at": { "type": "string", "format": "date-time" },
-                    "updated_at": { "type": "string", "format": "date-time" }
                 },
                 "type": "object"
             },
@@ -7387,6 +7981,115 @@
                     }
                 },
                 "type": "object"
+            },
+            "UserResource": {
+                "description": "User resource (admin, or base for patient/doctor/receptionist)",
+                "properties": {
+                    "id": {
+                        "description": "User UUID",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "first_name": {
+                        "type": "string",
+                        "example": "Ahmed"
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "example": "Ali"
+                    },
+                    "username": {
+                        "type": "string",
+                        "example": "ahmedali"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "user@example.com"
+                    },
+                    "phone": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "+963912345678"
+                    },
+                    "address": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "Damascus, Syria"
+                    },
+                    "gender": {
+                        "type": "string",
+                        "example": "male",
+                        "enum": [
+                            "male",
+                            "female"
+                        ]
+                    },
+                    "birthday_date": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date",
+                        "example": "1995-06-15"
+                    },
+                    "roles": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "admin"
+                        ]
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "city_id": {
+                        "description": "City UUID",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "uuid"
+                    },
+                    "city": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/CityResource"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "country": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/CountryResource"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "image": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/ImageResource"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object"
             }
         },
         "securitySchemes": {
@@ -7443,12 +8146,8 @@
             "description": "Medicines"
         },
         {
-            "name": "Medical Records",
-            "description": "Medical Records"
-        },
-        {
             "name": "Prescriptions",
-            "description": "Prescriptions and Prescription Items"
+            "description": "Prescriptions"
         },
         {
             "name": "Ratings",
@@ -7465,6 +8164,10 @@
         {
             "name": "Supervision Requests",
             "description": "Supervision Requests"
+        },
+        {
+            "name": "Users",
+            "description": "Users"
         }
     ]
 }

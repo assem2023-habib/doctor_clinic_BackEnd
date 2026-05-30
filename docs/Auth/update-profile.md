@@ -30,6 +30,7 @@
 | `address` | `string` | اختياري | max:1000 |
 | `gender` | `string` (enum) | اختياري | `male`, `female` |
 | `birthday_date` | `string` (date) | اختياري | صيغة YYYY-MM-DD |
+| `city_id` | `string` (UUID) | اختياري | exists:cities,id |
 | `file` | `file` (image) | اختياري | max:2MB, mimes:jpg,jpeg,png,webp |
 
 ### مثال (JSON):
@@ -71,6 +72,7 @@ public function rules(): array
         'address' => ['sometimes', 'nullable', 'string', 'max:1000'],
         'gender' => ['sometimes', 'required', Rule::enum(GenderEnum::class)],
         'birthday_date' => ['sometimes', 'nullable', 'date'],
+        'city_id' => ['sometimes', 'nullable', 'string', 'exists:cities,id'],
         'file' => ['sometimes', 'nullable', 'image', 'max:2048', 'mimes:jpg,jpeg,png,webp'],
     ];
 }
@@ -96,7 +98,7 @@ class UpdateProfileData
 
 ```
 1. ينشئ DTO فارغاً
-2. يمر على الحقول: first_name, last_name, username, email, phone, address, birthday_date
+2. يمر على الحقول: first_name, last_name, username, email, phone, address, birthday_date, city_id
    - إذا الحقل موجود في الـ Request ← يضيفه إلى $fields
 3. إذا gender موجود ← يحوله من string إلى GenderEnum value
 4. إذا file موجود ← يخزنه في $this->file
@@ -213,6 +215,9 @@ public function updateProfile(UpdateProfileRequest $request): JsonResponse
             }
         ],
         "is_active": true,
+        "city_id": null,
+        "city": null,
+        "country": null,
         "patient": {
             "id": "0196f0a0-5678-7def-abcd-987654321abc"
         },

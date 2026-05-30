@@ -17,6 +17,7 @@ class RegisterPatientData
         public readonly ?string $address,
         public readonly GenderEnum $gender,
         public readonly ?string $birthdayDate,
+        public readonly ?string $cityId,
         public readonly string $password,
         public readonly ?UploadedFile $file,
     ) {}
@@ -32,6 +33,7 @@ class RegisterPatientData
             address: $request->address,
             gender: GenderEnum::from($request->gender),
             birthdayDate: $request->birthday_date,
+            cityId: $request->city_id,
             password: $request->password,
             file: $request->file('file'),
         );

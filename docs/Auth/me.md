@@ -81,6 +81,9 @@ public function me(Request $request): JsonResponse
             }
         ],
         "is_active": true,
+        "city_id": null,
+        "city": null,
+        "country": null,
         "patient": {
             "id": "0196f0a0-..."
         },
@@ -165,6 +168,9 @@ public function me(Request $request): JsonResponse
             }
         ],
         "is_active": true,
+        "city_id": null,
+        "city": null,
+        "country": null,
         "receptionist": {
             "id": "0196f0a0-...",
             "shift_start": "08:00",
@@ -204,6 +210,9 @@ public function me(Request $request): JsonResponse
             }
         ],
         "is_active": true,
+        "city_id": null,
+        "city": null,
+        "country": null,
         "image": null
     }
 }
@@ -226,6 +235,9 @@ public function me(Request $request): JsonResponse
 | `birthday_date` | `string?` | تاريخ الميلاد |
 | `roles` | `array` | قائمة الأدوار (`patient`/`doctor`/`receptionist`/`admin`) |
 | `is_active` | `boolean` | هل الحساب مفعّل |
+| `city_id` | `string?` | UUID المدينة (إن وجدت) |
+| `city` | `object?` | كائن المدينة (يحوي `id`, `name`, `country_id`) |
+| `country` | `object?` | كائن الدولة (يحوي `id`, `name`, `code`, `flag`) |
 | `image` | `array?` | صورة المستخدم (إن وجدت) |
 
 ---
