@@ -46,9 +46,12 @@ class PatientController
         );
     }
 
-    public function show(Patient $patient): JsonResponse
+    public function show(string $patient): JsonResponse
     {
-        $patient->load('user.roles');
+        $patient = Patient::where('user_id', $patient)
+            ->with('user.roles')
+            ->firstOrFail();
+
         $user = $patient->user;
         $user->setRelation('patient', $patient);
 

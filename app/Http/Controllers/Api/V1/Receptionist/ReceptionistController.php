@@ -52,9 +52,12 @@ class ReceptionistController
         );
     }
 
-    public function show(Receptionist $receptionist): JsonResponse
+    public function show(string $receptionist): JsonResponse
     {
-        $receptionist->load('user.roles');
+        $receptionist = Receptionist::where('user_id', $receptionist)
+            ->with('user.roles')
+            ->firstOrFail();
+
         $user = $receptionist->user;
         $user->setRelation('receptionist', $receptionist);
 

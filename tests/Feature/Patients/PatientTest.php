@@ -150,7 +150,7 @@ class PatientTest extends TestCase
             'email' => 'john@example.com',
         ]);
 
-        $response = $this->getJson("/api/v1/patients/{$patientUser->patient->id}");
+        $response = $this->getJson("/api/v1/patients/{$patientUser->id}");
 
         $response->assertStatus(200)
             ->assertJsonStructure([
@@ -459,7 +459,7 @@ class PatientTest extends TestCase
 
         $patientUser = $this->createPatient(['email' => 'patient@example.com']);
 
-        $response = $this->getJson("/api/v1/patients/{$patientUser->patient->id}");
+        $response = $this->getJson("/api/v1/patients/{$patientUser->id}");
 
         $response->assertStatus(200);
         $json = $response->json();

@@ -134,7 +134,7 @@ class DoctorTest extends TestCase
         ]);
         $this->createSchedule($user->doctor);
 
-        $response = $this->getJson("/api/v1/doctors/{$user->doctor->id}");
+        $response = $this->getJson("/api/v1/doctors/{$user->id}");
 
         $response->assertStatus(200)
             ->assertJsonStructure([

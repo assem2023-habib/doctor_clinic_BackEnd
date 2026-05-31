@@ -51,9 +51,12 @@ class DoctorController
         );
     }
 
-    public function show(Doctor $doctor): JsonResponse
+    public function show(string $doctor): JsonResponse
     {
-        $doctor->load('user.roles', 'schedules');
+        $doctor = Doctor::where('user_id', $doctor)
+            ->with('user.roles', 'schedules')
+            ->firstOrFail();
+
         $user = $doctor->user;
         $user->setRelation('doctor', $doctor);
 
