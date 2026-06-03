@@ -58,7 +58,20 @@ Single endpoint `GET /api/v1/dashboard` that returns statistics tailored to the 
     },
     "ratings": {
         "average": 4.2,
-        "total": 80
+        "total": 80,
+        "negative_count": 5,
+        "top_positive": [
+            { "doctor_id": 1, "doctor_name": "John Doe", "average": 4.9, "total": 20 }
+        ],
+        "lowest_positive": [
+            { "doctor_id": 5, "doctor_name": "Jane Smith", "average": 3.1, "total": 10 }
+        ],
+        "most_rated": [
+            { "doctor_id": 2, "doctor_name": "Alice Brown", "average": 4.5, "total": 50 }
+        ],
+        "top_per_specialization": [
+            { "specialization_id": 1, "specialization_name": "Cardiology", "doctor_id": 1, "doctor_name": "John Doe", "average": 4.8, "total": 15 }
+        ]
     }
 }
 ```
@@ -82,6 +95,11 @@ Single endpoint `GET /api/v1/dashboard` that returns statistics tailored to the 
 | `specializations.top` | array | Top 5 specializations by doctor count |
 | `ratings.average` | float | Average rating across all users |
 | `ratings.total` | integer | Total ratings count |
+| `ratings.negative_count` | integer | Count of ratings ≤ 2 |
+| `ratings.top_positive` | array | Top 3 doctors by highest average rating |
+| `ratings.lowest_positive` | array | Bottom 3 doctors by lowest average rating |
+| `ratings.most_rated` | array | Top 3 doctors by most ratings received |
+| `ratings.top_per_specialization` | array | Best-rated doctor per specialization |
 
 ---
 
@@ -110,7 +128,8 @@ Single endpoint `GET /api/v1/dashboard` that returns statistics tailored to the 
     "prescriptions": { "total": 250 },
     "ratings": {
         "average": 4.5,
-        "total": 30
+        "total": 30,
+        "negative_count": 2
     }
 }
 ```
@@ -125,6 +144,7 @@ Single endpoint `GET /api/v1/dashboard` that returns statistics tailored to the 
 | `prescriptions.total` | integer | Prescriptions on doctor's medical records |
 | `ratings.average` | float | Average rating received by this doctor |
 | `ratings.total` | integer | Total ratings received |
+| `ratings.negative_count` | integer | Count of ratings ≤ 2 received by this doctor |
 
 ---
 
@@ -178,7 +198,26 @@ Single endpoint `GET /api/v1/dashboard` that returns statistics tailored to the 
         "registered_today": 3,
         "total": 100
     },
-    "doctors": { "total": 25 }
+    "doctors": { "total": 25 },
+    "medical_records": { "total": 300 },
+    "prescriptions": { "total": 450 },
+    "ratings": {
+        "average": 4.2,
+        "total": 80,
+        "negative_count": 5,
+        "top_positive": [
+            { "doctor_id": 1, "doctor_name": "John Doe", "average": 4.9, "total": 20 }
+        ],
+        "lowest_positive": [
+            { "doctor_id": 5, "doctor_name": "Jane Smith", "average": 3.1, "total": 10 }
+        ],
+        "most_rated": [
+            { "doctor_id": 2, "doctor_name": "Alice Brown", "average": 4.5, "total": 50 }
+        ],
+        "top_per_specialization": [
+            { "specialization_id": 1, "specialization_name": "Cardiology", "doctor_id": 1, "doctor_name": "John Doe", "average": 4.8, "total": 15 }
+        ]
+    }
 }
 ```
 
@@ -189,6 +228,9 @@ Single endpoint `GET /api/v1/dashboard` that returns statistics tailored to the 
 | `patients.registered_today` | integer | Patients registered today |
 | `patients.total` | integer | Total patients |
 | `doctors.total` | integer | Total doctors |
+| `medical_records.total` | integer | Total medical records |
+| `prescriptions.total` | integer | Total prescriptions |
+| `ratings.*` | | Same ratings structure as admin dashboard |
 
 ---
 
