@@ -16,6 +16,7 @@ class SupervisionControllerDoc
             new OA\Parameter(name: 'limit', in: 'query', schema: new OA\Schema(type: 'integer', default: 20, maximum: 100), description: 'Items per page (max 100)'),
             new OA\Parameter(name: 'page', in: 'query', schema: new OA\Schema(type: 'integer', default: 1), description: 'Page number'),
             new OA\Parameter(name: 'search', in: 'query', schema: new OA\Schema(type: 'string'), description: 'Search by name or email'),
+            new OA\Parameter(name: 'status', in: 'query', schema: new OA\Schema(type: 'array', items: new OA\Items(type: 'string', enum: ['active', 'suspended'])), style: 'form', explode: false, description: 'Filter by supervision status(es). Single (?status=active) or multiple (?status[]=active&status[]=suspended)'),
         ],
         responses: [
             new OA\Response(response: 200, description: 'Patients retrieved successfully'),

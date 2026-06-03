@@ -179,6 +179,52 @@ class SupervisionTest extends TestCase
         $response->assertStatus(401);
     }
 
+    // ─── Filter doctor patients by status ───
+
+    public function test_doctor_can_filter_patients_by_status(): void
+    {
+        $doctor = $this->createDoctor();
+        $patient = $this->createPatient();
+        $admin = $this->createAdmin();
+        $this->assignPatientToDoctor($patient->patient, $doctor, $admin);
+
+        Passport::actingAs($doctor);
+        $response = $this->getJson("/api/v1/doctors/{$doctor->doctor->id}/patients?status=active");
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $response->json()['data']);
+    }
+
+    public function test_doctor_can_filter_patients_by_multiple_statuses(): void
+    {
+        $doctor = $this->createDoctor();
+        $patient1 = $this->createPatient();
+        $patient2 = $this->createPatient();
+        $admin = $this->createAdmin();
+        $this->assignPatientToDoctor($patient1->patient, $doctor, $admin);
+        $this->assignPatientToDoctor($patient2->patient, $doctor, $admin);
+
+        Passport::actingAs($doctor);
+        $response = $this->getJson("/api/v1/doctors/{$doctor->doctor->id}/patients?status[]=active&status[]=suspended");
+
+        $response->assertStatus(200);
+        $this->assertCount(2, $response->json()['data']);
+    }
+
+    public function test_doctor_filter_patients_by_status_returns_empty_for_unmatched(): void
+    {
+        $doctor = $this->createDoctor();
+        $patient = $this->createPatient();
+        $admin = $this->createAdmin();
+        $this->assignPatientToDoctor($patient->patient, $doctor, $admin);
+
+        Passport::actingAs($doctor);
+        $response = $this->getJson("/api/v1/doctors/{$doctor->doctor->id}/patients?status=suspended");
+
+        $response->assertStatus(200);
+        $this->assertCount(0, $response->json()['data']);
+    }
+
     // ─── Patient views their doctors ───
 
     public function test_patient_can_view_their_doctors(): void

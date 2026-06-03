@@ -41,7 +41,12 @@ class SupervisionController
 
         $limit = (int) $request->integer('limit', 20);
 
-        $patients = User::whereHas('patient', fn ($q) => $q->whereIn('id', $doctor->patients()->pluck('patient_id')))
+        $patientQuery = $doctor->patients();
+        if ($request->filled('status')) {
+            $patientQuery->wherePivotIn('supervision_status', (array) $request->status);
+        }
+
+        $patients = User::whereHas('patient', fn ($q) => $q->whereIn('id', $patientQuery->pluck('patient_id')))
             ->with(['patient', 'image', 'roles'])
             ->when($request->search, fn ($q, $v) => $q->where(function ($q) use ($v) {
                 $q->where('first_name', 'like', "%{$v}%")
