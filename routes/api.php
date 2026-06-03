@@ -18,6 +18,7 @@ use App\Domains\Doctors\Controllers\SpecializationController;
 use App\Domains\Prescriptions\Controllers\MedicineController;
 use App\Domains\Prescriptions\Controllers\PrescriptionController;
 use App\Domains\Prescriptions\Controllers\PrescriptionItemController;
+use App\Domains\Ratings\Controllers\AppRatingController;
 use App\Domains\Ratings\Controllers\RatingController;
 use App\Http\Controllers\Api\V1\Location\CityController;
 use App\Http\Controllers\Api\V1\Location\CountryController;
@@ -129,6 +130,8 @@ Route::middleware(['auth:api', 'active'])->group(function () {
         Route::get('/', [SpecializationController::class, 'index']);
         Route::get('/{specialization}', [SpecializationController::class, 'show']);
     });
+
+    Route::get('v1/app-ratings', [AppRatingController::class, 'index']);
 
     Route::prefix('v1/ratings')->group(function () {
         Route::get('/', [RatingController::class, 'index']);

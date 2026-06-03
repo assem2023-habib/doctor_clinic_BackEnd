@@ -13,6 +13,7 @@
 
 | Method | Path | Description |
 |--------|------|-------------|
+| `GET` | `/api/v1/app-ratings` | List app ratings (service, center, appointment_system) — simplified |
 | `GET` | `/api/v1/ratings` | List all ratings (paginated, filterable) |
 | `GET` | `/api/v1/ratings/{rating}` | Get a single rating |
 | `POST` | `/api/v1/ratings` | Create a new rating |
@@ -22,7 +23,58 @@
 
 ---
 
-## 1. List Ratings
+## 1. List App Ratings
+
+```
+GET /api/v1/app-ratings
+Authorization: Bearer <token>
+```
+
+### Query Parameters
+
+| Parameter | Type | Description | Example |
+|-----------|------|-------------|---------|
+| `type` | string / array | Filter by type(s) | `?type=service` or `?type[]=service&type[]=center` |
+| `rating` | integer | Filter by value (1-5) | `5` |
+| `limit` | integer | Items per page (max 100, default 20) | `50` |
+| `page` | integer | Page number | `1` |
+
+**ملاحظة:** هذا الـ endpoint **يعيد فقط تقييمات التطبيق** (`service`, `center`, `appointment_system`) — يستثني `user`. الـ response مبسّط: فقط `name` للـ rater و `comment`.
+
+### Response (200)
+
+```json
+{
+    "status": 200,
+    "message": "App ratings retrieved successfully",
+    "data": [
+        {
+            "id": "019e1d0f-...",
+            "type": "service",
+            "rater": {
+                "name": "Ahmed Ali"
+            },
+            "comment": "Good service overall",
+            "rating": 5,
+            "created_at": "2026-06-03T10:00:00.000000Z"
+        }
+    ],
+    "meta": {
+        "pagination": {
+            "current_page": 1,
+            "last_page": 5,
+            "limit": 20,
+            "total": 100,
+            "hasNextPage": true,
+            "hasPreviousPage": false
+        }
+    }
+}
+```
+
+---
+
+## 2. List Ratings
 
 ```
 GET /api/v1/ratings
