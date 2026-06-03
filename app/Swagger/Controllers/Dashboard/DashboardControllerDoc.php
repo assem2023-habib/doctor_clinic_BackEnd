@@ -70,6 +70,33 @@ class DashboardControllerDoc {}
         new OA\Property(property: 'ratings', type: 'object', properties: [
             new OA\Property(property: 'average', type: 'number', format: 'float', example: 4.2),
             new OA\Property(property: 'total', type: 'integer', example: 80),
+            new OA\Property(property: 'negative_count', type: 'integer', example: 5),
+            new OA\Property(property: 'top_positive', type: 'array', items: new OA\Items(type: 'object', properties: [
+                new OA\Property(property: 'doctor_id', type: 'integer', example: 1),
+                new OA\Property(property: 'doctor_name', type: 'string', example: 'John Doe'),
+                new OA\Property(property: 'average', type: 'number', format: 'float', example: 4.9),
+                new OA\Property(property: 'total', type: 'integer', example: 20),
+            ])),
+            new OA\Property(property: 'lowest_positive', type: 'array', items: new OA\Items(type: 'object', properties: [
+                new OA\Property(property: 'doctor_id', type: 'integer', example: 5),
+                new OA\Property(property: 'doctor_name', type: 'string', example: 'Jane Smith'),
+                new OA\Property(property: 'average', type: 'number', format: 'float', example: 3.1),
+                new OA\Property(property: 'total', type: 'integer', example: 10),
+            ])),
+            new OA\Property(property: 'most_rated', type: 'array', items: new OA\Items(type: 'object', properties: [
+                new OA\Property(property: 'doctor_id', type: 'integer', example: 2),
+                new OA\Property(property: 'doctor_name', type: 'string', example: 'Alice Brown'),
+                new OA\Property(property: 'average', type: 'number', format: 'float', example: 4.5),
+                new OA\Property(property: 'total', type: 'integer', example: 50),
+            ])),
+            new OA\Property(property: 'top_per_specialization', type: 'array', items: new OA\Items(type: 'object', properties: [
+                new OA\Property(property: 'specialization_id', type: 'integer', example: 1),
+                new OA\Property(property: 'specialization_name', type: 'string', example: 'Cardiology'),
+                new OA\Property(property: 'doctor_id', type: 'integer', example: 1),
+                new OA\Property(property: 'doctor_name', type: 'string', example: 'John Doe'),
+                new OA\Property(property: 'average', type: 'number', format: 'float', example: 4.8),
+                new OA\Property(property: 'total', type: 'integer', example: 15),
+            ])),
         ]),
     ]
 )]
@@ -103,6 +130,7 @@ class AdminDashboardSchema {}
         new OA\Property(property: 'ratings', type: 'object', properties: [
             new OA\Property(property: 'average', type: 'number', format: 'float', example: 4.5),
             new OA\Property(property: 'total', type: 'integer', example: 30),
+            new OA\Property(property: 'negative_count', type: 'integer', example: 2),
         ]),
     ]
 )]
@@ -154,6 +182,43 @@ class PatientDashboardSchema {}
         ]),
         new OA\Property(property: 'doctors', type: 'object', properties: [
             new OA\Property(property: 'total', type: 'integer', example: 25),
+        ]),
+        new OA\Property(property: 'medical_records', type: 'object', properties: [
+            new OA\Property(property: 'total', type: 'integer', example: 300),
+        ]),
+        new OA\Property(property: 'prescriptions', type: 'object', properties: [
+            new OA\Property(property: 'total', type: 'integer', example: 450),
+        ]),
+        new OA\Property(property: 'ratings', type: 'object', properties: [
+            new OA\Property(property: 'average', type: 'number', format: 'float', example: 4.2),
+            new OA\Property(property: 'total', type: 'integer', example: 80),
+            new OA\Property(property: 'negative_count', type: 'integer', example: 5),
+            new OA\Property(property: 'top_positive', type: 'array', items: new OA\Items(type: 'object', properties: [
+                new OA\Property(property: 'doctor_id', type: 'integer', example: 1),
+                new OA\Property(property: 'doctor_name', type: 'string', example: 'John Doe'),
+                new OA\Property(property: 'average', type: 'number', format: 'float', example: 4.9),
+                new OA\Property(property: 'total', type: 'integer', example: 20),
+            ])),
+            new OA\Property(property: 'lowest_positive', type: 'array', items: new OA\Items(type: 'object', properties: [
+                new OA\Property(property: 'doctor_id', type: 'integer', example: 5),
+                new OA\Property(property: 'doctor_name', type: 'string', example: 'Jane Smith'),
+                new OA\Property(property: 'average', type: 'number', format: 'float', example: 3.1),
+                new OA\Property(property: 'total', type: 'integer', example: 10),
+            ])),
+            new OA\Property(property: 'most_rated', type: 'array', items: new OA\Items(type: 'object', properties: [
+                new OA\Property(property: 'doctor_id', type: 'integer', example: 2),
+                new OA\Property(property: 'doctor_name', type: 'string', example: 'Alice Brown'),
+                new OA\Property(property: 'average', type: 'number', format: 'float', example: 4.5),
+                new OA\Property(property: 'total', type: 'integer', example: 50),
+            ])),
+            new OA\Property(property: 'top_per_specialization', type: 'array', items: new OA\Items(type: 'object', properties: [
+                new OA\Property(property: 'specialization_id', type: 'integer', example: 1),
+                new OA\Property(property: 'specialization_name', type: 'string', example: 'Cardiology'),
+                new OA\Property(property: 'doctor_id', type: 'integer', example: 1),
+                new OA\Property(property: 'doctor_name', type: 'string', example: 'John Doe'),
+                new OA\Property(property: 'average', type: 'number', format: 'float', example: 4.8),
+                new OA\Property(property: 'total', type: 'integer', example: 15),
+            ])),
         ]),
     ]
 )]

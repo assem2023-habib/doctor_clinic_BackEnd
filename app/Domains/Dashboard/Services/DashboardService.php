@@ -12,14 +12,17 @@ class DashboardService
 {
     public function forAdmin(): array
     {
+        $now = now();
+
         $users = User::selectRaw("
             COUNT(*) as total,
                 SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as active,
-                SUM(CASE WHEN is_active = 0 THEN 1 ELSE 0 END) as inactive,
-                SUM(CASE WHEN DATE(created_at) = CURDATE() THEN 1 ELSE 0 END) as new_today,
-                SUM(CASE WHEN YEARWEEK(created_at) = YEARWEEK(CURDATE()) THEN 1 ELSE 0 END) as new_this_week,
-                SUM(CASE WHEN YEAR(created_at) = YEAR(CURDATE()) AND MONTH(created_at) = MONTH(CURDATE()) THEN 1 ELSE 0 END) as new_this_month
+                SUM(CASE WHEN is_active = 0 THEN 1 ELSE 0 END) as inactive
         ")->first();
+
+        $newToday = User::whereDate('created_at', $now->toDateString())->count();
+        $newThisWeek = User::whereBetween('created_at', [$now->copy()->startOfWeek(), $now->copy()->endOfWeek()])->count();
+        $newThisMonth = User::whereYear('created_at', $now->year)->whereMonth('created_at', $now->month)->count();
 
         $usersByRole = DB::table('role_user')
             ->join('roles', 'role_user.role_id', '=', 'roles.id')
@@ -27,12 +30,10 @@ class DashboardService
             ->groupBy('roles.name')
             ->pluck('count', 'name');
 
-        $appointments = Appointment::selectRaw("
-            COUNT(*) as total,
-                SUM(CASE WHEN DATE(appointment_date) = CURDATE() THEN 1 ELSE 0 END) as today,
-                SUM(CASE WHEN YEARWEEK(appointment_date) = YEARWEEK(CURDATE()) THEN 1 ELSE 0 END) as this_week,
-                SUM(CASE WHEN YEAR(appointment_date) = YEAR(CURDATE()) AND MONTH(appointment_date) = MONTH(CURDATE()) THEN 1 ELSE 0 END) as this_month
-        ")->first();
+        $appointmentsTotal = Appointment::count();
+        $appointmentsToday = Appointment::whereDate('appointment_date', $now->toDateString())->count();
+        $appointmentsThisWeek = Appointment::whereBetween('appointment_date', [$now->copy()->startOfWeek(), $now->copy()->endOfWeek()])->count();
+        $appointmentsThisMonth = Appointment::whereYear('appointment_date', $now->year)->whereMonth('appointment_date', $now->month)->count();
 
         $appointmentsByStatus = Appointment::selectRaw("status, COUNT(*) as count")
             ->groupBy('status')
@@ -51,9 +52,7 @@ class DashboardService
             ->get()
             ->toArray();
 
-        $ratings = DB::table('ratings')
-            ->selectRaw('AVG(rating) as average, COUNT(*) as total')
-            ->first();
+        $ratings = $this->getGlobalRatings();
 
         return [
             'users' => [
@@ -64,15 +63,15 @@ class DashboardService
                 'admins' => (int) ($usersByRole['Admin'] ?? 0),
                 'active' => (int) $users->active,
                 'inactive' => (int) $users->inactive,
-                'new_today' => (int) $users->new_today,
-                'new_this_week' => (int) $users->new_this_week,
-                'new_this_month' => (int) $users->new_this_month,
+                'new_today' => $newToday,
+                'new_this_week' => $newThisWeek,
+                'new_this_month' => $newThisMonth,
             ],
             'appointments' => [
-                'total' => (int) $appointments->total,
-                'today' => (int) $appointments->today,
-                'this_week' => (int) $appointments->this_week,
-                'this_month' => (int) $appointments->this_month,
+                'total' => $appointmentsTotal,
+                'today' => $appointmentsToday,
+                'this_week' => $appointmentsThisWeek,
+                'this_month' => $appointmentsThisMonth,
                 'by_status' => $appointmentsByStatus->map(fn ($c, $s) => (int) $c)->toArray(),
             ],
             'medical_records' => ['total' => $medicalRecords],
@@ -81,10 +80,7 @@ class DashboardService
                 'total' => $specializationsTotal,
                 'top' => $topSpecializations,
             ],
-            'ratings' => [
-                'average' => $ratings->average ? round((float) $ratings->average, 2) : 0,
-                'total' => (int) $ratings->total,
-            ],
+            'ratings' => $ratings,
         ];
     }
 
@@ -96,6 +92,7 @@ class DashboardService
             return [];
         }
 
+        $now = now();
         $doctorId = $doctor->id;
 
         $patientsCount = DB::table('doctor_patient')
@@ -105,16 +102,16 @@ class DashboardService
 
         $newPatientsThisMonth = DB::table('doctor_patient')
             ->where('doctor_id', $doctorId)
-            ->whereYear('created_at', now()->year)
-            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', $now->year)
+            ->whereMonth('created_at', $now->month)
             ->count();
 
-        $appointments = Appointment::where('doctor_id', $doctorId)
-            ->selectRaw("
-                COUNT(*) as total,
-                    SUM(CASE WHEN DATE(appointment_date) = CURDATE() THEN 1 ELSE 0 END) as today,
-                    SUM(CASE WHEN appointment_date >= CURDATE() AND status != 'completed' AND status != 'cancelled' THEN 1 ELSE 0 END) as upcoming
-            ")->first();
+        $appointmentsTotal = Appointment::where('doctor_id', $doctorId)->count();
+        $appointmentsToday = Appointment::where('doctor_id', $doctorId)->whereDate('appointment_date', $now->toDateString())->count();
+        $appointmentsUpcoming = Appointment::where('doctor_id', $doctorId)
+            ->where('appointment_date', '>=', $now->toDateString())
+            ->whereNotIn('status', ['completed', 'cancelled'])
+            ->count();
 
         $appointmentsByStatus = Appointment::where('doctor_id', $doctorId)
             ->selectRaw("status, COUNT(*) as count")
@@ -127,7 +124,7 @@ class DashboardService
         $ratings = DB::table('ratings')
             ->where('rateable_id', $user->id)
             ->where('rateable_type', 'App\Models\User')
-            ->selectRaw('AVG(rating) as average, COUNT(*) as total')
+            ->selectRaw('AVG(rating) as average, COUNT(*) as total, SUM(CASE WHEN rating <= 2 THEN 1 ELSE 0 END) as negative_count')
             ->first();
 
         return [
@@ -136,9 +133,9 @@ class DashboardService
                 'new_this_month' => $newPatientsThisMonth,
             ],
             'appointments' => [
-                'total' => (int) $appointments->total,
-                'today' => (int) $appointments->today,
-                'upcoming' => (int) $appointments->upcoming,
+                'total' => $appointmentsTotal,
+                'today' => $appointmentsToday,
+                'upcoming' => $appointmentsUpcoming,
                 'by_status' => $appointmentsByStatus->map(fn ($c, $s) => (int) $c)->toArray(),
             ],
             'medical_records' => ['total' => $medicalRecords],
@@ -146,6 +143,7 @@ class DashboardService
             'ratings' => [
                 'average' => $ratings->average ? round((float) $ratings->average, 2) : 0,
                 'total' => (int) $ratings->total,
+                'negative_count' => (int) ($ratings->negative_count ?? 0),
             ],
         ];
     }
@@ -158,6 +156,7 @@ class DashboardService
             return [];
         }
 
+        $now = now();
         $patientId = $patient->id;
 
         $doctorsCount = DB::table('doctor_patient')
@@ -165,11 +164,11 @@ class DashboardService
             ->where('supervision_status', 'active')
             ->count();
 
-        $appointments = Appointment::where('patient_id', $patientId)
-            ->selectRaw("
-                COUNT(*) as total,
-                    SUM(CASE WHEN appointment_date >= CURDATE() AND status != 'completed' AND status != 'cancelled' THEN 1 ELSE 0 END) as upcoming
-            ")->first();
+        $appointmentsTotal = Appointment::where('patient_id', $patientId)->count();
+        $appointmentsUpcoming = Appointment::where('patient_id', $patientId)
+            ->where('appointment_date', '>=', $now->toDateString())
+            ->whereNotIn('status', ['completed', 'cancelled'])
+            ->count();
 
         $appointmentsByStatus = Appointment::where('patient_id', $patientId)
             ->selectRaw("status, COUNT(*) as count")
@@ -183,8 +182,8 @@ class DashboardService
         return [
             'doctors' => ['total' => $doctorsCount],
             'appointments' => [
-                'total' => (int) $appointments->total,
-                'upcoming' => (int) $appointments->upcoming,
+                'total' => $appointmentsTotal,
+                'upcoming' => $appointmentsUpcoming,
                 'by_status' => $appointmentsByStatus->map(fn ($c, $s) => (int) $c)->toArray(),
             ],
             'medical_records' => ['total' => $medicalRecords],
@@ -194,25 +193,29 @@ class DashboardService
 
     public function forReceptionist(User $user): array
     {
-        $appointmentsToday = Appointment::whereDate('appointment_date', now()->toDateString())
-            ->selectRaw("COUNT(*) as total")
-            ->first();
+        $now = now();
 
-        $appointmentsByStatus = Appointment::whereDate('appointment_date', now()->toDateString())
+        $appointmentsToday = Appointment::whereDate('appointment_date', $now->toDateString())->count();
+
+        $appointmentsByStatus = Appointment::whereDate('appointment_date', $now->toDateString())
             ->selectRaw("status, COUNT(*) as count")
             ->groupBy('status')
             ->pluck('count', 'status');
 
         $patientsRegisteredToday = User::whereHas('roles', fn ($q) => $q->where('slug', 'patient'))
-            ->whereDate('created_at', now()->toDateString())
+            ->whereDate('created_at', $now->toDateString())
             ->count();
 
         $totalPatients = User::whereHas('roles', fn ($q) => $q->where('slug', 'patient'))->count();
         $totalDoctors = User::whereHas('roles', fn ($q) => $q->where('slug', 'doctor'))->count();
+        $medicalRecords = MedicalRecord::count();
+        $prescriptions = Prescription::count();
+
+        $ratings = $this->getGlobalRatings();
 
         return [
             'appointments' => [
-                'today_total' => (int) $appointmentsToday->total,
+                'today_total' => $appointmentsToday,
                 'by_status' => $appointmentsByStatus->map(fn ($c, $s) => (int) $c)->toArray(),
             ],
             'patients' => [
@@ -222,6 +225,86 @@ class DashboardService
             'doctors' => [
                 'total' => $totalDoctors,
             ],
+            'medical_records' => ['total' => $medicalRecords],
+            'prescriptions' => ['total' => $prescriptions],
+            'ratings' => $ratings,
+        ];
+    }
+
+    private function getGlobalRatings(): array
+    {
+        $doctorRatings = DB::table('ratings')
+            ->select([
+                'ratings.rateable_id as doctor_id',
+                'users.first_name',
+                'users.last_name',
+                DB::raw('ROUND(AVG(ratings.rating), 2) as average'),
+                DB::raw('COUNT(ratings.id) as total'),
+            ])
+            ->join('users', 'users.id', '=', 'ratings.rateable_id')
+            ->where('ratings.rateable_type', 'App\Models\User')
+            ->where('ratings.type', 'user')
+            ->groupBy('ratings.rateable_id', 'users.first_name', 'users.last_name')
+            ->get()
+            ->map(fn ($row) => (object) [
+                'doctor_id' => $row->doctor_id,
+                'doctor_name' => $row->first_name . ' ' . $row->last_name,
+                'average' => (float) $row->average,
+                'total' => (int) $row->total,
+            ]);
+
+        $topPositive = $doctorRatings->sortByDesc('average')->take(3)->values();
+        $lowestPositive = $doctorRatings->sortBy('average')->take(3)->values();
+        $mostRated = $doctorRatings->sortByDesc('total')->take(3)->values();
+
+        $overall = DB::table('ratings')
+            ->where('rateable_type', 'App\Models\User')
+            ->where('type', 'user')
+            ->selectRaw('AVG(rating) as average, COUNT(*) as total, SUM(CASE WHEN rating <= 2 THEN 1 ELSE 0 END) as negative_count')
+            ->first();
+
+        $topPerSpecialization = DB::select("
+            SELECT ranked.specialization_id, ranked.specialization_name,
+                   ranked.doctor_id, ranked.first_name, ranked.last_name, ranked.average, ranked.total
+            FROM (
+                SELECT
+                    s.id AS specialization_id,
+                    s.name AS specialization_name,
+                    u.id AS doctor_id,
+                    u.first_name,
+                    u.last_name,
+                    ROUND(AVG(r.rating), 2) AS average,
+                    COUNT(r.id) AS total,
+                    ROW_NUMBER() OVER (PARTITION BY s.id ORDER BY AVG(r.rating) DESC, COUNT(r.id) DESC) AS rn
+                FROM ratings r
+                INNER JOIN users u ON u.id = r.rateable_id
+                INNER JOIN doctors d ON d.user_id = u.id
+                INNER JOIN specializations s ON s.id = d.specialization_id
+                WHERE r.rateable_type = 'App\Models\User'
+                    AND r.type = 'user'
+                GROUP BY s.id, s.name, u.id, u.first_name, u.last_name
+            ) ranked
+            WHERE ranked.rn = 1
+            ORDER BY ranked.average DESC
+        ");
+
+        $topPerSpecialization = array_map(fn ($row) => [
+            'specialization_id' => $row->specialization_id,
+            'specialization_name' => $row->specialization_name,
+            'doctor_id' => $row->doctor_id,
+            'doctor_name' => $row->first_name . ' ' . $row->last_name,
+            'average' => (float) $row->average,
+            'total' => (int) $row->total,
+        ], $topPerSpecialization);
+
+        return [
+            'average' => $overall->average ? round((float) $overall->average, 2) : 0,
+            'total' => (int) $overall->total,
+            'negative_count' => (int) ($overall->negative_count ?? 0),
+            'top_positive' => $topPositive,
+            'lowest_positive' => $lowestPositive,
+            'most_rated' => $mostRated,
+            'top_per_specialization' => $topPerSpecialization,
         ];
     }
 }

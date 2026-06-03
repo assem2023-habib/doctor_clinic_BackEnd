@@ -7455,6 +7455,118 @@
                             "total": {
                                 "type": "integer",
                                 "example": 80
+                            },
+                            "negative_count": {
+                                "type": "integer",
+                                "example": 5
+                            },
+                            "top_positive": {
+                                "type": "array",
+                                "items": {
+                                    "properties": {
+                                        "doctor_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "doctor_name": {
+                                            "type": "string",
+                                            "example": "John Doe"
+                                        },
+                                        "average": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 4.9
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 20
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            },
+                            "lowest_positive": {
+                                "type": "array",
+                                "items": {
+                                    "properties": {
+                                        "doctor_id": {
+                                            "type": "integer",
+                                            "example": 5
+                                        },
+                                        "doctor_name": {
+                                            "type": "string",
+                                            "example": "Jane Smith"
+                                        },
+                                        "average": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 3.1
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 10
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            },
+                            "most_rated": {
+                                "type": "array",
+                                "items": {
+                                    "properties": {
+                                        "doctor_id": {
+                                            "type": "integer",
+                                            "example": 2
+                                        },
+                                        "doctor_name": {
+                                            "type": "string",
+                                            "example": "Alice Brown"
+                                        },
+                                        "average": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 4.5
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 50
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            },
+                            "top_per_specialization": {
+                                "type": "array",
+                                "items": {
+                                    "properties": {
+                                        "specialization_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "specialization_name": {
+                                            "type": "string",
+                                            "example": "Cardiology"
+                                        },
+                                        "doctor_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "doctor_name": {
+                                            "type": "string",
+                                            "example": "John Doe"
+                                        },
+                                        "average": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 4.8
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 15
+                                        }
+                                    },
+                                    "type": "object"
+                                }
                             }
                         },
                         "type": "object"
@@ -7544,6 +7656,10 @@
                             "total": {
                                 "type": "integer",
                                 "example": 30
+                            },
+                            "negative_count": {
+                                "type": "integer",
+                                "example": 2
                             }
                         },
                         "type": "object"
@@ -7669,6 +7785,150 @@
                             "total": {
                                 "type": "integer",
                                 "example": 25
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "medical_records": {
+                        "properties": {
+                            "total": {
+                                "type": "integer",
+                                "example": 300
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "prescriptions": {
+                        "properties": {
+                            "total": {
+                                "type": "integer",
+                                "example": 450
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "ratings": {
+                        "properties": {
+                            "average": {
+                                "type": "number",
+                                "format": "float",
+                                "example": 4.2
+                            },
+                            "total": {
+                                "type": "integer",
+                                "example": 80
+                            },
+                            "negative_count": {
+                                "type": "integer",
+                                "example": 5
+                            },
+                            "top_positive": {
+                                "type": "array",
+                                "items": {
+                                    "properties": {
+                                        "doctor_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "doctor_name": {
+                                            "type": "string",
+                                            "example": "John Doe"
+                                        },
+                                        "average": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 4.9
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 20
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            },
+                            "lowest_positive": {
+                                "type": "array",
+                                "items": {
+                                    "properties": {
+                                        "doctor_id": {
+                                            "type": "integer",
+                                            "example": 5
+                                        },
+                                        "doctor_name": {
+                                            "type": "string",
+                                            "example": "Jane Smith"
+                                        },
+                                        "average": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 3.1
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 10
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            },
+                            "most_rated": {
+                                "type": "array",
+                                "items": {
+                                    "properties": {
+                                        "doctor_id": {
+                                            "type": "integer",
+                                            "example": 2
+                                        },
+                                        "doctor_name": {
+                                            "type": "string",
+                                            "example": "Alice Brown"
+                                        },
+                                        "average": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 4.5
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 50
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            },
+                            "top_per_specialization": {
+                                "type": "array",
+                                "items": {
+                                    "properties": {
+                                        "specialization_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "specialization_name": {
+                                            "type": "string",
+                                            "example": "Cardiology"
+                                        },
+                                        "doctor_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "doctor_name": {
+                                            "type": "string",
+                                            "example": "John Doe"
+                                        },
+                                        "average": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 4.8
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 15
+                                        }
+                                    },
+                                    "type": "object"
+                                }
                             }
                         },
                         "type": "object"

@@ -2898,6 +2898,11 @@
 									"key": "limit",
 									"value": "20",
 									"description": "Items per page (max 100)"
+								},
+								{
+									"key": "status",
+									"value": "",
+									"description": "Filter by supervision status(es). Single (?status=active) or multiple (?status[]=active&status[]=suspended)"
 								}
 							]
 						}
