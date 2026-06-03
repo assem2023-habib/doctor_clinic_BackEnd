@@ -11,6 +11,7 @@ use App\Domains\Doctors\Requests\PatchDoctorRequest;
 use App\Domains\Doctors\Requests\StoreDoctorRequest;
 use App\Domains\Doctors\Requests\UpdateDoctorRequest;
 use App\Domains\Doctors\Resources\DoctorResource;
+use App\Domains\Ratings\Resources\RatingResource;
 use App\Domains\Shared\Responses\ApiResponse;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -57,12 +58,46 @@ class DoctorController
             ->with('user.roles', 'schedules')
             ->firstOrFail();
 
+        $doctor->loadCount('ratings');
+        $doctor->loadAvg('ratings', 'rating');
+
+        $recentRatings = $doctor->ratings()
+            ->with('rater')
+            ->latest()
+            ->limit(5)
+            ->get();
+
+        $doctor->setRelation('recentRatings', $recentRatings);
+
         $user = $doctor->user;
         $user->setRelation('doctor', $doctor);
 
         return ApiResponse::success(
             new DoctorResource($user),
             __('Doctor retrieved successfully')
+        );
+    }
+
+    public function ratings(Request $request, string $doctor): JsonResponse
+    {
+        $limit = (int) $request->integer('limit', 20);
+
+        $doctor = Doctor::where('user_id', $doctor)->firstOrFail();
+
+        $ratings = $doctor->ratings()
+            ->with('rater')
+            ->when($request->search, fn ($q, $v) => $q->where(function ($q) use ($v) {
+                $q->where('comment', 'like', "%{$v}%")
+                  ->orWhereHas('rater', fn ($q) => $q->where('first_name', 'like', "%{$v}%")
+                      ->orWhere('last_name', 'like', "%{$v}%"));
+            }))
+            ->latest()
+            ->paginate(min($limit, 100));
+
+        return ApiResponse::success(
+            RatingResource::collection($ratings),
+            __('Doctor ratings retrieved successfully'),
+            pagination: ApiResponse::pagination($ratings)
         );
     }
 

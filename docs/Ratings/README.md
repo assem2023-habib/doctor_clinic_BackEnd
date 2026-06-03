@@ -18,6 +18,7 @@
 | `POST` | `/api/v1/ratings` | Create a new rating |
 | `PUT` | `/api/v1/ratings/{rating}` | Update your own rating |
 | `DELETE` | `/api/v1/ratings/{rating}` | Delete a rating (owner or admin) |
+| `GET` | `/api/v1/doctors/{doctor}/ratings` | Doctor ratings (paginated, searchable) |
 
 ---
 

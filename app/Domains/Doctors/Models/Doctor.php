@@ -4,6 +4,8 @@ namespace App\Domains\Doctors\Models;
 
 use App\Domains\Appointments\Models\Appointment;
 use App\Domains\Patients\Models\Patient;
+use App\Domains\Ratings\Models\Rating;
+use App\Enums\RatingTypeEnum;
 use App\Models\User;
 use App\Traits\HasUuidV7;
 use Illuminate\Database\Eloquent\Model;
@@ -49,5 +51,12 @@ class Doctor extends Model
         return $this->belongsToMany(Patient::class, 'doctor_patient')
             ->withPivot('assigned_by', 'notes', 'supervision_status', 'supervision_start', 'supervision_end', 'created_at')
             ->withTimestamps();
+    }
+
+    public function ratings(): HasMany
+    {
+        return $this->hasMany(Rating::class, 'rateable_id', 'user_id')
+            ->where('type', RatingTypeEnum::User)
+            ->where('rateable_type', 'App\Models\User');
     }
 }

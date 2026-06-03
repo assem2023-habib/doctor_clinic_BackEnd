@@ -10,6 +10,7 @@ class DoctorControllerDoc
         path: '/api/v1/doctors',
         summary: 'List all doctors',
         tags: ['Doctors'],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(name: 'limit', in: 'query', schema: new OA\Schema(type: 'integer', default: 20, maximum: 100), description: 'Items per page (max 100)'),
             new OA\Parameter(name: 'page', in: 'query', schema: new OA\Schema(type: 'integer', default: 1), description: 'Page number'),
@@ -57,9 +58,36 @@ class DoctorControllerDoc
                     type: 'object'
                 )
             ),
+            new OA\Response(response: 401, description: 'Unauthenticated'),
         ]
     )]
     public function index() {}
+
+    #[OA\Get(
+        path: '/api/v1/doctors/{doctor}/ratings',
+        summary: 'Get doctor ratings (paginated)',
+        tags: ['Doctors'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(name: 'doctor', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Doctor user UUID'),
+            new OA\Parameter(name: 'limit', in: 'query', schema: new OA\Schema(type: 'integer', default: 20, maximum: 100), description: 'Items per page (max 100)'),
+            new OA\Parameter(name: 'page', in: 'query', schema: new OA\Schema(type: 'integer', default: 1), description: 'Page number'),
+            new OA\Parameter(name: 'search', in: 'query', schema: new OA\Schema(type: 'string'), description: 'Search by comment or rater name'),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Doctor ratings retrieved successfully', content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'status', type: 'integer', example: 200),
+                    new OA\Property(property: 'message', type: 'string', example: 'Doctor ratings retrieved successfully'),
+                    new OA\Property(property: 'data', type: 'array', items: new OA\Items(ref: '#/components/schemas/RatingResource')),
+                    new OA\Property(property: 'meta', type: 'object'),
+                ]
+            )),
+            new OA\Response(response: 401, description: 'Unauthenticated'),
+            new OA\Response(response: 404, description: 'Doctor not found'),
+        ]
+    )]
+    public function ratings() {}
 
     #[OA\Post(
         path: '/api/v1/doctors',
@@ -106,12 +134,13 @@ class DoctorControllerDoc
         path: '/api/v1/doctors/{doctor}',
         summary: 'Get a single doctor',
         tags: ['Doctors'],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'doctor',
                 in: 'path',
                 required: true,
-                description: 'Doctor ID (UUID)',
+                description: 'Doctor ID (user UUID)',
                 schema: new OA\Schema(type: 'string', format: 'uuid')
             ),
         ],
@@ -131,6 +160,7 @@ class DoctorControllerDoc
                     type: 'object'
                 )
             ),
+            new OA\Response(response: 401, description: 'Unauthenticated'),
             new OA\Response(
                 response: 404,
                 description: 'Doctor not found'

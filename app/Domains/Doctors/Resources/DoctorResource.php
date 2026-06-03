@@ -24,6 +24,21 @@ class DoctorResource extends UserResource
                 'end_time' => $schedule->end_time?->format('H:i'),
                 'is_active' => $schedule->is_active,
             ]),
+            'rating' => [
+                'avg' => round((float) ($this->doctor?->ratings_avg_rating ?? 0), 1),
+                'count' => (int) ($this->doctor?->ratings_count ?? 0),
+                'recent' => $this->doctor?->recentRatings?->map(fn ($r) => [
+                    'id' => $r->id,
+                    'rating' => $r->rating,
+                    'comment' => $r->comment,
+                    'rater' => $r->rater ? [
+                        'id' => $r->rater->id,
+                        'first_name' => $r->rater->first_name,
+                        'last_name' => $r->rater->last_name,
+                    ] : null,
+                    'created_at' => $r->created_at,
+                ]) ?? [],
+            ],
         ]);
     }
 }

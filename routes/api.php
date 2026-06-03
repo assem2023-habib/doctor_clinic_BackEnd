@@ -46,11 +46,6 @@ Route::prefix('v1/auth')->group(function () {
     });
 });
 
-Route::prefix('v1/doctors')->group(function () {
-    Route::get('/', [DoctorController::class, 'index']);
-    Route::get('/{doctor}', [DoctorController::class, 'show']);
-});
-
 Route::prefix('v1/receptionists')->group(function () {
     Route::get('/', [ReceptionistController::class, 'index']);
     Route::get('/{receptionist}', [ReceptionistController::class, 'show']);
@@ -71,9 +66,15 @@ Route::prefix('v1/cities')->group(function () {
     Route::get('/{city}', [CityController::class, 'show']);
 });
 
-Route::get('/v1/doctors/{doctor}/booked-slots', [AppointmentController::class, 'bookedSlots']);
-
 Route::middleware(['auth:api', 'active'])->group(function () {
+    Route::prefix('v1/doctors')->group(function () {
+        Route::get('/', [DoctorController::class, 'index']);
+        Route::get('/{doctor}', [DoctorController::class, 'show']);
+        Route::get('/{doctor}/ratings', [DoctorController::class, 'ratings']);
+    });
+
+    Route::get('/v1/doctors/{doctor}/booked-slots', [AppointmentController::class, 'bookedSlots']);
+
     Route::get('/v1/doctors/{doctor}/appointments', [AppointmentController::class, 'doctorAppointments']);
     Route::get('/v1/doctors/{doctor}/patients', [SupervisionController::class, 'doctorPatients']);
     Route::get('/v1/patients/{patient}/doctors', [SupervisionController::class, 'patientDoctors']);

@@ -1430,7 +1430,7 @@
 		},
 		{
 			"name": "Doctors",
-			"description": "Doctor management.\n\nPublic routes: List / Get.\nProtected routes (auth required + admin): Update, Delete, Activate Account.",
+			"description": "Doctor management.\n\nAll endpoints require authentication (Bearer token). Admin required for: Create, Update, Delete, Activate Account.",
 			"item": [
 				{
 					"name": "List Doctors",
@@ -1452,11 +1452,22 @@
 						}
 					],
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [
 							{
 								"key": "Accept",
 								"value": "application/json"
+
 							}
 						],
 						"url": {
@@ -1488,7 +1499,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctors retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Khaled\",\n            \"last_name\": \"Suleiman\",\n            \"email\": \"doctor@example.com\",\n            \"roles\": [\"doctor\"],\n            \"phone\": \"+963912345679\",\n            \"gender\": \"male\",\n            \"birthday_date\": \"1985-03-20\",\n            \"is_active\": true,\n            \"specialization\": {\"id\": \"019e1d0f-...\", \"slug\": \"cardiology\", \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"}, \"description\": null},\n            \"experience_months\": 60,\n            \"schedules\": []\n        }\n    ],\n    \"meta\": {\n        \"pagination\": {\n            \"current_page\": 1,\n            \"last_page\": 1,\n            \"per_page\": 20,\n            \"total\": 1,\n            \"from\": 1,\n            \"to\": 1,\n            \"limit\": 20\n        }\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctors retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"first_name\": \"Khaled\",\n            \"last_name\": \"Suleiman\",\n            \"email\": \"doctor@example.com\",\n            \"roles\": [\"doctor\"],\n            \"phone\": \"+963912345679\",\n            \"gender\": \"male\",\n            \"birthday_date\": \"1985-03-20\",\n            \"is_active\": true,\n            \"specialization\": {\"id\": \"019e1d0f-...\", \"slug\": \"cardiology\", \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"}, \"description\": null},\n            \"experience_months\": 60,\n            \"schedules\": [],\n            \"rating\": {\"avg\": 0, \"count\": 0, \"recent\": []}\n        }\n    ],\n    \"meta\": {\n        \"pagination\": {\n            \"current_page\": 1,\n            \"last_page\": 1,\n            \"per_page\": 20,\n            \"total\": 1,\n            \"from\": 1,\n            \"to\": 1,\n            \"limit\": 20\n        }\n    }\n}"
 						}
 					]
 				},
@@ -1604,7 +1615,7 @@
 							"name": "Created",
 							"status": "Created",
 							"code": 201,
-							"body": "{\n    \"status\": 201,\n    \"message\": \"Doctor created successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor@example.com\",\n        \"roles\": [\"doctor\"],\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"specialization\": {\"id\": \"019e1d0f-...\", \"slug\": \"cardiology\", \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"}, \"description\": null},\n        \"experience_months\": 60,\n        \"schedules\": []\n    }\n}"
+							"body": "{\n    \"status\": 201,\n    \"message\": \"Doctor created successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor@example.com\",\n        \"roles\": [\"doctor\"],\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"specialization\": {\"id\": \"019e1d0f-...\", \"slug\": \"cardiology\", \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"}, \"description\": null},\n        \"experience_months\": 60,\n        \"schedules\": [],\n        \"rating\": {\"avg\": 0, \"count\": 0, \"recent\": []}\n    }\n}"
 						},
 						{
 							"name": "Unauthenticated",
@@ -1637,6 +1648,16 @@
 						}
 					],
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [
 							{
@@ -1662,7 +1683,94 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctor retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor@example.com\",\n        \"roles\": [\"doctor\"],\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"specialization\": {\"id\": \"019e1d0f-...\", \"slug\": \"cardiology\", \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"}, \"description\": null},\n        \"experience_months\": 60,\n        \"schedules\": []\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctor retrieved successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman\",\n        \"email\": \"doctor@example.com\",\n        \"roles\": [\"doctor\"],\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"specialization\": {\"id\": \"019e1d0f-...\", \"slug\": \"cardiology\", \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"}, \"description\": null},\n        \"experience_months\": 60,\n        \"schedules\": [],\n        \"rating\": {\n            \"avg\": 4.5,\n            \"count\": 12,\n            \"recent\": [\n                {\n                    \"id\": \"019e1d0f-...\",\n                    \"rating\": 5,\n                    \"comment\": \"Excellent doctor, very professional\",\n                    \"rater\": {\n                        \"id\": \"019e1d0f-...\",\n                        \"first_name\": \"Ahmed\",\n                        \"last_name\": \"Ali\"\n                    },\n                    \"created_at\": \"2026-06-02T10:00:00.000000Z\"\n                }\n            ]\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Doctor Ratings",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    if (json.data && json.data.length > 0) {",
+									"        pm.collectionVariables.set('rating_id', json.data[0].id);",
+									"        console.log('Rating ID stored:', json.data[0].id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/doctors/{{doctor_id}}/ratings",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"doctors",
+								"{{doctor_id}}",
+								"ratings"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Items per page (max 100)"
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number"
+								},
+								{
+									"key": "search",
+									"value": "",
+									"description": "Search by comment or rater name"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"status": "OK",
+							"code": 200,
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctor ratings retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"019e1d0f-...\",\n            \"type\": \"user\",\n            \"rater\": {\n                \"id\": \"019e1d0f-...\",\n                \"first_name\": \"Ahmed\",\n                \"last_name\": \"Ali\",\n                \"email\": \"ahmed@example.com\"\n            },\n            \"rateable_id\": \"019e1d0f-...\",\n            \"rateable_type\": \"App\\\\Models\\\\User\",\n            \"rating\": 5,\n            \"comment\": \"Excellent doctor\",\n            \"created_at\": \"2026-06-02T10:00:00.000000Z\",\n            \"updated_at\": \"2026-06-02T10:00:00.000000Z\"\n        }\n    ],\n    \"meta\": {\n        \"pagination\": {\n            \"current_page\": 1,\n            \"last_page\": 1,\n            \"limit\": 20,\n            \"total\": 1,\n            \"hasNextPage\": false,\n            \"hasPreviousPage\": false\n        }\n    }\n}"
+						},
+						{
+							"name": "Unauthenticated",
+							"status": "Unauthorized",
+							"code": 401
+						},
+						{
+							"name": "Not Found",
+							"status": "Not Found",
+							"code": 404
 						}
 					]
 				},
@@ -1781,7 +1889,7 @@
 							"name": "Success",
 							"status": "OK",
 							"code": 200,
-							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctor updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman Updated\",\n        \"email\": \"doctor@example.com\",\n        \"roles\": [\"doctor\"],\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"specialization\": {\"id\": \"019e1d0f-...\", \"slug\": \"cardiology\", \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"}, \"description\": null},\n        \"experience_months\": 60,\n        \"schedules\": []\n    }\n}"
+							"body": "{\n    \"status\": 200,\n    \"message\": \"Doctor updated successfully\",\n    \"data\": {\n        \"id\": \"019e1d0f-...\",\n        \"first_name\": \"Khaled\",\n        \"last_name\": \"Suleiman Updated\",\n        \"email\": \"doctor@example.com\",\n        \"roles\": [\"doctor\"],\n        \"phone\": \"+963912345679\",\n        \"gender\": \"male\",\n        \"birthday_date\": \"1985-03-20\",\n        \"is_active\": true,\n        \"specialization\": {\"id\": \"019e1d0f-...\", \"slug\": \"cardiology\", \"name\": {\"ar\": \"طب القلب\", \"en\": \"Cardiology\"}, \"description\": null},\n        \"experience_months\": 60,\n        \"schedules\": [],\n        \"rating\": {\"avg\": 0, \"count\": 0, \"recent\": []}\n    }\n}"
 						},
 						{
 							"name": "Forbidden",
@@ -1969,9 +2077,7 @@
 					"script": {
 						"exec": [
 							"var token = pm.collectionVariables.get('access_token');",
-							"var url = pm.request.url.toString();",
-							"var needsAuth = pm.request.method !== 'GET';",
-							"if (token && needsAuth) {",
+							"if (token) {",
 							"    pm.request.headers.add({",
 							"        key: 'Authorization',",
 							"        value: 'Bearer ' + token",
@@ -2262,11 +2368,21 @@
 		},
 		{
 			"name": "Appointments",
-			"description": "Full appointment lifecycle: request, set time, respond, cancel, complete, suggest alternative.\n\nAll endpoints require authentication (Bearer token). Booked slots is public.",
+			"description": "Full appointment lifecycle: request, set time, respond, cancel, complete, suggest alternative.\n\nAll endpoints require authentication (Bearer token).",
 			"item": [
 				{
 					"name": "Get Booked Slots",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [
 							{

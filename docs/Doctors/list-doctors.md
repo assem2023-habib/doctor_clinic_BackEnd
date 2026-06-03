@@ -10,8 +10,8 @@
 |-------|-------|
 | **Method** | `GET` |
 | **URL** | `/api/v1/doctors` |
-| **Auth** | ❌ عام |
-| **Middleware** | لا يوجد |
+| **Auth** | ✅ مطلوب (`auth:api`, `active`) |
+| **Middleware** | `auth:api`, `active` |
 
 ---
 
@@ -83,32 +83,13 @@ public function index(Request $request): JsonResponse
 
 **الملف:** `app/Domains/Doctors/Resources/DoctorResource.php`
 
-```php
-class DoctorResource extends UserResource
-{
-    public function toArray($request): array
-    {
-        return array_merge(parent::toArray($request), [
-            'specialization' => $this->doctor?->specialization ? [
-                'id' => $this->doctor->specialization->id,
-                'slug' => $this->doctor->specialization->slug,
-                'name' => $this->doctor->specialization->name,
-                'description' => $this->doctor->specialization->description,
-            ] : null,
-            'experience_months' => $this->doctor?->experience_months,
-            'schedules' => $this->doctor?->schedules->map(fn ($s) => [
-                'id' => $s->id,
-                'day_of_week' => $s->day_of_week?->value,
-                'start_time' => $s->start_time?->format('H:i'),
-                'end_time' => $s->end_time?->format('H:i'),
-                'is_active' => $s->is_active,
-            ]),
-        ]);
-    }
-}
-```
+يمتد من `UserResource` (id, first_name, last_name, username, email, phone, address, gender, birthday_date, roles, is_active, image) ويضيف:
+- `specialization`
+- `experience_months`
+- `schedules`
+- `rating` (avg, count, recent) — فقط في show
 
-يمتد من `UserResource` (id, first_name, last_name, username, email, phone, address, gender, birthday_date, roles, is_active, image).
+> **ملاحظة:** في قائمة الأطباء `rating` يكون `{"avg": 0, "count": 0, "recent": []}` لأن بيانات التقييمات تُحمّل فقط في show.
 
 ---
 
@@ -152,7 +133,12 @@ class DoctorResource extends UserResource
                     "end_time": "17:00",
                     "is_active": true
                 }
-            ]
+            ],
+            "rating": {
+                "avg": 0,
+                "count": 0,
+                "recent": []
+            }
         }
     ],
     "meta": {
@@ -175,3 +161,4 @@ class DoctorResource extends UserResource
 | كود الحالة | الرسالة | السبب |
 |-----------|---------|-------|
 | `200` | `Doctors retrieved successfully` | نجاح |
+| `401` | `Unauthenticated` | لم يتم تسجيل الدخول |

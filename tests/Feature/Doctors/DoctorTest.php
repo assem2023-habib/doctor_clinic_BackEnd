@@ -6,9 +6,11 @@ use App\Domains\Appointments\Models\Appointment;
 use App\Domains\Doctors\Models\Doctor;
 use App\Domains\Doctors\Models\Specialization;
 use App\Domains\Patients\Models\Patient;
+use App\Domains\Ratings\Models\Rating;
 use App\Enums\AppointmentStatusEnum;
 use App\Enums\DayOfWeekEnum;
 use App\Enums\GenderEnum;
+use App\Enums\RatingTypeEnum;
 use App\Models\User;
 use Database\Seeders\SpecializationSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -98,6 +100,7 @@ class DoctorTest extends TestCase
         $this->createDoctor(['first_name' => 'John', 'email' => 'john@example.com']);
         $this->createDoctor(['first_name' => 'Jane', 'email' => 'jane@example.com']);
 
+        Passport::actingAs($this->createAdmin());
         $response = $this->getJson('/api/v1/doctors');
 
         $response->assertStatus(200)
@@ -118,6 +121,7 @@ class DoctorTest extends TestCase
         $user = $this->createDoctor();
         $this->createSchedule($user->doctor);
 
+        Passport::actingAs($this->createAdmin());
         $response = $this->getJson('/api/v1/doctors');
 
         $response->assertStatus(200);
@@ -134,6 +138,7 @@ class DoctorTest extends TestCase
         ]);
         $this->createSchedule($user->doctor);
 
+        Passport::actingAs($this->createAdmin());
         $response = $this->getJson("/api/v1/doctors/{$user->id}");
 
         $response->assertStatus(200)
@@ -153,6 +158,7 @@ class DoctorTest extends TestCase
 
     public function test_show_returns_404_for_nonexistent_doctor(): void
     {
+        Passport::actingAs($this->createAdmin());
         $response = $this->getJson('/api/v1/doctors/' . fake()->uuid());
 
         $response->assertStatus(404);
@@ -165,6 +171,7 @@ class DoctorTest extends TestCase
         $patientUser = User::factory()->create(['email' => 'patient@example.com']);
         $patientUser->assignRole('patient');
 
+        Passport::actingAs($this->createAdmin());
         $response = $this->getJson('/api/v1/doctors');
 
         $json = $response->json();
@@ -178,6 +185,7 @@ class DoctorTest extends TestCase
             $this->createDoctor(['email' => "doctor{$i}@example.com"]);
         }
 
+        Passport::actingAs($this->createAdmin());
         $response = $this->getJson('/api/v1/doctors?limit=10');
 
         $json = $response->json();
@@ -426,5 +434,183 @@ class DoctorTest extends TestCase
             'username' => 'johndoe',
             'phone' => '+963911111111',
         ]);
+    }
+
+    public function test_show_returns_rating_key_with_empty_values(): void
+    {
+        $user = $this->createDoctor();
+        $this->createSchedule($user->doctor);
+
+        Passport::actingAs($this->createAdmin());
+        $response = $this->getJson("/api/v1/doctors/{$user->id}");
+
+        $response->assertStatus(200);
+        $json = $response->json();
+
+        $this->assertArrayHasKey('rating', $json['data']);
+        $this->assertEquals(0, $json['data']['rating']['avg']);
+        $this->assertEquals(0, $json['data']['rating']['count']);
+        $this->assertEmpty($json['data']['rating']['recent']);
+    }
+
+    public function test_show_includes_rating_data_with_avg_and_recent(): void
+    {
+        $user = $this->createDoctor();
+        $this->createSchedule($user->doctor);
+
+        $raters = [];
+        for ($i = 0; $i < 3; $i++) {
+            $rater = User::factory()->create();
+            $rater->assignRole('patient');
+            $raters[] = $rater;
+        }
+
+        $ratings = [];
+        for ($i = 0; $i < 7; $i++) {
+            $ratings[] = Rating::create([
+                'rater_id' => $raters[$i % 3]->id,
+                'type' => RatingTypeEnum::User,
+                'rateable_id' => $user->id,
+                'rateable_type' => 'App\Models\User',
+                'rating' => ($i % 5) + 1,
+                'comment' => "Rating {$i}",
+                'created_at' => now()->subDays(7 - $i),
+            ]);
+        }
+
+        Passport::actingAs($this->createAdmin());
+        $response = $this->getJson("/api/v1/doctors/{$user->id}");
+
+        $response->assertStatus(200);
+        $json = $response->json();
+
+        $expectedAvg = round(array_sum(array_column($ratings, 'rating')) / count($ratings), 1);
+        $this->assertEquals($expectedAvg, $json['data']['rating']['avg']);
+        $this->assertEquals(7, $json['data']['rating']['count']);
+        $this->assertCount(5, $json['data']['rating']['recent']);
+
+        $recent = $json['data']['rating']['recent'];
+        $recentDates = array_map(fn ($r) => $r['created_at'], $recent);
+        $sortedDates = $recentDates;
+        rsort($sortedDates);
+        $this->assertEquals($sortedDates, $recentDates, 'Recent ratings must be ordered by created_at desc');
+
+        $firstRecent = $json['data']['rating']['recent'][0];
+        $this->assertArrayHasKey('id', $firstRecent);
+        $this->assertArrayHasKey('rating', $firstRecent);
+        $this->assertArrayHasKey('comment', $firstRecent);
+        $this->assertArrayHasKey('rater', $firstRecent);
+        $this->assertArrayHasKey('first_name', $firstRecent['rater']);
+        $this->assertArrayHasKey('last_name', $firstRecent['rater']);
+        $this->assertArrayHasKey('created_at', $firstRecent);
+    }
+
+    public function test_doctor_ratings_requires_auth(): void
+    {
+        $response = $this->getJson('/api/v1/doctors/' . fake()->uuid() . '/ratings');
+
+        $response->assertStatus(401);
+    }
+
+    public function test_doctor_ratings_returns_paginated_ratings(): void
+    {
+        $doctor = $this->createDoctor();
+        $patientRaters = [];
+
+        for ($i = 0; $i < 4; $i++) {
+            $rater = User::factory()->create();
+            $rater->assignRole('patient');
+            $patientRaters[] = $rater;
+        }
+
+        for ($i = 0; $i < 15; $i++) {
+            Rating::create([
+                'rater_id' => $patientRaters[$i % 4]->id,
+                'type' => RatingTypeEnum::User,
+                'rateable_id' => $doctor->id,
+                'rateable_type' => 'App\Models\User',
+                'rating' => ($i % 5) + 1,
+                'comment' => "Test rating {$i}",
+            ]);
+        }
+
+        Passport::actingAs($this->createAdmin());
+        $response = $this->getJson("/api/v1/doctors/{$doctor->id}/ratings?limit=5");
+
+        $response->assertStatus(200);
+        $json = $response->json();
+
+        $this->assertCount(5, $json['data']);
+        $this->assertArrayHasKey('meta', $json);
+        $this->assertArrayHasKey('pagination', $json['meta']);
+        $this->assertEquals(5, $json['meta']['pagination']['limit']);
+        $this->assertEquals(3, $json['meta']['pagination']['last_page']);
+        $this->assertEquals(15, $json['meta']['pagination']['total']);
+
+        $firstRating = $json['data'][0];
+        $this->assertArrayHasKey('id', $firstRating);
+        $this->assertArrayHasKey('rating', $firstRating);
+        $this->assertArrayHasKey('comment', $firstRating);
+        $this->assertArrayHasKey('rater', $firstRating);
+        $this->assertArrayHasKey('type', $firstRating);
+    }
+
+    public function test_doctor_ratings_returns_404_for_nonexistent_doctor(): void
+    {
+        Passport::actingAs($this->createAdmin());
+        $response = $this->getJson('/api/v1/doctors/' . fake()->uuid() . '/ratings');
+
+        $response->assertStatus(404);
+    }
+
+    public function test_doctor_ratings_search_filters_by_comment_or_rater_name(): void
+    {
+        $doctor = $this->createDoctor();
+
+        $raterJohn = User::factory()->create(['first_name' => 'John', 'last_name' => 'Doe']);
+        $raterJohn->assignRole('patient');
+        $raterJane = User::factory()->create(['first_name' => 'Jane', 'last_name' => 'Smith']);
+        $raterJane->assignRole('patient');
+
+        Rating::create([
+            'rater_id' => $raterJohn->id,
+            'type' => RatingTypeEnum::User,
+            'rateable_id' => $doctor->id,
+            'rateable_type' => 'App\Models\User',
+            'rating' => 5,
+            'comment' => 'Excellent doctor, very professional',
+        ]);
+
+        Rating::create([
+            'rater_id' => $raterJane->id,
+            'type' => RatingTypeEnum::User,
+            'rateable_id' => $doctor->id,
+            'rateable_type' => 'App\Models\User',
+            'rating' => 3,
+            'comment' => 'Average experience',
+        ]);
+
+        Rating::create([
+            'rater_id' => $raterJohn->id,
+            'type' => RatingTypeEnum::User,
+            'rateable_id' => $doctor->id,
+            'rateable_type' => 'App\Models\User',
+            'rating' => 4,
+            'comment' => 'Good follow-up care',
+        ]);
+
+        Passport::actingAs($this->createAdmin());
+
+        $responseSearchJohn = $this->getJson("/api/v1/doctors/{$doctor->id}/ratings?search=John");
+        $responseSearchJohn->assertStatus(200);
+        $this->assertCount(2, $responseSearchJohn->json()['data']);
+
+        $responseSearchExcellent = $this->getJson("/api/v1/doctors/{$doctor->id}/ratings?search=Excellent");
+        $responseSearchExcellent->assertStatus(200);
+        $this->assertCount(1, $responseSearchExcellent->json()['data']);
+
+        $responseSearchNoMatch = $this->getJson("/api/v1/doctors/{$doctor->id}/ratings?search=zzzzz");
+        $responseSearchNoMatch->assertStatus(200);
+        $this->assertCount(0, $responseSearchNoMatch->json()['data']);
     }
 }

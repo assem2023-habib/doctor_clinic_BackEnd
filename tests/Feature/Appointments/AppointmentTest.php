@@ -136,10 +136,12 @@ class AppointmentTest extends TestCase
         ], $overrides));
     }
 
-    public function test_anyone_can_view_booked_slots(): void
+    public function test_authenticated_user_can_view_booked_slots(): void
     {
         $doctorUser = $this->createDoctorUser();
         $patient = $this->createPatientUser();
+
+        Passport::actingAs($patient);
 
         $futureDate = now()->addDays(5)->format('Y-m-d');
 
@@ -172,6 +174,9 @@ class AppointmentTest extends TestCase
     {
         $doctorUser = $this->createDoctorUser();
 
+        $patient = $this->createPatientUser();
+        Passport::actingAs($patient);
+
         $monday = Carbon::now()->next(Carbon::MONDAY)->format('Y-m-d');
 
         $response = $this->getJson("/api/v1/doctors/{$doctorUser->doctor->id}/booked-slots?date={$monday}");
@@ -186,6 +191,8 @@ class AppointmentTest extends TestCase
     {
         $doctorUser = $this->createDoctorUser();
         $patient = $this->createPatientUser();
+
+        Passport::actingAs($patient);
 
         $futureDate = now()->addDays(5)->format('Y-m-d');
 

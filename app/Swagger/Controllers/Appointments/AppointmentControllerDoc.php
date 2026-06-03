@@ -9,8 +9,9 @@ class AppointmentControllerDoc
     #[OA\Get(
         path: '/api/v1/doctors/{doctor}/booked-slots',
         summary: 'Get booked slots for a doctor',
-        description: 'Public endpoint. No authentication required. Returns future booked appointments only (from now onwards).',
+        description: 'Returns future booked appointments only (from now onwards). Requires authentication.',
         tags: ['Appointments'],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(name: 'doctor', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Doctor UUID'),
             new OA\Parameter(name: 'date', in: 'query', schema: new OA\Schema(type: 'string', format: 'date'), description: 'Filter by exact date (Y-m-d)'),
@@ -21,6 +22,7 @@ class AppointmentControllerDoc
         ],
         responses: [
             new OA\Response(response: 200, description: 'Booked slots retrieved successfully'),
+            new OA\Response(response: 401, description: 'Unauthenticated'),
         ]
     )]
     public function bookedSlots() {}

@@ -51,6 +51,38 @@ use OpenApi\Attributes as OA;
                 type: 'object'
             )
         ),
+        new OA\Property(
+            property: 'rating',
+            type: 'object',
+            properties: [
+                new OA\Property(property: 'avg', type: 'number', format: 'float', example: 4.5, description: 'Average rating (0 if none)'),
+                new OA\Property(property: 'count', type: 'integer', example: 12, description: 'Total ratings count'),
+                new OA\Property(
+                    property: 'recent',
+                    type: 'array',
+                    description: 'Last 5 ratings (empty if none)',
+                    items: new OA\Items(
+                        properties: [
+                            new OA\Property(property: 'id', type: 'string', format: 'uuid'),
+                            new OA\Property(property: 'rating', type: 'integer', example: 5, description: '1-5'),
+                            new OA\Property(property: 'comment', type: 'string', nullable: true, example: 'Excellent doctor, very professional'),
+                            new OA\Property(
+                                property: 'rater',
+                                type: 'object',
+                                nullable: true,
+                                properties: [
+                                    new OA\Property(property: 'id', type: 'string', format: 'uuid'),
+                                    new OA\Property(property: 'first_name', type: 'string'),
+                                    new OA\Property(property: 'last_name', type: 'string'),
+                                ]
+                            ),
+                            new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+                        ],
+                        type: 'object'
+                    )
+                ),
+            ]
+        ),
     ],
     type: 'object'
 )]
