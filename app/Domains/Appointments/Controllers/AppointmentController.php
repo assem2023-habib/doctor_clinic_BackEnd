@@ -89,28 +89,29 @@ class AppointmentController
         $query = Appointment::with(['patient.user.image', 'doctor.user.image', 'doctor.schedules']);
 
         if ($user->hasRole('patient')) {
-            $patient = $user->patient;
-            $query->where('patient_id', $patient?->id);
+            $query->where('patient_id', $user->patient?->id);
         } elseif ($user->hasRole('doctor')) {
-            $doctor = $user->doctor;
-            $query->where('doctor_id', $doctor?->id);
+            $query->where('doctor_id', $user->doctor?->id);
         } elseif (!$user->hasAnyRole(['admin', 'receptionist'])) {
             return ApiResponse::forbidden(__('Unauthorized'));
         }
 
-        if ($request->status) {
-            $query->where('status', $request->status);
-        }
+        $query->when($request->filled('status'), fn($q) => $q->whereIn('status', (array) $request->status))
+            ->when(
+                $request->filled('date'),
+                fn($q) => $q->whereDate('appointment_date', $request->date),
+                fn($q) => $q
+                    ->when($request->filled('from_date'), fn($q) => $q->whereDate('appointment_date', '>=', $request->from_date))
+                    ->when($request->filled('to_date'), fn($q) => $q->whereDate('appointment_date', '<=', $request->to_date))
+            )
+            ->when($request->filled('from_time'), fn($q) => $q->whereTime('start_time', '>=', $request->from_time))
+            ->when($request->filled('to_time'), fn($q) => $q->whereTime('end_time', '<=', $request->to_time))
+            ->when($request->filled('doctor_id'), fn($q) => $q->whereIn('doctor_id', (array) $request->doctor_id));
 
-        if ($request->date) {
-            $query->whereDate('appointment_date', $request->date);
-        }
+        $orderBy = $request->order_by ?? 'created_at';
+        $orderDir = $request->order_dir ?? 'desc';
 
-        if ($request->doctor_id && $user->hasAnyRole(['admin', 'receptionist'])) {
-            $query->where('doctor_id', $request->doctor_id);
-        }
-
-        $appointments = $query->orderBy('created_at', 'desc')
+        $appointments = $query->orderBy($orderBy, $orderDir)
             ->paginate(min($limit, 100));
 
         return ApiResponse::success(

@@ -2465,59 +2465,59 @@
 							"path": ["api", "v1", "appointments"],
 							"query": [
 								{
-									"key": "search",
-									"value": "",
-									"description": "Filter by name or email"
-								},
-								{
-									"key": "specialization_id",
-									"value": "",
-									"description": "Filter by specialization ID"
-								},
-								{
-									"key": "experience_from",
-									"value": "",
-									"description": "Minimum experience in months"
-								},
-								{
-									"key": "experience_to",
-									"value": "",
-									"description": "Maximum experience in months"
-								},
-								{
-									"key": "gender",
-									"value": "",
-									"description": "Filter by gender (male/female)"
-								},
-								{
-									"key": "date_from",
-									"value": "",
-									"description": "Birthday date range start (Y-m-d)"
-								},
-								{
-									"key": "date_to",
-									"value": "",
-									"description": "Birthday date range end (Y-m-d)"
-								},
-								{
-									"key": "is_active",
-									"value": "",
-									"description": "Filter by active status (true/false)"
-								},
-								{
 									"key": "limit",
 									"value": "20",
 									"description": "Items per page (max 100)"
 								},
 								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number"
+								},
+								{
+									"key": "status",
+									"value": "",
+									"description": "Filter by status(es). Single (?status=accepted) or multiple (?status[]=set&status[]=accepted)"
+								},
+								{
 									"key": "date",
 									"value": "",
-									"description": "Filter by date (Y-m-d)"
+									"description": "Filter by exact date (Y-m-d)"
+								},
+								{
+									"key": "from_date",
+									"value": "",
+									"description": "Filter from date (Y-m-d)"
+								},
+								{
+									"key": "to_date",
+									"value": "",
+									"description": "Filter to date (Y-m-d)"
+								},
+								{
+									"key": "from_time",
+									"value": "",
+									"description": "Filter by start_time >= value (H:i)"
+								},
+								{
+									"key": "to_time",
+									"value": "",
+									"description": "Filter by end_time <= value (H:i)"
 								},
 								{
 									"key": "doctor_id",
 									"value": "",
-									"description": "Filter by doctor UUID (admin/receptionist only)"
+									"description": "Filter by doctor(s). Single (?doctor_id=uuid) or multiple (?doctor_id[]=uuid1&uuid2)"
+								},
+								{
+									"key": "order_by",
+									"value": "created_at",
+									"description": "Sort field: created_at, appointment_date, start_time"
+								},
+								{
+									"key": "order_dir",
+									"value": "desc",
+									"description": "Sort direction: asc, desc"
 								}
 							]
 						}

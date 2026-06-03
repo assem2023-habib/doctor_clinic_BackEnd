@@ -20,7 +20,7 @@ Set → Auto-Confirmed (after response window expires via Job)
 |--------|----------|------|-------------|
 | GET | `/v1/doctors/{doctor}/booked-slots` | None | Get booked slots for a doctor (future only, optional date range) |
 | GET | `/v1/doctors/{doctor}/appointments` | `auth:api` | List doctor appointments (filtered by date, role-scoped) |
-| GET | `/v1/appointments` | `auth:api` | List appointments (role-scoped, supports `doctor_id` filter) |
+| GET | `/v1/appointments` | `auth:api` | List appointments (role-scoped, supports status/date/time/doctor filters, multi-value, custom order) |
 | GET | `/v1/appointments/{appointment}` | `auth:api` | Get a single appointment |
 | POST | `/v1/appointments` | `auth:api` | Request a new appointment (patient only) |
 | POST | `/v1/appointments/{appointment}/set-time` | `auth:api` | Set appointment time (staff/doctor) |

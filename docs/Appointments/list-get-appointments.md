@@ -15,14 +15,24 @@
 | Parameter | Type | Default | Constraints | Description |
 |-----------|------|---------|-------------|-------------|
 | `limit` | integer | 20 | 1–100 | Items per page |
-| `status` | string | — | enum `AppointmentStatusEnum` | Filter by status |
-| `date` | string | — | date (Y-m-d) | Filter by appointment date |
-| `doctor_id` | string | — | uuid | Filter by doctor (admin/receptionist only) |
+| `page` | integer | 1 | min:1 | Page number |
+| `status` | string/array | — | enum `AppointmentStatusEnum` | Filter by status(es). Single (`?status=accepted`) or multiple (`?status[]=set&status[]=accepted`) |
+| `date` | string | — | date (Y-m-d) | Filter by exact date. When set, `from_date`/`to_date` are ignored |
+| `from_date` | string | — | date (Y-m-d) | Filter from date |
+| `to_date` | string | — | date (Y-m-d) | Filter to date |
+| `from_time` | string | — | H:i | Filter by `start_time >= value` |
+| `to_time` | string | — | H:i | Filter by `end_time <= value` |
+| `doctor_id` | string/array | — | uuid | Filter by doctor(s). Single (`?doctor_id=uuid`) or multiple (`?doctor_id[]=uuid1&uuid2`). Patients see only their own appointments with those doctors |
+| `order_by` | string | `created_at` | `created_at`, `appointment_date`, `start_time` | Sort field |
+| `order_dir` | string | `desc` | `asc`, `desc` | Sort direction |
 
-### Example
+### Examples
 
 ```
-GET /v1/appointments?status=requested&date=2026-06-01&limit=10&doctor_id=uuid
+GET /v1/appointments?status=requested&date=2026-06-01&limit=10
+GET /v1/appointments?status[]=set&status[]=accepted&from_date=2026-06-01&to_date=2026-06-30
+GET /v1/appointments?from_time=09:00&to_time=17:00&order_by=appointment_date&order_dir=asc
+GET /v1/appointments?doctor_id[]=uuid1&doctor_id[]=uuid2&limit=50
 ```
 
 ## Doctor Appointments (`/v1/doctors/{doctor}/appointments`)

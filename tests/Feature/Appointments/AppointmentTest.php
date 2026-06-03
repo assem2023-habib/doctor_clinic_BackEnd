@@ -593,6 +593,126 @@ class AppointmentTest extends TestCase
         $this->assertEquals(AppointmentStatusEnum::Accepted->value, $json['data'][0]['status']);
     }
 
+    public function test_list_can_filter_by_multiple_statuses(): void
+    {
+        $admin = $this->createAdminUser();
+        Passport::actingAs($admin);
+
+        $doctorUser = $this->createDoctorUser();
+        $patient = $this->createPatientUser();
+        $this->createAppointment(['patient' => $patient, 'doctor' => $doctorUser, 'status' => AppointmentStatusEnum::Requested]);
+        $this->createAppointment(['patient' => $patient, 'doctor' => $doctorUser, 'status' => AppointmentStatusEnum::Accepted]);
+        $this->createAppointment(['patient' => $patient, 'doctor' => $doctorUser, 'status' => AppointmentStatusEnum::Set]);
+
+        $response = $this->getJson('/api/v1/appointments?status[]=' . AppointmentStatusEnum::Accepted->value . '&status[]=' . AppointmentStatusEnum::Set->value);
+
+        $json = $response->json();
+        $this->assertCount(2, $json['data']);
+    }
+
+    public function test_list_can_filter_by_date_range(): void
+    {
+        $admin = $this->createAdminUser();
+        Passport::actingAs($admin);
+
+        $doctorUser = $this->createDoctorUser();
+        $patient = $this->createPatientUser();
+        $this->createAppointment(['patient' => $patient, 'doctor' => $doctorUser, 'appointment_date' => '2026-06-01']);
+        $this->createAppointment(['patient' => $patient, 'doctor' => $doctorUser, 'appointment_date' => '2026-06-15']);
+        $this->createAppointment(['patient' => $patient, 'doctor' => $doctorUser, 'appointment_date' => '2026-07-01']);
+
+        $response = $this->getJson('/api/v1/appointments?from_date=2026-06-01&to_date=2026-06-30');
+
+        $json = $response->json();
+        $this->assertCount(2, $json['data']);
+    }
+
+    public function test_list_can_filter_by_time_range(): void
+    {
+        $admin = $this->createAdminUser();
+        Passport::actingAs($admin);
+
+        $doctorUser = $this->createDoctorUser();
+        $patient = $this->createPatientUser();
+        $this->createAppointment(['patient' => $patient, 'doctor' => $doctorUser, 'start_time' => '08:00', 'end_time' => '09:00']);
+        $this->createAppointment(['patient' => $patient, 'doctor' => $doctorUser, 'start_time' => '10:00', 'end_time' => '11:00']);
+        $this->createAppointment(['patient' => $patient, 'doctor' => $doctorUser, 'start_time' => '14:00', 'end_time' => '15:00']);
+
+        $response = $this->getJson('/api/v1/appointments?from_time=09:00&to_time=13:00');
+
+        $json = $response->json();
+        $this->assertCount(1, $json['data']);
+    }
+
+    public function test_list_can_filter_by_multiple_doctors(): void
+    {
+        $admin = $this->createAdminUser();
+        Passport::actingAs($admin);
+
+        $doctor1 = $this->createDoctorUser();
+        $doctor2 = $this->createDoctorUser();
+        $doctor3 = $this->createDoctorUser();
+        $patient = $this->createPatientUser();
+        $this->createAppointment(['patient' => $patient, 'doctor' => $doctor1]);
+        $this->createAppointment(['patient' => $patient, 'doctor' => $doctor2]);
+        $this->createAppointment(['patient' => $patient, 'doctor' => $doctor3]);
+
+        $response = $this->getJson('/api/v1/appointments?doctor_id[]=' . $doctor1->doctor->id . '&doctor_id[]=' . $doctor2->doctor->id);
+
+        $json = $response->json();
+        $this->assertCount(2, $json['data']);
+    }
+
+    public function test_patient_can_filter_by_doctor(): void
+    {
+        $patient = $this->createPatientUser();
+        Passport::actingAs($patient);
+
+        $doctor1 = $this->createDoctorUser();
+        $doctor2 = $this->createDoctorUser();
+        $this->createAppointment(['patient' => $patient, 'doctor' => $doctor1]);
+        $this->createAppointment(['patient' => $patient, 'doctor' => $doctor2]);
+
+        $response = $this->getJson('/api/v1/appointments?doctor_id[]=' . $doctor1->doctor->id);
+
+        $json = $response->json();
+        $this->assertCount(1, $json['data']);
+        $this->assertEquals($doctor1->id, $json['data'][0]['doctor']['id']);
+    }
+
+    public function test_patient_filter_by_doctor_returns_empty_for_unrelated_doctor(): void
+    {
+        $patient = $this->createPatientUser();
+        Passport::actingAs($patient);
+
+        $doctor = $this->createDoctorUser();
+        $otherDoctor = $this->createDoctorUser();
+        $this->createAppointment(['patient' => $patient, 'doctor' => $doctor]);
+
+        $response = $this->getJson('/api/v1/appointments?doctor_id[]=' . $otherDoctor->doctor->id);
+
+        $json = $response->json();
+        $this->assertCount(0, $json['data']);
+    }
+
+    public function test_list_can_order_by_appointment_date_asc(): void
+    {
+        $admin = $this->createAdminUser();
+        Passport::actingAs($admin);
+
+        $doctorUser = $this->createDoctorUser();
+        $patient = $this->createPatientUser();
+        $this->createAppointment(['patient' => $patient, 'doctor' => $doctorUser, 'appointment_date' => '2026-07-01']);
+        $this->createAppointment(['patient' => $patient, 'doctor' => $doctorUser, 'appointment_date' => '2026-06-01']);
+        $this->createAppointment(['patient' => $patient, 'doctor' => $doctorUser, 'appointment_date' => '2026-08-01']);
+
+        $response = $this->getJson('/api/v1/appointments?order_by=appointment_date&order_dir=asc');
+
+        $json = $response->json();
+        $dates = array_map(fn($a) => $a['appointment_date'], $json['data']);
+        $this->assertEquals(['2026-06-01', '2026-07-01', '2026-08-01'], $dates);
+    }
+
     public function test_patient_can_view_own_appointment(): void
     {
         $patient = $this->createPatientUser();

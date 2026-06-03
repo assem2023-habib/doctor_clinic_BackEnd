@@ -99,7 +99,7 @@
                     "Appointments"
                 ],
                 "summary": "List appointments (role-scoped)",
-                "description": "Patients see own appointments, doctors see own, admins/receptionists see all.",
+                "description": "Patients see own appointments, doctors see own, admins/receptionists see all. Supports multiple statuses and doctors, date/time ranges, and custom ordering.",
                 "operationId": "725bf2cf951ebf479026ea18dc2064ee",
                 "parameters": [
                     {
@@ -124,18 +124,100 @@
                     {
                         "name": "status",
                         "in": "query",
-                        "description": "Filter by status",
+                        "description": "Filter by status(es). Supports single (?status=accepted) or multiple (?status[]=set&status[]=accepted)",
+                        "style": "form",
+                        "explode": false,
                         "schema": {
-                            "type": "string"
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     },
                     {
                         "name": "date",
                         "in": "query",
-                        "description": "Filter by date (Y-m-d)",
+                        "description": "Filter by exact date (Y-m-d). When set, from_date/to_date are ignored",
                         "schema": {
                             "type": "string",
                             "format": "date"
+                        }
+                    },
+                    {
+                        "name": "from_date",
+                        "in": "query",
+                        "description": "Filter from date (Y-m-d)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to_date",
+                        "in": "query",
+                        "description": "Filter to date (Y-m-d)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "from_time",
+                        "in": "query",
+                        "description": "Filter by start_time >= value (H:i)",
+                        "schema": {
+                            "type": "string",
+                            "example": "09:00"
+                        }
+                    },
+                    {
+                        "name": "to_time",
+                        "in": "query",
+                        "description": "Filter by end_time <= value (H:i)",
+                        "schema": {
+                            "type": "string",
+                            "example": "17:00"
+                        }
+                    },
+                    {
+                        "name": "doctor_id",
+                        "in": "query",
+                        "description": "Filter by doctor(s). Single (?doctor_id=uuid) or multiple (?doctor_id[]=uuid1&doctor_id[]=uuid2). Patients can filter by their own doctors.",
+                        "style": "form",
+                        "explode": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "format": "uuid"
+                            }
+                        }
+                    },
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "description": "Sort field",
+                        "schema": {
+                            "type": "string",
+                            "default": "created_at",
+                            "enum": [
+                                "created_at",
+                                "appointment_date",
+                                "start_time"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "order_dir",
+                        "in": "query",
+                        "description": "Sort direction",
+                        "schema": {
+                            "type": "string",
+                            "default": "desc",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
                         }
                     }
                 ],
