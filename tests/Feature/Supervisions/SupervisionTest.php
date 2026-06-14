@@ -116,7 +116,7 @@ class SupervisionTest extends TestCase
         $this->assignPatientToDoctor($patient->patient, $doctor, $admin);
 
         Passport::actingAs($doctor);
-        $response = $this->getJson("/api/v1/doctors/{$doctor->doctor->id}/patients");
+        $response = $this->getJson("/api/v1/doctors/{$doctor->id}/patients");
 
         $response->assertStatus(200);
         $json = $response->json();
@@ -135,7 +135,7 @@ class SupervisionTest extends TestCase
         $this->assignPatientToDoctor($patient->patient, $doctor, $admin);
 
         Passport::actingAs($admin);
-        $response = $this->getJson("/api/v1/doctors/{$doctor->doctor->id}/patients");
+        $response = $this->getJson("/api/v1/doctors/{$doctor->id}/patients");
 
         $response->assertStatus(200);
         $this->assertCount(1, $response->json()['data']);
@@ -150,7 +150,7 @@ class SupervisionTest extends TestCase
 
         $receptionist = $this->createReceptionist();
         Passport::actingAs($receptionist);
-        $response = $this->getJson("/api/v1/doctors/{$doctor->doctor->id}/patients");
+        $response = $this->getJson("/api/v1/doctors/{$doctor->id}/patients");
 
         $response->assertStatus(200);
         $this->assertCount(1, $response->json()['data']);
@@ -167,7 +167,7 @@ class SupervisionTest extends TestCase
 
         $doctor2 = $this->createDoctor();
         Passport::actingAs($doctor2);
-        $response = $this->getJson("/api/v1/doctors/{$doctor1->doctor->id}/patients");
+        $response = $this->getJson("/api/v1/doctors/{$doctor1->id}/patients");
 
         $response->assertStatus(403);
     }
@@ -175,7 +175,7 @@ class SupervisionTest extends TestCase
     public function test_unauthenticated_cannot_view_doctor_patients(): void
     {
         $doctor = $this->createDoctor();
-        $response = $this->getJson("/api/v1/doctors/{$doctor->doctor->id}/patients");
+        $response = $this->getJson("/api/v1/doctors/{$doctor->id}/patients");
         $response->assertStatus(401);
     }
 
@@ -189,7 +189,7 @@ class SupervisionTest extends TestCase
         $this->assignPatientToDoctor($patient->patient, $doctor, $admin);
 
         Passport::actingAs($doctor);
-        $response = $this->getJson("/api/v1/doctors/{$doctor->doctor->id}/patients?status=active");
+        $response = $this->getJson("/api/v1/doctors/{$doctor->id}/patients?status=active");
 
         $response->assertStatus(200);
         $this->assertCount(1, $response->json()['data']);
@@ -205,7 +205,7 @@ class SupervisionTest extends TestCase
         $this->assignPatientToDoctor($patient2->patient, $doctor, $admin);
 
         Passport::actingAs($doctor);
-        $response = $this->getJson("/api/v1/doctors/{$doctor->doctor->id}/patients?status[]=active&status[]=suspended");
+        $response = $this->getJson("/api/v1/doctors/{$doctor->id}/patients?status[]=active&status[]=suspended");
 
         $response->assertStatus(200);
         $this->assertCount(2, $response->json()['data']);
@@ -219,7 +219,7 @@ class SupervisionTest extends TestCase
         $this->assignPatientToDoctor($patient->patient, $doctor, $admin);
 
         Passport::actingAs($doctor);
-        $response = $this->getJson("/api/v1/doctors/{$doctor->doctor->id}/patients?status=suspended");
+        $response = $this->getJson("/api/v1/doctors/{$doctor->id}/patients?status=suspended");
 
         $response->assertStatus(200);
         $this->assertCount(0, $response->json()['data']);
@@ -235,7 +235,7 @@ class SupervisionTest extends TestCase
         $this->assignPatientToDoctor($patient->patient, $doctor, $admin);
 
         Passport::actingAs($patient);
-        $response = $this->getJson("/api/v1/patients/{$patient->patient->id}/doctors");
+        $response = $this->getJson("/api/v1/patients/{$patient->id}/doctors");
 
         $response->assertStatus(200);
         $this->assertCount(1, $response->json()['data']);
@@ -253,7 +253,7 @@ class SupervisionTest extends TestCase
         $this->assignPatientToDoctor($patient->patient, $doctor, $admin);
 
         Passport::actingAs($admin);
-        $response = $this->getJson("/api/v1/patients/{$patient->patient->id}/doctors");
+        $response = $this->getJson("/api/v1/patients/{$patient->id}/doctors");
 
         $response->assertStatus(200);
         $this->assertCount(1, $response->json()['data']);
@@ -268,7 +268,7 @@ class SupervisionTest extends TestCase
 
         $patient2 = $this->createPatient();
         Passport::actingAs($patient2);
-        $response = $this->getJson("/api/v1/patients/{$patient1->patient->id}/doctors");
+        $response = $this->getJson("/api/v1/patients/{$patient1->id}/doctors");
 
         $response->assertStatus(403);
     }
@@ -282,8 +282,8 @@ class SupervisionTest extends TestCase
         $admin = $this->createAdmin();
 
         Passport::actingAs($admin);
-        $response = $this->postJson("/api/v1/doctors/{$doctor->doctor->id}/patients", [
-            'patient_id' => $patient->patient->id,
+        $response = $this->postJson("/api/v1/doctors/{$doctor->id}/patients", [
+            'patient_id' => $patient->id,
             'notes' => 'Follow up on cardiology',
         ]);
 
@@ -303,8 +303,8 @@ class SupervisionTest extends TestCase
         $receptionist = $this->createReceptionist();
 
         Passport::actingAs($receptionist);
-        $response = $this->postJson("/api/v1/doctors/{$doctor->doctor->id}/patients", [
-            'patient_id' => $patient->patient->id,
+        $response = $this->postJson("/api/v1/doctors/{$doctor->id}/patients", [
+            'patient_id' => $patient->id,
         ]);
 
         $response->assertStatus(200);
@@ -316,8 +316,8 @@ class SupervisionTest extends TestCase
         $patient = $this->createPatient();
 
         Passport::actingAs($doctor);
-        $response = $this->postJson("/api/v1/doctors/{$doctor->doctor->id}/patients", [
-            'patient_id' => $patient->patient->id,
+        $response = $this->postJson("/api/v1/doctors/{$doctor->id}/patients", [
+            'patient_id' => $patient->id,
         ]);
 
         $response->assertStatus(403);
@@ -330,12 +330,12 @@ class SupervisionTest extends TestCase
         $admin = $this->createAdmin();
 
         Passport::actingAs($admin);
-        $this->postJson("/api/v1/doctors/{$doctor->doctor->id}/patients", [
-            'patient_id' => $patient->patient->id,
+        $this->postJson("/api/v1/doctors/{$doctor->id}/patients", [
+            'patient_id' => $patient->id,
         ])->assertStatus(200);
 
-        $response = $this->postJson("/api/v1/doctors/{$doctor->doctor->id}/patients", [
-            'patient_id' => $patient->patient->id,
+        $response = $this->postJson("/api/v1/doctors/{$doctor->id}/patients", [
+            'patient_id' => $patient->id,
         ]);
 
         $response->assertStatus(200);
@@ -348,7 +348,7 @@ class SupervisionTest extends TestCase
         $admin = $this->createAdmin();
 
         Passport::actingAs($admin);
-        $response = $this->postJson("/api/v1/doctors/{$doctor->doctor->id}/patients", [
+        $response = $this->postJson("/api/v1/doctors/{$doctor->id}/patients", [
             'patient_id' => 'non-existent-id',
         ]);
 
@@ -365,12 +365,12 @@ class SupervisionTest extends TestCase
         $admin = $this->createAdmin();
 
         Passport::actingAs($admin);
-        $this->postJson("/api/v1/doctors/{$doctor1->doctor->id}/patients", [
-            'patient_id' => $patient->patient->id,
+        $this->postJson("/api/v1/doctors/{$doctor1->id}/patients", [
+            'patient_id' => $patient->id,
         ])->assertStatus(200);
 
-        $response = $this->postJson("/api/v1/doctors/{$doctor2->doctor->id}/patients", [
-            'patient_id' => $patient->patient->id,
+        $response = $this->postJson("/api/v1/doctors/{$doctor2->id}/patients", [
+            'patient_id' => $patient->id,
         ]);
 
         $response->assertStatus(409);
@@ -384,12 +384,12 @@ class SupervisionTest extends TestCase
         $admin = $this->createAdmin();
 
         Passport::actingAs($admin);
-        $this->postJson("/api/v1/doctors/{$doctor1->doctor->id}/patients", [
-            'patient_id' => $patient->patient->id,
+        $this->postJson("/api/v1/doctors/{$doctor1->id}/patients", [
+            'patient_id' => $patient->id,
         ])->assertStatus(200);
 
-        $response = $this->postJson("/api/v1/doctors/{$doctor2->doctor->id}/patients", [
-            'patient_id' => $patient->patient->id,
+        $response = $this->postJson("/api/v1/doctors/{$doctor2->id}/patients", [
+            'patient_id' => $patient->id,
         ]);
 
         $response->assertStatus(200);
@@ -406,7 +406,7 @@ class SupervisionTest extends TestCase
         $this->assignPatientToDoctor($patient->patient, $doctor, $admin);
 
         Passport::actingAs($admin);
-        $response = $this->deleteJson("/api/v1/doctors/{$doctor->doctor->id}/patients/{$patient->patient->id}");
+        $response = $this->deleteJson("/api/v1/doctors/{$doctor->id}/patients/{$patient->id}");
 
         $response->assertStatus(200);
         $this->assertDatabaseMissing('doctor_patient', [
@@ -423,7 +423,7 @@ class SupervisionTest extends TestCase
         $this->assignPatientToDoctor($patient->patient, $doctor, $admin);
 
         Passport::actingAs($patient);
-        $response = $this->deleteJson("/api/v1/doctors/{$doctor->doctor->id}/patients/{$patient->patient->id}");
+        $response = $this->deleteJson("/api/v1/doctors/{$doctor->id}/patients/{$patient->id}");
 
         $response->assertStatus(403);
     }
@@ -433,8 +433,8 @@ class SupervisionTest extends TestCase
         $doctor = $this->createDoctor();
         $patient = $this->createPatient();
 
-        $response = $this->postJson("/api/v1/doctors/{$doctor->doctor->id}/patients", [
-            'patient_id' => $patient->patient->id,
+        $response = $this->postJson("/api/v1/doctors/{$doctor->id}/patients", [
+            'patient_id' => $patient->id,
         ]);
 
         $response->assertStatus(401);
@@ -445,7 +445,7 @@ class SupervisionTest extends TestCase
         $doctor = $this->createDoctor();
         $patient = $this->createPatient();
 
-        $response = $this->deleteJson("/api/v1/doctors/{$doctor->doctor->id}/patients/{$patient->patient->id}");
+        $response = $this->deleteJson("/api/v1/doctors/{$doctor->id}/patients/{$patient->id}");
 
         $response->assertStatus(401);
     }
@@ -456,7 +456,7 @@ class SupervisionTest extends TestCase
         $admin = $this->createAdmin();
 
         Passport::actingAs($admin);
-        $response = $this->getJson("/api/v1/doctors/{$doctor->doctor->id}/patients");
+        $response = $this->getJson("/api/v1/doctors/{$doctor->id}/patients");
 
         $response->assertStatus(200);
         $this->assertCount(0, $response->json()['data']);
@@ -471,7 +471,7 @@ class SupervisionTest extends TestCase
         $admin = $this->createAdmin();
 
         Passport::actingAs($patient);
-        $response = $this->getJson("/api/v1/patients/{$patient->patient->id}/available-doctors");
+        $response = $this->getJson("/api/v1/patients/{$patient->id}/available-doctors");
 
         $response->assertStatus(200);
         $ids = collect($response->json()['data'])->pluck('id');
@@ -486,7 +486,7 @@ class SupervisionTest extends TestCase
         $this->assignPatientToDoctor($patient->patient, $doctor, $admin);
 
         Passport::actingAs($patient);
-        $response = $this->getJson("/api/v1/patients/{$patient->patient->id}/available-doctors");
+        $response = $this->getJson("/api/v1/patients/{$patient->id}/available-doctors");
 
         $response->assertStatus(200);
         $ids = collect($response->json()['data'])->pluck('id');
@@ -500,7 +500,7 @@ class SupervisionTest extends TestCase
         $patient = $this->createPatient();
 
         Passport::actingAs($patient);
-        $response = $this->getJson("/api/v1/patients/{$patient->patient->id}/available-doctors?specialization_id={$this->cardiology->id}");
+        $response = $this->getJson("/api/v1/patients/{$patient->id}/available-doctors?specialization_id={$this->cardiology->id}");
 
         $response->assertStatus(200);
         $ids = collect($response->json()['data'])->pluck('id');
@@ -518,8 +518,8 @@ class SupervisionTest extends TestCase
         $admin = $this->createAdmin();
 
         Passport::actingAs($admin);
-        $response = $this->postJson("/api/v1/doctors/{$doctor->doctor->id}/patients/bulk", [
-            'patient_ids' => [$patient1->patient->id, $patient2->patient->id],
+        $response = $this->postJson("/api/v1/doctors/{$doctor->id}/patients/bulk", [
+            'patient_ids' => [$patient1->id, $patient2->id],
         ]);
 
         $response->assertStatus(200);
@@ -538,8 +538,8 @@ class SupervisionTest extends TestCase
         $this->assignPatientToDoctor($patient->patient, $doctor1, $admin);
 
         Passport::actingAs($admin);
-        $response = $this->postJson("/api/v1/doctors/{$doctor2->doctor->id}/patients/bulk", [
-            'patient_ids' => [$patient->patient->id],
+        $response = $this->postJson("/api/v1/doctors/{$doctor2->id}/patients/bulk", [
+            'patient_ids' => [$patient->id],
         ]);
 
         $response->assertStatus(200);
@@ -554,8 +554,8 @@ class SupervisionTest extends TestCase
         $patient = $this->createPatient();
 
         Passport::actingAs($patient);
-        $response = $this->postJson("/api/v1/doctors/{$doctor->doctor->id}/patients/bulk", [
-            'patient_ids' => [$patient->patient->id],
+        $response = $this->postJson("/api/v1/doctors/{$doctor->id}/patients/bulk", [
+            'patient_ids' => [$patient->id],
         ]);
 
         $response->assertStatus(403);
@@ -571,7 +571,7 @@ class SupervisionTest extends TestCase
         $this->assignPatientToDoctor($patient->patient, $doctor, $admin);
 
         Passport::actingAs($doctor);
-        $response = $this->deleteJson("/api/v1/doctors/{$doctor->doctor->id}/patients/{$patient->patient->id}");
+        $response = $this->deleteJson("/api/v1/doctors/{$doctor->id}/patients/{$patient->id}");
 
         $response->assertStatus(200);
         $this->assertDatabaseMissing('doctor_patient', [
@@ -589,7 +589,7 @@ class SupervisionTest extends TestCase
         $this->assignPatientToDoctor($patient->patient, $doctor, $admin);
 
         Passport::actingAs($otherDoctor);
-        $response = $this->deleteJson("/api/v1/doctors/{$doctor->doctor->id}/patients/{$patient->patient->id}");
+        $response = $this->deleteJson("/api/v1/doctors/{$doctor->id}/patients/{$patient->id}");
 
         $response->assertStatus(403);
     }
@@ -604,7 +604,7 @@ class SupervisionTest extends TestCase
         $this->assignPatientToDoctor($patient->patient, $doctor, $admin);
 
         Passport::actingAs($patient);
-        $response = $this->deleteJson("/api/v1/patients/{$patient->patient->id}/doctors/{$doctor->doctor->id}");
+        $response = $this->deleteJson("/api/v1/patients/{$patient->id}/doctors/{$doctor->id}");
 
         $response->assertStatus(200);
         $this->assertDatabaseMissing('doctor_patient', [
@@ -622,7 +622,7 @@ class SupervisionTest extends TestCase
         $this->assignPatientToDoctor($patient->patient, $doctor, $admin);
 
         Passport::actingAs($otherPatient);
-        $response = $this->deleteJson("/api/v1/patients/{$patient->patient->id}/doctors/{$doctor->doctor->id}");
+        $response = $this->deleteJson("/api/v1/patients/{$patient->id}/doctors/{$doctor->id}");
 
         $response->assertStatus(403);
     }
@@ -637,12 +637,12 @@ class SupervisionTest extends TestCase
         $this->assignPatientToDoctor($patient->patient, $doctor, $admin);
 
         Passport::actingAs($patient);
-        $this->deleteJson("/api/v1/patients/{$patient->patient->id}/doctors/{$doctor->doctor->id}")->assertStatus(200);
+        $this->deleteJson("/api/v1/patients/{$patient->id}/doctors/{$doctor->id}")->assertStatus(200);
 
         $this->travel(3)->days();
 
-        $response = $this->postJson("/api/v1/patients/{$patient->patient->id}/supervision-requests", [
-            'doctor_id' => $doctor->doctor->id,
+        $response = $this->postJson("/api/v1/patients/{$patient->id}/supervision-requests", [
+            'doctor_id' => $doctor->id,
         ]);
 
         $response->assertStatus(429);
@@ -656,12 +656,12 @@ class SupervisionTest extends TestCase
         $this->assignPatientToDoctor($patient->patient, $doctor, $admin);
 
         Passport::actingAs($patient);
-        $this->deleteJson("/api/v1/patients/{$patient->patient->id}/doctors/{$doctor->doctor->id}")->assertStatus(200);
+        $this->deleteJson("/api/v1/patients/{$patient->id}/doctors/{$doctor->id}")->assertStatus(200);
 
         $this->travel(8)->days();
 
-        $response = $this->postJson("/api/v1/patients/{$patient->patient->id}/supervision-requests", [
-            'doctor_id' => $doctor->doctor->id,
+        $response = $this->postJson("/api/v1/patients/{$patient->id}/supervision-requests", [
+            'doctor_id' => $doctor->id,
         ]);
 
         $response->assertStatus(201);
@@ -674,8 +674,8 @@ class SupervisionTest extends TestCase
 
         Passport::actingAs($patient);
 
-        $createResponse = $this->postJson("/api/v1/patients/{$patient->patient->id}/supervision-requests", [
-            'doctor_id' => $doctor->doctor->id,
+        $createResponse = $this->postJson("/api/v1/patients/{$patient->id}/supervision-requests", [
+            'doctor_id' => $doctor->id,
         ]);
         $createResponse->assertStatus(201);
         $requestId = $createResponse->json('data.id');
@@ -684,8 +684,8 @@ class SupervisionTest extends TestCase
 
         $this->travel(3)->days();
 
-        $response = $this->postJson("/api/v1/patients/{$patient->patient->id}/supervision-requests", [
-            'doctor_id' => $doctor->doctor->id,
+        $response = $this->postJson("/api/v1/patients/{$patient->id}/supervision-requests", [
+            'doctor_id' => $doctor->id,
         ]);
 
         $response->assertStatus(429);

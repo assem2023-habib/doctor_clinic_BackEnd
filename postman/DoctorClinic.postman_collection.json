@@ -24,12 +24,14 @@
 		{
 			"key": "doctor_id",
 			"value": "",
-			"type": "string"
+			"type": "string",
+			"description": "User UUID of the doctor (maps to doctors.user_id, NOT doctors.id PK)"
 		},
 		{
 			"key": "patient_id",
 			"value": "",
-			"type": "string"
+			"type": "string",
+			"description": "User UUID of the patient (maps to patients.user_id, NOT patients.id PK)"
 		},
 		{
 			"key": "receptionist_id",
@@ -2368,7 +2370,7 @@
 		},
 		{
 			"name": "Appointments",
-			"description": "Full appointment lifecycle: request, set time, respond, cancel, complete, suggest alternative.\n\nAll endpoints require authentication (Bearer token).",
+			"description": "Full appointment lifecycle: request, set time, respond, cancel, complete, suggest alternative.\n\nAll endpoints require authentication (Bearer token).\n\n**Note:** `doctor_id` in request/response bodies refers to the User UUID (maps to doctors.user_id), NOT the doctors table primary key.",
 			"item": [
 				{
 					"name": "Get Booked Slots",
@@ -2578,6 +2580,7 @@
 				},
 				{
 					"name": "Create Appointment",
+					"description": "Patient requests a new appointment.\n\n- `doctor_id`: User UUID of the doctor (maps to doctors.user_id)\n- `preferred_date`: Desired appointment date (optional)\n- `reason`: Reason for the appointment (optional)",
 					"event": [
 						{
 							"listen": "test",
@@ -2586,7 +2589,7 @@
 									"if (pm.response.code === 201) {",
 									"    var json = pm.response.json();",
 									"    pm.collectionVariables.set('appointment_id', json.data.id);",
-									"    console.log('Appointment created:', json.data.id);",
+									"    console.log('Appointment ID stored:', json.data.id);",
 									"}"
 								],
 								"type": "text/javascript"
@@ -2872,7 +2875,7 @@
 		},
 		{
 			"name": "Supervisions",
-			"description": "Doctor-Patient supervision management.\n\nAll endpoints require authentication. Assign/Remove/Bulk require staff role. Available-doctors and supervision requests require auth. Doctor self-assign is for the doctor themselves.",
+			"description": "Doctor-Patient supervision management.\n\nAll endpoints require authentication. Assign/Remove/Bulk require staff role. Available-doctors and supervision requests require auth. Doctor self-assign is for the doctor themselves.\n\n**Note:** `doctor_id` and `patient_id` in request bodies/URLs are User UUIDs (maps to doctors.user_id / patients.user_id).",
 			"item": [
 				{
 					"name": "Get Doctor's Patients",
@@ -3012,6 +3015,7 @@
 				},
 				{
 					"name": "Assign Patient to Doctor",
+					"description": "Staff assigns a patient to a doctor.\n\n- `patient_id`: User UUID of the patient (maps to patients.user_id)\n- `supervision_status`: defaults to 'active'",
 					"event": [
 						{
 							"listen": "test",
@@ -3064,6 +3068,7 @@
 				},
 				{
 					"name": "Bulk Assign Patients to Doctor",
+					"description": "Staff assigns multiple patients to a doctor.\n\n- `patient_ids`: Array of User UUIDs of the patients (maps to patients.user_id)",
 					"event": [
 						{
 							"listen": "test",
@@ -3166,6 +3171,7 @@
 				},
 				{
 					"name": "Doctor Self-Assign",
+					"description": "Doctor assigns themselves to a patient.\n\n- `patient_id`: User UUID of the patient (maps to patients.user_id)",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -3208,6 +3214,7 @@
 					"item": [
 						{
 							"name": "Create Request",
+							"description": "Patient requests supervision from a specific doctor.\n\n- `doctor_id`: User UUID of the target doctor (maps to doctors.user_id)",
 							"request": {
 								"method": "POST",
 								"header": [
@@ -4612,10 +4619,11 @@
 		},
 		{
 			"name": "Medical Records",
-			"description": "Medical record management.\n\nAdmin-only endpoints for transferring medical records between doctors.",
+			"description": "Medical record management.\n\nAdmin-only endpoints for transferring medical records between doctors.\n\n**Note:** `doctor_id` in request bodies is the User UUID (maps to doctors.user_id).",
 			"item": [
 				{
 					"name": "Transfer Medical Record",
+					"description": "Admin transfers a medical record to another doctor.\n\n- `doctor_id`: User UUID of the target doctor (maps to doctors.user_id)",
 					"event": [
 						{
 							"listen": "test",

@@ -15,7 +15,7 @@
 
 | Parameter | Type | Constraints | Description |
 |-----------|------|-------------|-------------|
-| `patient_id` | string | required, exists:patients,id | Patient UUID to assign |
+| `patient_id` | string | required, exists:patients,user_id | Patient UUID (user_id) to assign |
 | `notes` | string | nullable, max:1000 | Assignment notes |
 
 ```json

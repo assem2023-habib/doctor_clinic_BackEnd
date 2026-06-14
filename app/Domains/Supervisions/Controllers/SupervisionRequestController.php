@@ -34,7 +34,7 @@ class SupervisionRequestController
             return ApiResponse::forbidden(__('Unauthorized to create supervision request'));
         }
 
-        $doctor = Doctor::findOrFail($request->doctor_id);
+        $doctor = Doctor::where('user_id', $request->doctor_id)->firstOrFail();
 
         $result = $this->createAction->execute($patient, $doctor);
 

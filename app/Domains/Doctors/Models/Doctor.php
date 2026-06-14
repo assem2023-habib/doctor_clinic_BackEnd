@@ -19,6 +19,11 @@ class Doctor extends Model
 
     protected $fillable = ['user_id', 'specialization_id', 'experience_months'];
 
+    public function getRouteKeyName(): string
+    {
+        return 'user_id';
+    }
+
     protected function casts(): array
     {
         return [

@@ -33,7 +33,7 @@ return ApiResponse::success(
 );
 ```
 
-The route uses implicit model binding — Laravel automatically resolves the `Patient` model by UUID. The controller loads the `user` relation, then attaches the patient relationship back to the user so `PatientResource` (which extends `UserResource`) can access it.
+The route uses implicit model binding — `getRouteKeyName()` returns `'user_id'`, so Laravel resolves `Patient` by `user_id` (the User UUID). The controller loads the `user` relation, then attaches the patient relationship back to the user so `PatientResource` (which extends `UserResource`) can access it.
 
 ## Response
 

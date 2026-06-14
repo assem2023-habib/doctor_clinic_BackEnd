@@ -2,6 +2,7 @@
 
 namespace App\Domains\Appointments\Rules;
 
+use App\Domains\Doctors\Models\Doctor;
 use App\Domains\Doctors\Models\DoctorSchedule;
 use Carbon\Carbon;
 use Closure;
@@ -22,9 +23,17 @@ class WithinDoctorSchedule implements ValidationRule
             return;
         }
 
+        $doctor = Doctor::where('user_id', $this->doctorId)->first()
+            ?? Doctor::find($this->doctorId);
+
+        if ($doctor === null) {
+            $fail(__('validation.doctor_not_working_that_day'));
+            return;
+        }
+
         $dayName = strtolower(Carbon::parse($this->date)->format('l'));
 
-        $schedules = DoctorSchedule::where('doctor_id', $this->doctorId)
+        $schedules = DoctorSchedule::where('doctor_id', $doctor->id)
             ->where('day_of_week', $dayName)
             ->where('is_active', true)
             ->get();

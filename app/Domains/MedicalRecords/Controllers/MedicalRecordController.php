@@ -19,7 +19,7 @@ class MedicalRecordController
     {
         $user = $request->user();
 
-        $toDoctor = Doctor::findOrFail($request->doctor_id);
+        $toDoctor = Doctor::where('user_id', $request->doctor_id)->firstOrFail();
 
         $transferred = $this->transferAction->execute(
             medicalRecord: $medicalRecord,

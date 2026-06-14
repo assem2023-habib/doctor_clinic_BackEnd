@@ -14,10 +14,10 @@ class RequestAppointmentData
         public readonly string $createdBy,
     ) {}
 
-    public static function fromRequest(RequestAppointmentRequest $request, string $patientId): self
+    public static function fromRequest(RequestAppointmentRequest $request, string $patientId, ?string $doctorId = null): self
     {
         return new self(
-            doctorId: $request->doctor_id,
+            doctorId: $doctorId ?? $request->doctor_id,
             patientId: $patientId,
             preferredDate: $request->preferred_date,
             reason: $request->reason,

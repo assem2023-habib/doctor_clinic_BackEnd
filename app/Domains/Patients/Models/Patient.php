@@ -16,6 +16,11 @@ class Patient extends Model
 
     protected $fillable = ['user_id'];
 
+    public function getRouteKeyName(): string
+    {
+        return 'user_id';
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

@@ -14,7 +14,7 @@ class AssignPatientRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'patient_id' => ['required', 'string', 'exists:patients,id'],
+            'patient_id' => ['required', 'string', 'exists:patients,user_id'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }

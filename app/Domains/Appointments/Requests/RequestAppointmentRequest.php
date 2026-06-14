@@ -15,7 +15,7 @@ class RequestAppointmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'doctor_id' => ['required', 'string', 'exists:doctors,id'],
+            'doctor_id' => ['required', 'string', 'exists:doctors,user_id'],
             'preferred_date' => [
                 'nullable',
                 'date',

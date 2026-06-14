@@ -110,11 +110,11 @@ class SupervisionController
         }
 
         $validated = $request->validate([
-            'patient_id' => ['required', 'string', 'exists:patients,id'],
+            'patient_id' => ['required', 'string', 'exists:patients,user_id'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        $patient = Patient::findOrFail($validated['patient_id']);
+        $patient = Patient::where('user_id', $validated['patient_id'])->firstOrFail();
 
         $this->assignAction->execute($doctor, $patient, $user, $validated['notes'] ?? null);
 
@@ -130,7 +130,7 @@ class SupervisionController
             return ApiResponse::forbidden(__('Unauthorized to assign patients'));
         }
 
-        $patient = Patient::findOrFail($request->patient_id);
+        $patient = Patient::where('user_id', $request->patient_id)->firstOrFail();
 
         $this->assignAction->execute($doctor, $patient, $user, $request->notes);
 

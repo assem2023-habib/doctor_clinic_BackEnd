@@ -15,7 +15,7 @@ class BulkAssignPatientRequest extends FormRequest
     {
         return [
             'patient_ids' => ['required', 'array', 'min:1'],
-            'patient_ids.*' => ['required', 'string', 'exists:patients,id'],
+            'patient_ids.*' => ['required', 'string', 'exists:patients,user_id'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }

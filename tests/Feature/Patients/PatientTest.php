@@ -202,7 +202,7 @@ class PatientTest extends TestCase
             'email' => 'john@example.com',
         ]);
 
-        $response = $this->putJson("/api/v1/patients/{$patientUser->patient->id}", [
+        $response = $this->putJson("/api/v1/patients/{$patientUser->id}", [
             'first_name' => 'John Updated',
             'last_name' => 'Doe',
             'username' => 'johnupdated',
@@ -233,7 +233,7 @@ class PatientTest extends TestCase
 
         $targetPatient = $this->createPatient();
 
-        $response = $this->putJson("/api/v1/patients/{$targetPatient->patient->id}", [
+        $response = $this->putJson("/api/v1/patients/{$targetPatient->id}", [
             'first_name' => 'Hacked',
             'last_name' => 'Name',
             'username' => 'hacked',
@@ -248,7 +248,7 @@ class PatientTest extends TestCase
     {
         $patient = $this->createPatient();
 
-        $response = $this->putJson("/api/v1/patients/{$patient->patient->id}", [
+        $response = $this->putJson("/api/v1/patients/{$patient->id}", [
             'first_name' => 'Hacked',
             'last_name' => 'Name',
             'username' => 'hacked',
@@ -270,7 +270,7 @@ class PatientTest extends TestCase
             'email' => 'john@example.com',
         ]);
 
-        $response = $this->patchJson("/api/v1/patients/{$patientUser->patient->id}", [
+        $response = $this->patchJson("/api/v1/patients/{$patientUser->id}", [
             'first_name' => 'Johnny',
         ]);
 
@@ -301,7 +301,7 @@ class PatientTest extends TestCase
             'phone' => '+963911111111',
         ]);
 
-        $response = $this->patchJson("/api/v1/patients/{$patientUser->patient->id}", [
+        $response = $this->patchJson("/api/v1/patients/{$patientUser->id}", [
             'email' => 'john.new@example.com',
         ]);
 
@@ -323,13 +323,14 @@ class PatientTest extends TestCase
         Passport::actingAs($admin);
 
         $patientUser = $this->createPatient();
+        $patientId = $patientUser->patient->id;
 
-        $response = $this->deleteJson("/api/v1/patients/{$patientUser->patient->id}");
+        $response = $this->deleteJson("/api/v1/patients/{$patientUser->id}");
 
         $response->assertStatus(204);
 
         $this->assertDatabaseMissing('users', ['id' => $patientUser->id]);
-        $this->assertDatabaseMissing('patients', ['id' => $patientUser->patient->id]);
+        $this->assertDatabaseMissing('patients', ['id' => $patientId]);
     }
 
     public function test_admin_cannot_delete_patient_with_active_appointments(): void
@@ -354,7 +355,7 @@ class PatientTest extends TestCase
             'created_by' => $admin->id . ': ' . $admin->first_name . ' ' . $admin->last_name,
         ]);
 
-        $response = $this->deleteJson("/api/v1/patients/{$patientUser->patient->id}");
+        $response = $this->deleteJson("/api/v1/patients/{$patientUser->id}");
 
         $response->assertStatus(409);
 
@@ -365,7 +366,7 @@ class PatientTest extends TestCase
     {
         $patientUser = $this->createPatient();
 
-        $response = $this->deleteJson("/api/v1/patients/{$patientUser->patient->id}");
+        $response = $this->deleteJson("/api/v1/patients/{$patientUser->id}");
 
         $response->assertStatus(401);
     }

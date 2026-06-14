@@ -19,7 +19,7 @@ class BulkAssignPatientsToDoctorAction
         $errors = [];
 
         foreach ($patientIds as $patientId) {
-            $patient = Patient::find($patientId);
+            $patient = Patient::where('user_id', $patientId)->first();
 
             if (!$patient) {
                 $errors[] = ['patient_id' => $patientId, 'reason' => 'Patient not found'];

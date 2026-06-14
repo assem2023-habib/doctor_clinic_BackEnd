@@ -204,7 +204,7 @@ class DoctorTest extends TestCase
             'email' => 'john@example.com',
         ]);
 
-        $response = $this->putJson("/api/v1/doctors/{$doctor->doctor->id}", [
+        $response = $this->putJson("/api/v1/doctors/{$doctor->id}", [
             'first_name' => 'John Updated',
             'last_name' => 'Doe',
             'username' => 'johnupdated',
@@ -246,7 +246,7 @@ class DoctorTest extends TestCase
 
         $doctor = $this->createDoctor();
 
-        $response = $this->putJson("/api/v1/doctors/{$doctor->doctor->id}", [
+        $response = $this->putJson("/api/v1/doctors/{$doctor->id}", [
             'first_name' => 'Hacked',
             'last_name' => 'Name',
             'username' => 'hacked',
@@ -279,7 +279,7 @@ class DoctorTest extends TestCase
             'created_by' => $admin->id . ': ' . $admin->first_name . ' ' . $admin->last_name,
         ]);
 
-        $response = $this->deleteJson("/api/v1/doctors/{$doctor->doctor->id}");
+        $response = $this->deleteJson("/api/v1/doctors/{$doctor->id}");
 
         $response->assertStatus(204);
 
@@ -308,7 +308,7 @@ class DoctorTest extends TestCase
             'created_by' => $admin->id . ': ' . $admin->first_name . ' ' . $admin->last_name,
         ]);
 
-        $response = $this->deleteJson("/api/v1/doctors/{$doctor->doctor->id}");
+        $response = $this->deleteJson("/api/v1/doctors/{$doctor->id}");
 
         $response->assertStatus(409);
 
@@ -327,7 +327,7 @@ class DoctorTest extends TestCase
             'experience_months' => 24,
         ]);
 
-        $response = $this->putJson("/api/v1/doctors/{$user->doctor->id}/activate-account");
+        $response = $this->putJson("/api/v1/doctors/{$user->id}/activate-account");
 
         $response->assertStatus(200)
             ->assertJsonStructure(['status', 'message', 'data' => ['id', 'first_name', 'last_name', 'email', 'is_active']]);
@@ -352,7 +352,7 @@ class DoctorTest extends TestCase
         ]);
         Passport::actingAs($user);
 
-        $response = $this->putJson("/api/v1/doctors/{$user->doctor->id}/activate-account");
+        $response = $this->putJson("/api/v1/doctors/{$user->id}/activate-account");
 
         $response->assertStatus(403);
         $this->assertDatabaseHas('users', [
@@ -365,7 +365,7 @@ class DoctorTest extends TestCase
     {
         $doctor = $this->createDoctor();
 
-        $response = $this->putJson("/api/v1/doctors/{$doctor->doctor->id}", [
+        $response = $this->putJson("/api/v1/doctors/{$doctor->id}", [
             'first_name' => 'Hacked',
             'last_name' => 'Name',
             'username' => 'hacked',
@@ -389,7 +389,7 @@ class DoctorTest extends TestCase
             'email' => 'john@example.com',
         ]);
 
-        $response = $this->patchJson("/api/v1/doctors/{$doctor->doctor->id}", [
+        $response = $this->patchJson("/api/v1/doctors/{$doctor->id}", [
             'first_name' => 'Johnny',
         ]);
 
@@ -420,7 +420,7 @@ class DoctorTest extends TestCase
             'phone' => '+963911111111',
         ]);
 
-        $response = $this->patchJson("/api/v1/doctors/{$doctor->doctor->id}", [
+        $response = $this->patchJson("/api/v1/doctors/{$doctor->id}", [
             'email' => 'john.new@example.com',
         ]);
 

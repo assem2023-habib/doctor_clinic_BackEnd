@@ -191,7 +191,8 @@ class AppointmentController
             return ApiResponse::error(__('Patient profile not found'), 400);
         }
 
-        $data = RequestAppointmentData::fromRequest($request, $patient->id);
+        $doctor = Doctor::where('user_id', $request->doctor_id)->firstOrFail();
+        $data = RequestAppointmentData::fromRequest($request, $patient->id, $doctor->id);
         $appointment = $this->requestAction->execute($data);
 
         $appointment->load(['patient.user.image', 'doctor.user.image']);

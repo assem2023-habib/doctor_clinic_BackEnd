@@ -44,6 +44,8 @@
 - `doctors()` — HasMany → Doctor
 - `image()` — MorphOne → Image (polymorphic, `imageable`)
 
+**Route Binding:** `getRouteKeyName()` returns `'user_id'` — implicit binding (`Doctor $doctor`) resolves by User UUID.
+
 ### علاقات Doctor:
 - `user()` — BelongsTo → User
 - `schedules()` — HasMany → DoctorSchedule

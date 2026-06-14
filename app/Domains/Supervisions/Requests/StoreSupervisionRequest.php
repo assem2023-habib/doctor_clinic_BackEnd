@@ -9,7 +9,7 @@ class StoreSupervisionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'doctor_id' => ['required', 'string', 'exists:doctors,id'],
+            'doctor_id' => ['required', 'string', 'exists:doctors,user_id'],
         ];
     }
 }

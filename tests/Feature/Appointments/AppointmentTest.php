@@ -155,7 +155,7 @@ class AppointmentTest extends TestCase
             'created_by' => $patient->id . ': ' . $patient->first_name . ' ' . $patient->last_name,
         ]);
 
-        $response = $this->getJson("/api/v1/doctors/{$doctorUser->doctor->id}/booked-slots?date={$futureDate}");
+        $response = $this->getJson("/api/v1/doctors/{$doctorUser->id}/booked-slots?date={$futureDate}");
 
         $response->assertStatus(200)
             ->assertJsonStructure([
@@ -179,12 +179,12 @@ class AppointmentTest extends TestCase
 
         $monday = Carbon::now()->next(Carbon::MONDAY)->format('Y-m-d');
 
-        $response = $this->getJson("/api/v1/doctors/{$doctorUser->doctor->id}/booked-slots?date={$monday}");
-
-        $response->assertStatus(200);
-
-        $json = $response->json();
-        $this->assertEmpty($json['data']);
+$response = $this->getJson("/api/v1/doctors/{$doctorUser->id}/booked-slots?date={$monday}");
+ 
+         $response->assertStatus(200);
+ 
+         $json = $response->json();
+         $this->assertEmpty($json['data']);
     }
 
     public function test_booked_slots_includes_existing_appointments(): void
@@ -206,11 +206,11 @@ class AppointmentTest extends TestCase
             'created_by' => $patient->id . ': ' . $patient->first_name . ' ' . $patient->last_name,
         ]);
 
-        $response = $this->getJson("/api/v1/doctors/{$doctorUser->doctor->id}/booked-slots?date={$futureDate}");
-
-        $response->assertStatus(200);
-
-        $slots = $response->json()['data'];
+$response = $this->getJson("/api/v1/doctors/{$doctorUser->id}/booked-slots?date={$futureDate}");
+ 
+         $response->assertStatus(200);
+ 
+         $slots = $response->json()['data'];
         $this->assertCount(1, $slots);
         $this->assertEquals('09:00', $slots[0]['start_time']);
         $this->assertEquals('11:00', $slots[0]['end_time']);
@@ -226,7 +226,7 @@ class AppointmentTest extends TestCase
         $this->createScheduleForDate($doctorUser->doctor, now()->addDays(3)->format('Y-m-d'));
 
         $response = $this->postJson('/api/v1/appointments', [
-            'doctor_id' => $doctorUser->doctor->id,
+            'doctor_id' => $doctorUser->id,
             'preferred_date' => now()->addDays(3)->format('Y-m-d'),
             'reason' => 'Feeling unwell',
         ]);
@@ -249,7 +249,7 @@ class AppointmentTest extends TestCase
         Passport::actingAs($doctor);
 
         $response = $this->postJson('/api/v1/appointments', [
-            'doctor_id' => $doctor->doctor->id,
+            'doctor_id' => $doctor->id,
             'reason' => 'Feeling unwell',
         ]);
 
@@ -261,7 +261,7 @@ class AppointmentTest extends TestCase
         $doctorUser = $this->createDoctorUser();
 
         $response = $this->postJson('/api/v1/appointments', [
-            'doctor_id' => $doctorUser->doctor->id,
+            'doctor_id' => $doctorUser->id,
             'reason' => 'Feeling unwell',
         ]);
 

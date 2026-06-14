@@ -25,7 +25,7 @@ PatientController
  └── destroy()        → DeletePatientAction → PatientDeletionService
 ```
 
-- **Model:** `Patient` (UUID v7, `HasUuidV7`, `user_id` FK)
+- **Model:** `Patient` (UUID v7, `HasUuidV7`, `user_id` FK, route key = `user_id` via `getRouteKeyName()`)
 - **Relations:** `user` (BelongsTo User), `appointments` (HasMany), `doctors` (BelongsToMany via `doctor_patient`)
 - **Resource:** `PatientResource` extends `UserResource` → returns `id, first_name, last_name, username, email, phone, address, gender, birthday_date, roles, is_active, image`
 - **DTO:** `UpdatePatientData` — built from either full PUT request or partial PATCH request; supports optional file upload
