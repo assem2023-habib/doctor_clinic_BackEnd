@@ -8373,6 +8373,32 @@
                             "type": "object"
                         }
                     },
+                    "supervision_request": {
+                        "description": "Only for Patient role. Supervision request info for the authenticated patient (omitted entirely for non-patients)",
+                        "properties": {
+                            "has_request": {
+                                "description": "Whether the authenticated patient has a supervision request for this doctor",
+                                "type": "boolean"
+                            },
+                            "status": {
+                                "description": "Status of the supervision request (null if no request)",
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "enum": [
+                                    "pending",
+                                    "approved",
+                                    "rejected",
+                                    "cancelled"
+                                ]
+                            }
+                        },
+                        "type": [
+                            "object",
+                            "null"
+                        ]
+                    },
                     "rating": {
                         "properties": {
                             "avg": {

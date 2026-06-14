@@ -9,7 +9,7 @@ class DoctorResource extends UserResource
 {
     public function toArray($request): array
     {
-        return array_merge(parent::toArray($request), [
+        $data = [
             'specialization' => $this->doctor?->specialization ? [
                 'id' => $this->doctor->specialization->id,
                 'slug' => $this->doctor->specialization->slug,
@@ -39,6 +39,15 @@ class DoctorResource extends UserResource
                     'created_at' => $r->created_at,
                 ]) ?? [],
             ],
-        ]);
+        ];
+
+        if ($request->user()?->patient && $this->doctor) {
+            $data['supervision_request'] = [
+                'has_request' => isset($this->doctor->supervision_request_status),
+                'status' => $this->doctor->supervision_request_status ?? null,
+            ];
+        }
+
+        return array_merge(parent::toArray($request), $data);
     }
 }

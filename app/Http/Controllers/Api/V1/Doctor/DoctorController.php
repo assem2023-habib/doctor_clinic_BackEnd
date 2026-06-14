@@ -13,6 +13,7 @@ use App\Domains\Doctors\Requests\UpdateDoctorRequest;
 use App\Domains\Doctors\Resources\DoctorResource;
 use App\Domains\Ratings\Resources\RatingResource;
 use App\Domains\Shared\Responses\ApiResponse;
+use App\Domains\Supervisions\Models\SupervisionRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -45,6 +46,21 @@ class DoctorController
             ->when($request->has('is_active'), fn ($q) => $q->where('is_active', $request->boolean('is_active')))
             ->paginate(min($limit, 100));
 
+        if ($patient = $request->user()?->patient) {
+            $doctorIds = $doctors->pluck('doctor.id')->filter();
+            $supervisionRequests = SupervisionRequest::where('patient_id', $patient->id)
+                ->whereIn('doctor_id', $doctorIds)
+                ->get()
+                ->keyBy('doctor_id');
+
+            $doctors->each(function ($user) use ($supervisionRequests) {
+                $doctor = $user->doctor;
+                if ($doctor && $supervisionRequests->has($doctor->id)) {
+                    $doctor->supervision_request_status = $supervisionRequests->get($doctor->id)->status->value;
+                }
+            });
+        }
+
         return ApiResponse::success(
             DoctorResource::collection($doctors),
             __('Doctors retrieved successfully'),
@@ -52,7 +68,7 @@ class DoctorController
         );
     }
 
-    public function show(string $doctor): JsonResponse
+    public function show(Request $request, string $doctor): JsonResponse
     {
         $doctor = Doctor::where('user_id', $doctor)
             ->with('user.roles', 'schedules')
@@ -60,6 +76,16 @@ class DoctorController
 
         $doctor->loadCount('ratings');
         $doctor->loadAvg('ratings', 'rating');
+
+        if ($patient = $request->user()?->patient) {
+            $supervisionRequest = SupervisionRequest::where('patient_id', $patient->id)
+                ->where('doctor_id', $doctor->id)
+                ->first();
+
+            if ($supervisionRequest) {
+                $doctor->supervision_request_status = $supervisionRequest->status->value;
+            }
+        }
 
         $recentRatings = $doctor->ratings()
             ->with('rater')

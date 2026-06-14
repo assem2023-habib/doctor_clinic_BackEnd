@@ -52,6 +52,16 @@ use OpenApi\Attributes as OA;
             )
         ),
         new OA\Property(
+            property: 'supervision_request',
+            type: 'object',
+            nullable: true,
+            description: 'Only for Patient role. Supervision request info for the authenticated patient (omitted entirely for non-patients)',
+            properties: [
+                new OA\Property(property: 'has_request', type: 'boolean', description: 'Whether the authenticated patient has a supervision request for this doctor'),
+                new OA\Property(property: 'status', type: 'string', nullable: true, enum: ['pending', 'approved', 'rejected', 'cancelled'], description: 'Status of the supervision request (null if no request)'),
+            ]
+        ),
+        new OA\Property(
             property: 'rating',
             type: 'object',
             properties: [

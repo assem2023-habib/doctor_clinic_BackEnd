@@ -10,9 +10,9 @@
 
 | # | Method | Endpoint | Auth | الوصف |
 |---|--------|----------|------|-------|
-| 1 | `GET` | `/api/v1/doctors` | ❌ عام | قائمة الأطباء مع البحث والفلترة |
+| 1 | `GET` | `/api/v1/doctors` | ❌ عام | قائمة الأطباء مع البحث والفلترة — يعيد `supervision_request` للمريض المصادق |
 | 2 | `POST` | `/api/v1/doctors` | ✅ admin | إنشاء دكتور جديد ([توثيق](create-doctor.md)) |
-| 3 | `GET` | `/api/v1/doctors/{doctor}` | ❌ عام | عرض طبيب |
+| 3 | `GET` | `/api/v1/doctors/{doctor}` | ❌ عام | عرض طبيب — يعيد `supervision_request` للمريض المصادق |
 | 4 | `PUT` | `/api/v1/doctors/{doctor}` | ✅ admin | تحديث كامل |
 | 5 | `PATCH` | `/api/v1/doctors/{doctor}` | ✅ admin | تحديث جزئي |
 | 6 | `DELETE` | `/api/v1/doctors/{doctor}` | ✅ admin | حذف مع تنظيف |
@@ -51,6 +51,21 @@
 - `schedules()` — HasMany → DoctorSchedule
 - `appointments()` — HasMany → Appointment
 - `patients()` — BelongsToMany → Patient (via doctor_patient)
+
+---
+
+## Response Fields
+
+### `supervision_request`
+
+موجود فقط في `GET /api/v1/doctors` و `GET /api/v1/doctors/{doctor}` للمستخدمين المصادقين (auth:api).
+
+| الحقل | النوع | الوصف |
+|-------|------|-------|
+| `has_request` | boolean | هل لدى المستخدم المصادق (Patient) طلب إشراف لهذا الدكتور |
+| `status` | string\|null | حالة الطلب: `pending`, `approved`, `rejected`, `cancelled` — أو `null` إن لم يوجد |
+
+**ملاحظة:** الحقل يظهر فقط إذا كان المستخدم المصادق لديه دور `Patient`. لـ Admin أو Doctor أو Receptionist **لا يظهر الحقل مطلقاً** (محذوف بالكامل من الاستجابة).
 
 ---
 
