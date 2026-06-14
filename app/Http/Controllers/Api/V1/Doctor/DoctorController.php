@@ -11,9 +11,11 @@ use App\Domains\Doctors\Requests\PatchDoctorRequest;
 use App\Domains\Doctors\Requests\StoreDoctorRequest;
 use App\Domains\Doctors\Requests\UpdateDoctorRequest;
 use App\Domains\Doctors\Resources\DoctorResource;
+use App\Domains\Ratings\Models\Rating;
 use App\Domains\Ratings\Resources\RatingResource;
 use App\Domains\Shared\Responses\ApiResponse;
 use App\Domains\Supervisions\Models\SupervisionRequest;
+use App\Enums\RatingTypeEnum;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -46,9 +48,10 @@ class DoctorController
             ->when($request->has('is_active'), fn ($q) => $q->where('is_active', $request->boolean('is_active')))
             ->paginate(min($limit, 100));
 
-        if ($patient = $request->user()?->patient) {
+        if ($request->user()?->patient) {
+            // Supervision requests
             $doctorIds = $doctors->pluck('doctor.id')->filter();
-            $supervisionRequests = SupervisionRequest::where('patient_id', $patient->id)
+            $supervisionRequests = SupervisionRequest::where('patient_id', $request->user()->patient->id)
                 ->whereIn('doctor_id', $doctorIds)
                 ->get()
                 ->keyBy('doctor_id');
@@ -58,6 +61,17 @@ class DoctorController
                 if ($doctor && $supervisionRequests->has($doctor->id)) {
                     $doctor->supervision_request_status = $supervisionRequests->get($doctor->id)->status->value;
                 }
+            });
+
+            // Has rated
+            $ratedUserIds = Rating::where('rater_id', $request->user()->id)
+                ->whereIn('rateable_id', $doctors->pluck('id'))
+                ->where('type', RatingTypeEnum::User)
+                ->where('rateable_type', 'App\Models\User')
+                ->pluck('rateable_id');
+
+            $doctors->each(function ($user) use ($ratedUserIds) {
+                $user->has_rated_doctor = $ratedUserIds->contains($user->id);
             });
         }
 
@@ -77,14 +91,20 @@ class DoctorController
         $doctor->loadCount('ratings');
         $doctor->loadAvg('ratings', 'rating');
 
-        if ($patient = $request->user()?->patient) {
-            $supervisionRequest = SupervisionRequest::where('patient_id', $patient->id)
+        if ($request->user()?->patient) {
+            $supervisionRequest = SupervisionRequest::where('patient_id', $request->user()->patient->id)
                 ->where('doctor_id', $doctor->id)
                 ->first();
 
             if ($supervisionRequest) {
                 $doctor->supervision_request_status = $supervisionRequest->status->value;
             }
+
+            $doctor->user->has_rated_doctor = Rating::where('rater_id', $request->user()->id)
+                ->where('rateable_id', $doctor->user_id)
+                ->where('type', RatingTypeEnum::User)
+                ->where('rateable_type', 'App\Models\User')
+                ->exists();
         }
 
         $recentRatings = $doctor->ratings()

@@ -46,6 +46,8 @@ class DoctorResource extends UserResource
                 'has_request' => isset($this->doctor->supervision_request_status),
                 'status' => $this->doctor->supervision_request_status ?? null,
             ];
+
+            $data['has_rated'] = $this->has_rated_doctor ?? false;
         }
 
         return array_merge(parent::toArray($request), $data);

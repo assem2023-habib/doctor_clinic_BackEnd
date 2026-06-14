@@ -54,9 +54,9 @@ public function index(Request $request): JsonResponse
         ->when($request->has('is_active'), fn ($q) => $q->where('is_active', $request->boolean('is_active')))
         ->paginate(min($limit, 100));
 
-    if ($patient = $request->user()?->patient) {
+    if ($request->user()?->patient) {
         $doctorIds = $doctors->pluck('doctor.id')->filter();
-        $supervisionRequests = SupervisionRequest::where('patient_id', $patient->id)
+        $supervisionRequests = SupervisionRequest::where('patient_id', $request->user()->patient->id)
             ->whereIn('doctor_id', $doctorIds)
             ->get()
             ->keyBy('doctor_id');
@@ -66,6 +66,16 @@ public function index(Request $request): JsonResponse
             if ($doctor && $supervisionRequests->has($doctor->id)) {
                 $doctor->supervision_request_status = $supervisionRequests->get($doctor->id)->status->value;
             }
+        });
+
+        $ratedUserIds = Rating::where('rater_id', $request->user()->id)
+            ->whereIn('rateable_id', $doctors->pluck('id'))
+            ->where('type', 'user')
+            ->where('rateable_type', 'App\Models\User')
+            ->pluck('rateable_id');
+
+        $doctors->each(function ($user) use ($ratedUserIds) {
+            $user->has_rated_doctor = $ratedUserIds->contains($user->id);
         });
     }
 
@@ -88,7 +98,7 @@ public function index(Request $request): JsonResponse
  7. if date_from/to → where birthday_date >= / <=
  8. if is_active → where is_active
  9. paginate(min(limit, 100))
-10. if patient → load supervision requests for all doctors in page
+10. if patient → load supervision requests + has_rated for all doctors in page
 11. DoctorResource::collection()
 12. return 200
 ```
@@ -104,6 +114,7 @@ public function index(Request $request): JsonResponse
 - `experience_months`
 - `schedules`
 - `supervision_request` — يظهر فقط لدور `Patient`
+- `has_rated` — يظهر فقط لدور `Patient`
 - `rating` (avg, count, recent) — فقط في show
 
 > **ملاحظة:** في قائمة الأطباء `rating` يكون `{"avg": 0, "count": 0, "recent": []}` لأن بيانات التقييمات تُحمّل فقط في show.
@@ -155,6 +166,7 @@ public function index(Request $request): JsonResponse
                 "has_request": false,
                 "status": null
             },
+            "has_rated": false,
             "rating": {
                 "avg": 0,
                 "count": 0,

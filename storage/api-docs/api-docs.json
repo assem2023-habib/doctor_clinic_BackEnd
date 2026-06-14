@@ -8399,6 +8399,10 @@
                             "null"
                         ]
                     },
+                    "has_rated": {
+                        "description": "Only for Patient role. Whether the authenticated patient has rated this doctor (omitted entirely for non-patients)",
+                        "type": "boolean"
+                    },
                     "rating": {
                         "properties": {
                             "avg": {

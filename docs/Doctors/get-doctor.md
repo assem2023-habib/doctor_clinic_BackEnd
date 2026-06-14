@@ -31,14 +31,20 @@ public function show(Request $request, string $doctor): JsonResponse
     $doctor->loadCount('ratings');
     $doctor->loadAvg('ratings', 'rating');
 
-    if ($patient = $request->user()?->patient) {
-        $supervisionRequest = SupervisionRequest::where('patient_id', $patient->id)
+    if ($request->user()?->patient) {
+        $supervisionRequest = SupervisionRequest::where('patient_id', $request->user()->patient->id)
             ->where('doctor_id', $doctor->id)
             ->first();
 
         if ($supervisionRequest) {
             $doctor->supervision_request_status = $supervisionRequest->status->value;
         }
+
+        $doctor->user->has_rated_doctor = Rating::where('rater_id', $request->user()->id)
+            ->where('rateable_id', $doctor->user_id)
+            ->where('type', 'user')
+            ->where('rateable_type', 'App\Models\User')
+            ->exists();
     }
 
     $recentRatings = $doctor->ratings()
@@ -65,7 +71,7 @@ public function show(Request $request, string $doctor): JsonResponse
 2. with('user.roles', 'schedules') — eager load
 3. loadCount('ratings') — عدد التقييمات
 4. loadAvg('ratings', 'rating') — متوسط التقييمات
-5. if patient → SupervisionRequest::where(patient_id, doctor_id) — تحميل طلب الإشراف
+5. if patient → SupervisionRequest::where(patient_id, doctor_id) + Rating::where(rater_id, rateable_id) — تحميل طلب الإشراف و has_rated
 6. ratings()->with('rater')->latest()->limit(5) — آخر 5 تقييمات مع الرائيتر
 7. setRelation('recentRatings', ...) — تخزينها مؤقتاً
 8. $user->setRelation('doctor', $doctor) — ربط doctor بالمستخدم
@@ -108,6 +114,8 @@ public function toArray($request): array
             'has_request' => isset($this->doctor->supervision_request_status),
             'status' => $this->doctor->supervision_request_status ?? null,
         ];
+
+        $data['has_rated'] = $this->has_rated_doctor ?? false;
     }
 
     return array_merge(parent::toArray($request), $data);
@@ -160,6 +168,7 @@ public function toArray($request): array
             "has_request": false,
             "status": null
         },
+        "has_rated": false,
         "rating": {
             "avg": 4.5,
             "count": 12,

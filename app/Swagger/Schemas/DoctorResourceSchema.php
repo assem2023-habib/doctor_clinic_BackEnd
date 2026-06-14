@@ -62,6 +62,11 @@ use OpenApi\Attributes as OA;
             ]
         ),
         new OA\Property(
+            property: 'has_rated',
+            type: 'boolean',
+            description: 'Only for Patient role. Whether the authenticated patient has rated this doctor (omitted entirely for non-patients)',
+        ),
+        new OA\Property(
             property: 'rating',
             type: 'object',
             properties: [
