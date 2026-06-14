@@ -24,6 +24,8 @@
 |---------|--------|--------|
 | `Receptionist` | `receptionists` | id, user_id, shift_start, shift_end |
 
+**Route Binding:** `getRouteKeyName()` returns `'user_id'` — implicit binding (`Receptionist $receptionist`) resolves by User UUID.
+
 ### علاقات Receptionist:
 - `user()` — BelongsTo → User
 

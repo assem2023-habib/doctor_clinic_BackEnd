@@ -61,7 +61,7 @@ class ReceptionistActivationTest extends TestCase
             'shift_end' => '17:00',
         ]);
 
-        $response = $this->putJson("/api/v1/receptionists/{$user->receptionist->id}/activate-account");
+        $response = $this->putJson("/api/v1/receptionists/{$user->id}/activate-account");
 
         $response->assertStatus(200)
             ->assertJsonStructure(['status', 'message', 'data' => ['id', 'first_name', 'last_name', 'email', 'is_active']]);
@@ -86,7 +86,7 @@ class ReceptionistActivationTest extends TestCase
         ]);
         Passport::actingAs($user);
 
-        $response = $this->putJson("/api/v1/receptionists/{$user->receptionist->id}/activate-account");
+        $response = $this->putJson("/api/v1/receptionists/{$user->id}/activate-account");
 
         $response->assertStatus(403);
         $this->assertDatabaseHas('users', [

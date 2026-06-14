@@ -5943,7 +5943,7 @@
                     {
                         "name": "receptionist",
                         "in": "path",
-                        "description": "Receptionist ID (UUID)",
+                        "description": "Receptionist user UUID",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -5990,7 +5990,7 @@
                     {
                         "name": "receptionist",
                         "in": "path",
-                        "description": "Receptionist UUID",
+                        "description": "Receptionist user UUID",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -6080,7 +6080,7 @@
                     {
                         "name": "receptionist",
                         "in": "path",
-                        "description": "Receptionist UUID",
+                        "description": "Receptionist user UUID",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -6118,7 +6118,7 @@
                     {
                         "name": "receptionist",
                         "in": "path",
-                        "description": "Receptionist UUID",
+                        "description": "Receptionist user UUID",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -6175,7 +6175,7 @@
                     {
                         "name": "receptionist",
                         "in": "path",
-                        "description": "Receptionist UUID",
+                        "description": "Receptionist user UUID",
                         "required": true,
                         "schema": {
                             "type": "string",
@@ -7563,8 +7563,9 @@
                                 "items": {
                                     "properties": {
                                         "doctor_id": {
-                                            "type": "integer",
-                                            "example": 1
+                                            "description": "Doctor user UUID",
+                                            "type": "string",
+                                            "format": "uuid"
                                         },
                                         "doctor_name": {
                                             "type": "string",
@@ -7588,8 +7589,9 @@
                                 "items": {
                                     "properties": {
                                         "doctor_id": {
-                                            "type": "integer",
-                                            "example": 5
+                                            "description": "Doctor user UUID",
+                                            "type": "string",
+                                            "format": "uuid"
                                         },
                                         "doctor_name": {
                                             "type": "string",
@@ -7613,8 +7615,9 @@
                                 "items": {
                                     "properties": {
                                         "doctor_id": {
-                                            "type": "integer",
-                                            "example": 2
+                                            "description": "Doctor user UUID",
+                                            "type": "string",
+                                            "format": "uuid"
                                         },
                                         "doctor_name": {
                                             "type": "string",
@@ -7638,16 +7641,18 @@
                                 "items": {
                                     "properties": {
                                         "specialization_id": {
-                                            "type": "integer",
-                                            "example": 1
+                                            "description": "Specialization UUID",
+                                            "type": "string",
+                                            "format": "uuid"
                                         },
                                         "specialization_name": {
                                             "type": "string",
                                             "example": "Cardiology"
                                         },
                                         "doctor_id": {
-                                            "type": "integer",
-                                            "example": 1
+                                            "description": "Doctor user UUID",
+                                            "type": "string",
+                                            "format": "uuid"
                                         },
                                         "doctor_name": {
                                             "type": "string",
@@ -7925,8 +7930,9 @@
                                 "items": {
                                     "properties": {
                                         "doctor_id": {
-                                            "type": "integer",
-                                            "example": 1
+                                            "description": "Doctor user UUID",
+                                            "type": "string",
+                                            "format": "uuid"
                                         },
                                         "doctor_name": {
                                             "type": "string",
@@ -7950,8 +7956,9 @@
                                 "items": {
                                     "properties": {
                                         "doctor_id": {
-                                            "type": "integer",
-                                            "example": 5
+                                            "description": "Doctor user UUID",
+                                            "type": "string",
+                                            "format": "uuid"
                                         },
                                         "doctor_name": {
                                             "type": "string",
@@ -7975,8 +7982,9 @@
                                 "items": {
                                     "properties": {
                                         "doctor_id": {
-                                            "type": "integer",
-                                            "example": 2
+                                            "description": "Doctor user UUID",
+                                            "type": "string",
+                                            "format": "uuid"
                                         },
                                         "doctor_name": {
                                             "type": "string",
@@ -8000,16 +8008,18 @@
                                 "items": {
                                     "properties": {
                                         "specialization_id": {
-                                            "type": "integer",
-                                            "example": 1
+                                            "description": "Specialization UUID",
+                                            "type": "string",
+                                            "format": "uuid"
                                         },
                                         "specialization_name": {
                                             "type": "string",
                                             "example": "Cardiology"
                                         },
                                         "doctor_id": {
-                                            "type": "integer",
-                                            "example": 1
+                                            "description": "Doctor user UUID",
+                                            "type": "string",
+                                            "format": "uuid"
                                         },
                                         "doctor_name": {
                                             "type": "string",

@@ -13,6 +13,11 @@ class Receptionist extends Model
 
     protected $fillable = ['user_id', 'shift_start', 'shift_end'];
 
+    public function getRouteKeyName(): string
+    {
+        return 'user_id';
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

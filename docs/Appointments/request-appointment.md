@@ -12,7 +12,7 @@
 
 | Parameter | Type | Constraints | Description |
 |-----------|------|-------------|-------------|
-| `doctor_id` | string | required, exists:doctors,id | Target doctor UUID |
+| `doctor_id` | string | required, exists:doctors,user_id | Target doctor's User UUID (maps to doctors.user_id) |
 | `preferred_date` | string | nullable, date, after_or_equal:today, must exist in doctor's schedule | Patient's preferred date (day-of-week must be in doctor's active schedule) |
 | `reason` | string | nullable, max:2000 | Reason for visit |
 
@@ -25,6 +25,8 @@
   "reason": "Annual checkup"
 }
 ```
+
+> **Note:** The API receives `doctor_id` as User UUID. The controller resolves it to the Doctor model's internal PK via `Doctor::where('user_id', $request->doctor_id)->firstOrFail()`, then passes the PK into the DTO. All internal storage uses the table primary key (`doctors.id`).
 
 ## DTO: `RequestAppointmentData`
 
@@ -77,7 +79,7 @@ This is handled by **`FindOrCreateMedicalRecordAction`** (`app/Domains/MedicalRe
 
 ## Notification
 
-Fires `appointment.requested` event to the doctor's user:
+Fires `appointment.requested` event to the doctor's user. The `doctor_id`/`patient_id` values in the body are User UUIDs (user_id):
 
 ```php
 $this->notificationManager->send('appointment.requested', new NotificationData(

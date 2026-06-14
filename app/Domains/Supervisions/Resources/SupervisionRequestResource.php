@@ -10,8 +10,8 @@ class SupervisionRequestResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'patient_id' => $this->patient_id,
-            'doctor_id' => $this->doctor_id,
+            'patient_id' => $this->patient?->user_id,
+            'doctor_id' => $this->doctor?->user_id,
             'status' => $this->status?->value,
             'responded_at' => $this->responded_at?->toIso8601String(),
             'created_at' => $this->created_at?->toIso8601String(),

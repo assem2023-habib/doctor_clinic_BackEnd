@@ -22,7 +22,7 @@
 | `to_date` | string | — | date (Y-m-d) | Filter to date |
 | `from_time` | string | — | H:i | Filter by `start_time >= value` |
 | `to_time` | string | — | H:i | Filter by `end_time <= value` |
-| `doctor_id` | string/array | — | uuid | Filter by doctor(s). Single (`?doctor_id=uuid`) or multiple (`?doctor_id[]=uuid1&uuid2`). Patients see only their own appointments with those doctors |
+| `doctor_id` | string/array | — | uuid | Filter by doctor(s) using their User UUID (maps to doctors.user_id). Single (`?doctor_id=uuid`) or multiple (`?doctor_id[]=uuid1&uuid2`). Internally converted to doctor PK for DB query |
 | `order_by` | string | `created_at` | `created_at`, `appointment_date`, `start_time` | Sort field |
 | `order_dir` | string | `desc` | `asc`, `desc` | Sort direction |
 

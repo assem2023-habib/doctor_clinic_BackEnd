@@ -37,6 +37,7 @@ class SupervisionRequestController
         $doctor = Doctor::where('user_id', $request->doctor_id)->firstOrFail();
 
         $result = $this->createAction->execute($patient, $doctor);
+        $result->loadMissing(['patient', 'doctor']);
 
         return ApiResponse::created(
             new SupervisionRequestResource($result),
@@ -54,7 +55,8 @@ class SupervisionRequestController
             return ApiResponse::forbidden(__('Unauthorized to view these requests'));
         }
 
-        $requests = SupervisionRequest::where('patient_id', $patient->id)
+        $requests = SupervisionRequest::with(['patient', 'doctor'])
+            ->where('patient_id', $patient->id)
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -81,7 +83,7 @@ class SupervisionRequestController
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $requests->loadMissing('patient.user');
+        $requests->loadMissing(['patient.user', 'doctor']);
 
         return ApiResponse::success(
             SupervisionRequestResource::collection($requests),

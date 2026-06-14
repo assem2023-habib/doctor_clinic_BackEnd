@@ -106,7 +106,7 @@ class AppointmentController
             )
             ->when($request->filled('from_time'), fn($q) => $q->whereTime('start_time', '>=', $request->from_time))
             ->when($request->filled('to_time'), fn($q) => $q->whereTime('end_time', '<=', $request->to_time))
-            ->when($request->filled('doctor_id'), fn($q) => $q->whereIn('doctor_id', (array) $request->doctor_id));
+            ->when($request->filled('doctor_id'), fn($q) => $q->whereIn('doctor_id', Doctor::whereIn('user_id', (array) $request->doctor_id)->pluck('id')));
 
         $orderBy = $request->order_by ?? 'created_at';
         $orderDir = $request->order_dir ?? 'desc';
@@ -202,8 +202,8 @@ class AppointmentController
             title: __('New Appointment Request'),
             body: [
                 'appointment_id' => $appointment->id,
-                'doctor_id' => $appointment->doctor_id,
-                'patient_id' => $appointment->patient_id,
+                'doctor_id' => $appointment->doctor?->user_id,
+                'patient_id' => $appointment->patient?->user_id,
                 'reason' => $appointment->reason,
             ],
             userIds: [$appointment->doctor?->user_id],
@@ -249,8 +249,8 @@ class AppointmentController
             title: __('Appointment Time Set'),
             body: [
                 'appointment_id' => $appointment->id,
-                'doctor_id' => $appointment->doctor_id,
-                'patient_id' => $appointment->patient_id,
+                'doctor_id' => $appointment->doctor?->user_id,
+                'patient_id' => $appointment->patient?->user_id,
                 'appointment_date' => $appointment->appointment_date?->format('Y-m-d'),
                 'start_time' => $appointment->start_time?->format('H:i'),
                 'end_time' => $appointment->end_time?->format('H:i'),
@@ -300,8 +300,8 @@ class AppointmentController
             title: $title,
             body: [
                 'appointment_id' => $appointment->id,
-                'doctor_id' => $appointment->doctor_id,
-                'patient_id' => $appointment->patient_id,
+                'doctor_id' => $appointment->doctor?->user_id,
+                'patient_id' => $appointment->patient?->user_id,
                 'response' => $response->value,
             ],
             userIds: [$appointment->doctor?->user_id],
@@ -343,8 +343,8 @@ class AppointmentController
             title: __('Appointment Cancelled'),
             body: [
                 'appointment_id' => $appointment->id,
-                'doctor_id' => $appointment->doctor_id,
-                'patient_id' => $appointment->patient_id,
+                'doctor_id' => $appointment->doctor?->user_id,
+                'patient_id' => $appointment->patient?->user_id,
                 'cancelled_by' => $changedBy,
             ],
             userIds: [$appointment->patient?->user_id, $appointment->doctor?->user_id],
@@ -384,8 +384,8 @@ class AppointmentController
             title: __('Appointment Completed'),
             body: [
                 'appointment_id' => $appointment->id,
-                'doctor_id' => $appointment->doctor_id,
-                'patient_id' => $appointment->patient_id,
+                'doctor_id' => $appointment->doctor?->user_id,
+                'patient_id' => $appointment->patient?->user_id,
             ],
             userIds: [$appointment->patient?->user_id],
             type: 'appointment',
@@ -424,8 +424,8 @@ class AppointmentController
             title: __('Appointment In Progress'),
             body: [
                 'appointment_id' => $appointment->id,
-                'doctor_id' => $appointment->doctor_id,
-                'patient_id' => $appointment->patient_id,
+                'doctor_id' => $appointment->doctor?->user_id,
+                'patient_id' => $appointment->patient?->user_id,
             ],
             userIds: [$appointment->patient?->user_id],
             type: 'appointment',
@@ -468,8 +468,8 @@ class AppointmentController
             title: __('Alternative Suggested'),
             body: [
                 'appointment_id' => $appointment->id,
-                'doctor_id' => $appointment->doctor_id,
-                'patient_id' => $appointment->patient_id,
+                'doctor_id' => $appointment->doctor?->user_id,
+                'patient_id' => $appointment->patient?->user_id,
                 'message' => $data->message,
             ],
             userIds: [$appointment->patient?->user_id],

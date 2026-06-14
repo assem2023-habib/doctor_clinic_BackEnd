@@ -657,7 +657,7 @@ $response = $this->getJson("/api/v1/doctors/{$doctorUser->id}/booked-slots?date=
         $this->createAppointment(['patient' => $patient, 'doctor' => $doctor2]);
         $this->createAppointment(['patient' => $patient, 'doctor' => $doctor3]);
 
-        $response = $this->getJson('/api/v1/appointments?doctor_id[]=' . $doctor1->doctor->id . '&doctor_id[]=' . $doctor2->doctor->id);
+        $response = $this->getJson('/api/v1/appointments?doctor_id[]=' . $doctor1->doctor->user_id . '&doctor_id[]=' . $doctor2->doctor->user_id);
 
         $json = $response->json();
         $this->assertCount(2, $json['data']);
@@ -673,7 +673,7 @@ $response = $this->getJson("/api/v1/doctors/{$doctorUser->id}/booked-slots?date=
         $this->createAppointment(['patient' => $patient, 'doctor' => $doctor1]);
         $this->createAppointment(['patient' => $patient, 'doctor' => $doctor2]);
 
-        $response = $this->getJson('/api/v1/appointments?doctor_id[]=' . $doctor1->doctor->id);
+        $response = $this->getJson('/api/v1/appointments?doctor_id[]=' . $doctor1->doctor->user_id);
 
         $json = $response->json();
         $this->assertCount(1, $json['data']);

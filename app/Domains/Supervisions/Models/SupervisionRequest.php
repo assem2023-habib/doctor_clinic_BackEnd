@@ -24,6 +24,7 @@ class SupervisionRequest extends Model
     {
         return [
             'status' => SupervisionRequestStatusEnum::class,
+            'responded_at' => 'datetime',
         ];
     }
 

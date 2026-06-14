@@ -71,7 +71,7 @@ class ReceptionistControllerDoc
                 name: 'receptionist',
                 in: 'path',
                 required: true,
-                description: 'Receptionist ID (UUID)',
+                description: 'Receptionist user UUID',
                 schema: new OA\Schema(type: 'string', format: 'uuid')
             ),
         ],
@@ -146,7 +146,7 @@ class ReceptionistControllerDoc
         tags: ['Receptionists'],
         security: [['bearerAuth' => []]],
         parameters: [
-            new OA\Parameter(name: 'receptionist', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Receptionist UUID'),
+            new OA\Parameter(name: 'receptionist', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Receptionist user UUID'),
         ],
         requestBody: new OA\RequestBody(
             required: true,
@@ -176,7 +176,7 @@ class ReceptionistControllerDoc
         tags: ['Receptionists'],
         security: [['bearerAuth' => []]],
         parameters: [
-            new OA\Parameter(name: 'receptionist', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Receptionist UUID'),
+            new OA\Parameter(name: 'receptionist', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Receptionist user UUID'),
         ],
         requestBody: new OA\RequestBody(
             required: true,
@@ -199,7 +199,7 @@ class ReceptionistControllerDoc
         tags: ['Receptionists'],
         security: [['bearerAuth' => []]],
         parameters: [
-            new OA\Parameter(name: 'receptionist', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Receptionist UUID'),
+            new OA\Parameter(name: 'receptionist', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Receptionist user UUID'),
         ],
         responses: [
             new OA\Response(response: 204, description: 'Receptionist deleted successfully'),
@@ -217,7 +217,7 @@ class ReceptionistControllerDoc
         tags: ['Receptionists'],
         security: [['bearerAuth' => []]],
         parameters: [
-            new OA\Parameter(name: 'receptionist', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Receptionist UUID'),
+            new OA\Parameter(name: 'receptionist', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Receptionist user UUID'),
         ],
         responses: [
             new OA\Response(response: 200, description: 'Account activated successfully', content: new OA\JsonContent(properties: [
