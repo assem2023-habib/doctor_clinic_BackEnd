@@ -22,7 +22,7 @@
 **الملف:** `app/Http/Controllers/Api/V1/Doctor/DoctorController.php`
 
 ```php
-public function show(string $doctor): JsonResponse
+public function show(Request $request, string $doctor): JsonResponse
 {
     $doctor = Doctor::where('user_id', $doctor)
         ->with('user.roles', 'schedules')
@@ -30,6 +30,16 @@ public function show(string $doctor): JsonResponse
 
     $doctor->loadCount('ratings');
     $doctor->loadAvg('ratings', 'rating');
+
+    if ($patient = $request->user()?->patient) {
+        $supervisionRequest = SupervisionRequest::where('patient_id', $patient->id)
+            ->where('doctor_id', $doctor->id)
+            ->first();
+
+        if ($supervisionRequest) {
+            $doctor->supervision_request_status = $supervisionRequest->status->value;
+        }
+    }
 
     $recentRatings = $doctor->ratings()
         ->with('rater')
@@ -55,11 +65,12 @@ public function show(string $doctor): JsonResponse
 2. with('user.roles', 'schedules') — eager load
 3. loadCount('ratings') — عدد التقييمات
 4. loadAvg('ratings', 'rating') — متوسط التقييمات
-5. ratings()->with('rater')->latest()->limit(5) — آخر 5 تقييمات مع الرائيتر
-6. setRelation('recentRatings', ...) — تخزينها مؤقتاً
-7. $user->setRelation('doctor', $doctor) — ربط doctor بالمستخدم
-8. new DoctorResource($user)
-9. return 200
+5. if patient → SupervisionRequest::where(patient_id, doctor_id) — تحميل طلب الإشراف
+6. ratings()->with('rater')->latest()->limit(5) — آخر 5 تقييمات مع الرائيتر
+7. setRelation('recentRatings', ...) — تخزينها مؤقتاً
+8. $user->setRelation('doctor', $doctor) — ربط doctor بالمستخدم
+9. new DoctorResource($user)
+10. return 200
 ```
 
 ---
@@ -71,7 +82,7 @@ public function show(string $doctor): JsonResponse
 ```php
 public function toArray($request): array
 {
-    return array_merge(parent::toArray($request), [
+    $data = [
         'specialization' => ...,
         'experience_months' => ...,
         'schedules' => ...,
@@ -90,7 +101,16 @@ public function toArray($request): array
                 'created_at' => $r->created_at,
             ]) ?? [],
         ],
-    ]);
+    ];
+
+    if ($request->user()?->patient && $this->doctor) {
+        $data['supervision_request'] = [
+            'has_request' => isset($this->doctor->supervision_request_status),
+            'status' => $this->doctor->supervision_request_status ?? null,
+        ];
+    }
+
+    return array_merge(parent::toArray($request), $data);
 }
 ```
 
@@ -136,6 +156,10 @@ public function toArray($request): array
                 "is_active": true
             }
         ],
+        "supervision_request": {
+            "has_request": false,
+            "status": null
+        },
         "rating": {
             "avg": 4.5,
             "count": 12,

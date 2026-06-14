@@ -54,6 +54,21 @@ public function index(Request $request): JsonResponse
         ->when($request->has('is_active'), fn ($q) => $q->where('is_active', $request->boolean('is_active')))
         ->paginate(min($limit, 100));
 
+    if ($patient = $request->user()?->patient) {
+        $doctorIds = $doctors->pluck('doctor.id')->filter();
+        $supervisionRequests = SupervisionRequest::where('patient_id', $patient->id)
+            ->whereIn('doctor_id', $doctorIds)
+            ->get()
+            ->keyBy('doctor_id');
+
+        $doctors->each(function ($user) use ($supervisionRequests) {
+            $doctor = $user->doctor;
+            if ($doctor && $supervisionRequests->has($doctor->id)) {
+                $doctor->supervision_request_status = $supervisionRequests->get($doctor->id)->status->value;
+            }
+        });
+    }
+
     return ApiResponse::success(
         DoctorResource::collection($doctors),
         __('Doctors retrieved successfully'),
@@ -64,17 +79,18 @@ public function index(Request $request): JsonResponse
 
 **التدفق:**
 ```
-1. User::whereHas('roles', slug=doctor)
-2. with('doctor.schedules', 'roles') — eager load
-3. if search → filter by first_name, last_name, email
-4. if specialization_id → whereHas doctor.specialization_id
-5. if experience_from/to → whereHas doctor.experience_months >= / <=
-6. if gender → where gender
-7. if date_from/to → where birthday_date >= / <=
-8. if is_active → where is_active
-9. paginate(min(limit, 100))
-10. DoctorResource::collection()
-11. return 200
+ 1. User::whereHas('roles', slug=doctor)
+ 2. with('doctor.schedules', 'roles') — eager load
+ 3. if search → filter by first_name, last_name, email
+ 4. if specialization_id → whereHas doctor.specialization_id
+ 5. if experience_from/to → whereHas doctor.experience_months >= / <=
+ 6. if gender → where gender
+ 7. if date_from/to → where birthday_date >= / <=
+ 8. if is_active → where is_active
+ 9. paginate(min(limit, 100))
+10. if patient → load supervision requests for all doctors in page
+11. DoctorResource::collection()
+12. return 200
 ```
 
 ---
@@ -87,6 +103,7 @@ public function index(Request $request): JsonResponse
 - `specialization`
 - `experience_months`
 - `schedules`
+- `supervision_request` — يظهر فقط لدور `Patient`
 - `rating` (avg, count, recent) — فقط في show
 
 > **ملاحظة:** في قائمة الأطباء `rating` يكون `{"avg": 0, "count": 0, "recent": []}` لأن بيانات التقييمات تُحمّل فقط في show.
@@ -134,6 +151,10 @@ public function index(Request $request): JsonResponse
                     "is_active": true
                 }
             ],
+            "supervision_request": {
+                "has_request": false,
+                "status": null
+            },
             "rating": {
                 "avg": 0,
                 "count": 0,
