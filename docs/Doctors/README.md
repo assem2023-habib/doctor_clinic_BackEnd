@@ -10,9 +10,9 @@
 
 | # | Method | Endpoint | Auth | الوصف |
 |---|--------|----------|------|-------|
-| 1 | `GET` | `/api/v1/doctors` | ❌ عام | قائمة الأطباء مع البحث والفلترة — يعيد `supervision_request` للمريض المصادق |
+| 1 | `GET` | `/api/v1/doctors` | ❌ عام | قائمة الأطباء مع البحث والفلترة |
 | 2 | `POST` | `/api/v1/doctors` | ✅ admin | إنشاء دكتور جديد ([توثيق](create-doctor.md)) |
-| 3 | `GET` | `/api/v1/doctors/{doctor}` | ❌ عام | عرض طبيب — يعيد `supervision_request` للمريض المصادق |
+| 3 | `GET` | `/api/v1/doctors/{doctor}` | ❌ عام | عرض طبيب — يعيد `supervision_request` و `has_rated` للمريض المصادق |
 | 4 | `PUT` | `/api/v1/doctors/{doctor}` | ✅ admin | تحديث كامل |
 | 5 | `PATCH` | `/api/v1/doctors/{doctor}` | ✅ admin | تحديث جزئي |
 | 6 | `DELETE` | `/api/v1/doctors/{doctor}` | ✅ admin | حذف مع تنظيف |
@@ -58,7 +58,7 @@
 
 ### `supervision_request`
 
-موجود فقط في `GET /api/v1/doctors` و `GET /api/v1/doctors/{doctor}` للمستخدمين المصادقين (auth:api).
+موجود فقط في `GET /api/v1/doctors/{doctor}` للمستخدمين المصادقين (auth:api).
 
 | الحقل | النوع | الوصف |
 |-------|------|-------|
@@ -71,7 +71,7 @@
 
 ### `has_rated`
 
-موجود فقط في `GET /api/v1/doctors` و `GET /api/v1/doctors/{doctor}` للمستخدمين المصادقين (auth:api).
+موجود فقط في `GET /api/v1/doctors/{doctor}` للمستخدمين المصادقين (auth:api).
 
 | الحقل | النوع | الوصف |
 |-------|------|-------|

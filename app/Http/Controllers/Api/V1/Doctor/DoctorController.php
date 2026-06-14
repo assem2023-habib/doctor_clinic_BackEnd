@@ -48,33 +48,6 @@ class DoctorController
             ->when($request->has('is_active'), fn ($q) => $q->where('is_active', $request->boolean('is_active')))
             ->paginate(min($limit, 100));
 
-        if ($request->user()?->patient) {
-            // Supervision requests
-            $doctorIds = $doctors->pluck('doctor.id')->filter();
-            $supervisionRequests = SupervisionRequest::where('patient_id', $request->user()->patient->id)
-                ->whereIn('doctor_id', $doctorIds)
-                ->get()
-                ->keyBy('doctor_id');
-
-            $doctors->each(function ($user) use ($supervisionRequests) {
-                $doctor = $user->doctor;
-                if ($doctor && $supervisionRequests->has($doctor->id)) {
-                    $doctor->supervision_request_status = $supervisionRequests->get($doctor->id)->status->value;
-                }
-            });
-
-            // Has rated
-            $ratedUserIds = Rating::where('rater_id', $request->user()->id)
-                ->whereIn('rateable_id', $doctors->pluck('id'))
-                ->where('type', RatingTypeEnum::User)
-                ->where('rateable_type', 'App\Models\User')
-                ->pluck('rateable_id');
-
-            $doctors->each(function ($user) use ($ratedUserIds) {
-                $user->has_rated_doctor = $ratedUserIds->contains($user->id);
-            });
-        }
-
         return ApiResponse::success(
             DoctorResource::collection($doctors),
             __('Doctors retrieved successfully'),

@@ -8374,7 +8374,7 @@
                         }
                     },
                     "supervision_request": {
-                        "description": "Only for Patient role. Supervision request info for the authenticated patient (omitted entirely for non-patients)",
+                        "description": "Only for Patient role, only in GET /api/v1/doctors/{doctor}. Supervision request info for the authenticated patient (omitted entirely for non-patients)",
                         "properties": {
                             "has_request": {
                                 "description": "Whether the authenticated patient has a supervision request for this doctor",
@@ -8400,7 +8400,7 @@
                         ]
                     },
                     "has_rated": {
-                        "description": "Only for Patient role. Whether the authenticated patient has rated this doctor (omitted entirely for non-patients)",
+                        "description": "Only for Patient role, only in GET /api/v1/doctors/{doctor}. Whether the authenticated patient has rated this doctor (omitted entirely for non-patients)",
                         "type": "boolean"
                     },
                     "rating": {
