@@ -10,10 +10,14 @@ class RatingControllerDoc
         path: '/api/v1/ratings',
         summary: 'List all ratings',
         tags: ['Ratings'],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(name: 'limit', in: 'query', schema: new OA\Schema(type: 'integer', default: 20, maximum: 100), description: 'Items per page (max 100)'),
             new OA\Parameter(name: 'page', in: 'query', schema: new OA\Schema(type: 'integer', default: 1)),
-            new OA\Parameter(name: 'type', in: 'query', schema: new OA\Schema(type: 'string'), description: 'Filter by type (user, service, center, appointment_system)'),
+            new OA\Parameter(name: 'type', in: 'query', description: 'Filter by type(s). Single (?type=service) or array (?type[]=service&type[]=center&type[]=appointment_system)', schema: new OA\Schema(oneOf: [
+                new OA\Schema(type: 'string'),
+                new OA\Schema(type: 'array', items: new OA\Items(type: 'string')),
+            ])),
             new OA\Parameter(name: 'rater_id', in: 'query', schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Filter by rater ID'),
             new OA\Parameter(name: 'rateable_id', in: 'query', schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Filter by rateable ID'),
             new OA\Parameter(name: 'rateable_type', in: 'query', schema: new OA\Schema(type: 'string'), description: 'Filter by rateable type'),

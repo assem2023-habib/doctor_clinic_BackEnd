@@ -27,7 +27,7 @@ class RatingController
         $limit = (int) $request->integer('limit', 20);
 
         $ratings = Rating::with('rater')
-            ->when($request->type, fn ($q, $v) => $q->where('type', $v))
+            ->when($request->type, fn ($q, $v) => $q->whereIn('type', (array) $v))
             ->when($request->rater_id, fn ($q, $v) => $q->where('rater_id', $v))
             ->when($request->rateable_id, fn ($q, $v) => $q->where('rateable_id', $v))
             ->when($request->rateable_type, fn ($q, $v) => $q->where('rateable_type', $v))
