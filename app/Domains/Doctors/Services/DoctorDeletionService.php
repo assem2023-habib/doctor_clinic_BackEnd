@@ -5,7 +5,9 @@ namespace App\Domains\Doctors\Services;
 use App\Domains\Appointments\Models\Appointment;
 use App\Domains\Doctors\Models\Doctor;
 use App\Domains\MedicalRecords\Models\MedicalRecord;
+use App\Domains\Shared\Exceptions\ApiServiceException;
 use App\Enums\AppointmentStatusEnum;
+use App\Enums\HttpStatusEnum;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -26,7 +28,11 @@ class DoctorDeletionService
             ->count();
 
         if ($activeCount > 0) {
-            abort(409, __('Doctor has active appointments. Cannot delete.'));
+            throw new ApiServiceException(
+                errorCode: 'DOCTOR_HAS_ACTIVE_APPOINTMENTS',
+                message: __('Doctor has active appointments. Cannot delete.'),
+                status: HttpStatusEnum::Conflict,
+            );
         }
 
         $actingLabel = $actingUser->id . ': ' . $actingUser->first_name . ' ' . $actingUser->last_name;

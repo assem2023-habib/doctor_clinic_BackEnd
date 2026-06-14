@@ -4,6 +4,7 @@ namespace App\Domains\Supervisions\Actions;
 
 use App\Domains\Doctors\Models\Doctor;
 use App\Domains\Patients\Models\Patient;
+use App\Domains\Shared\Exceptions\ApiServiceException;
 use App\Models\User;
 
 class BulkAssignPatientsToDoctorAction
@@ -29,7 +30,7 @@ class BulkAssignPatientsToDoctorAction
             try {
                 $this->assignAction->execute($doctor, $patient, $assigner, $notes);
                 $assigned[] = $patientId;
-            } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+            } catch (ApiServiceException $e) {
                 $skipped[] = [
                     'patient_id' => $patientId,
                     'reason' => $e->getMessage(),

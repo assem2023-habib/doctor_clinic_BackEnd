@@ -1,6 +1,8 @@
 <?php
 
+use App\Domains\Shared\Exceptions\ApiServiceException;
 use App\Domains\Shared\Responses\ApiResponse;
+use App\Enums\HttpStatusEnum;
 use App\Http\Middleware\AuthorizeByAttribute;
 use App\Http\Middleware\CheckAdminRole;
 use App\Http\Middleware\CheckStaffRole;
@@ -19,6 +21,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -67,6 +70,28 @@ return Application::configure(basePath: dirname(__DIR__))
                     'message' => class_basename($e->getModel()) . ' ' . __('not found'),
                     'data' => null,
                 ], 404);
+            }
+        });
+
+        $exceptions->render(function (ApiServiceException $e, $request) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return ApiResponse::error(
+                    message: $e->getMessage(),
+                    status: $e->getStatus(),
+                    errorCode: $e->getErrorCode(),
+                );
+            }
+        });
+
+        $exceptions->render(function (HttpException $e, $request) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                $status = $e->getStatusCode();
+                $statusEnum = HttpStatusEnum::tryFrom($status) ?? HttpStatusEnum::InternalServerError;
+
+                return ApiResponse::error(
+                    message: $e->getMessage() ?: $statusEnum->label(),
+                    status: $statusEnum,
+                );
             }
         });
     })->create();

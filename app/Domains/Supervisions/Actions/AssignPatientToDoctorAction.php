@@ -4,6 +4,8 @@ namespace App\Domains\Supervisions\Actions;
 
 use App\Domains\Doctors\Models\Doctor;
 use App\Domains\Patients\Models\Patient;
+use App\Domains\Shared\Exceptions\ApiServiceException;
+use App\Enums\HttpStatusEnum;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 
@@ -17,7 +19,11 @@ class AssignPatientToDoctorAction
             ->exists();
 
         if ($hasSameSpecialization) {
-            abort(409, __('Patient already has a doctor with this specialization'));
+            throw new ApiServiceException(
+                errorCode: 'PATIENT_ALREADY_HAS_DOCTOR',
+                message: __('Patient already has a doctor with this specialization'),
+                status: HttpStatusEnum::Conflict,
+            );
         }
 
         $assignedBy = "{$assigner->id}: {$assigner->first_name} {$assigner->last_name}";

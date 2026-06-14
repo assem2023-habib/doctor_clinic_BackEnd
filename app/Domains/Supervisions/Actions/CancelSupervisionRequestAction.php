@@ -4,8 +4,10 @@ namespace App\Domains\Supervisions\Actions;
 
 use App\Domains\Notifications\DTOs\NotificationData;
 use App\Domains\Notifications\Services\NotificationManager;
+use App\Domains\Shared\Exceptions\ApiServiceException;
 use App\Domains\Supervisions\Enums\SupervisionRequestStatusEnum;
 use App\Domains\Supervisions\Models\SupervisionRequest;
+use App\Enums\HttpStatusEnum;
 
 class CancelSupervisionRequestAction
 {
@@ -16,7 +18,11 @@ class CancelSupervisionRequestAction
     public function execute(SupervisionRequest $request): void
     {
         if ($request->status !== SupervisionRequestStatusEnum::Pending) {
-            abort(422, __('Supervision request is not pending'));
+            throw new ApiServiceException(
+                errorCode: 'SUPERVISION_REQUEST_NOT_PENDING',
+                message: __('Supervision request is not pending'),
+                status: HttpStatusEnum::UnprocessableEntity,
+            );
         }
 
         $request->loadMissing(['doctor.user']);

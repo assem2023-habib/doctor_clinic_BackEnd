@@ -4,7 +4,9 @@ namespace App\Domains\Receptionists\Actions;
 
 use App\Domains\Appointments\Models\Appointment;
 use App\Domains\Receptionists\Models\Receptionist;
+use App\Domains\Shared\Exceptions\ApiServiceException;
 use App\Enums\AppointmentStatusEnum;
+use App\Enums\HttpStatusEnum;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -25,7 +27,11 @@ class DeleteReceptionistAction
             ->count();
 
         if ($activeCount > 0) {
-            abort(409, __('Receptionist has active appointments. Cannot delete.'));
+            throw new ApiServiceException(
+                errorCode: 'RECEPTIONIST_HAS_ACTIVE_APPOINTMENTS',
+                message: __('Receptionist has active appointments. Cannot delete.'),
+                status: HttpStatusEnum::Conflict,
+            );
         }
 
         $actingLabel = $actingUser->id . ': ' . $actingUser->first_name . ' ' . $actingUser->last_name;

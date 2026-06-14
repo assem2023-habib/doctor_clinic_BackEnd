@@ -56,12 +56,17 @@ class ApiResponse
         HttpStatusEnum $status = HttpStatusEnum::BadRequest,
         mixed $data = null,
         ?array $errors = null,
+        ?string $errorCode = null,
     ): JsonResponse {
         $response = [
             'status' => $status->value,
             'message' => $message,
             'data' => $data,
         ];
+
+        if ($errorCode !== null) {
+            $response['error_code'] = $errorCode;
+        }
 
         if ($errors) {
             $response['errors'] = $errors;

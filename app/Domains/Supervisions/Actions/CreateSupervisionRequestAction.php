@@ -6,8 +6,10 @@ use App\Domains\Doctors\Models\Doctor;
 use App\Domains\Notifications\DTOs\NotificationData;
 use App\Domains\Notifications\Services\NotificationManager;
 use App\Domains\Patients\Models\Patient;
+use App\Domains\Shared\Exceptions\ApiServiceException;
 use App\Domains\Supervisions\Enums\SupervisionRequestStatusEnum;
 use App\Domains\Supervisions\Models\SupervisionRequest;
+use App\Enums\HttpStatusEnum;
 
 class CreateSupervisionRequestAction
 {
@@ -25,7 +27,11 @@ class CreateSupervisionRequestAction
             ->exists();
 
         if ($hasSameSpecialization) {
-            abort(409, __('Patient already has an active supervision with a doctor of this specialization'));
+            throw new ApiServiceException(
+                errorCode: 'ACTIVE_SUPERVISION_EXISTS',
+                message: __('Patient already has an active supervision with a doctor of this specialization'),
+                status: HttpStatusEnum::Conflict,
+            );
         }
 
         $recentCancellation = SupervisionRequest::where('patient_id', $patient->id)
@@ -35,7 +41,11 @@ class CreateSupervisionRequestAction
             ->exists();
 
         if ($recentCancellation) {
-            abort(429, __('You cannot request supervision from this doctor again yet. Please wait 7 days after cancellation.'));
+            throw new ApiServiceException(
+                errorCode: 'RECENT_CANCELLATION_COOLDOWN',
+                message: __('You cannot request supervision from this doctor again yet. Please wait 7 days after cancellation.'),
+                status: HttpStatusEnum::TooManyRequests,
+            );
         }
 
         $exists = SupervisionRequest::where('patient_id', $patient->id)
@@ -44,7 +54,11 @@ class CreateSupervisionRequestAction
             ->exists();
 
         if ($exists) {
-            abort(409, __('A pending request to this doctor already exists'));
+            throw new ApiServiceException(
+                errorCode: 'DUPLICATE_SUPERVISION_REQUEST',
+                message: __('A pending request to this doctor already exists'),
+                status: HttpStatusEnum::Conflict,
+            );
         }
 
         $maxPendingRequests = 5;
@@ -54,7 +68,11 @@ class CreateSupervisionRequestAction
             ->count();
 
         if ($pendingCount >= $maxPendingRequests) {
-            abort(409, __('Maximum of :max pending supervision requests reached', ['max' => $maxPendingRequests]));
+            throw new ApiServiceException(
+                errorCode: 'MAX_PENDING_SUPERVISION_REQUESTS',
+                message: __('Maximum of :max pending supervision requests reached', ['max' => $maxPendingRequests]),
+                status: HttpStatusEnum::Conflict,
+            );
         }
 
         $request = SupervisionRequest::create([

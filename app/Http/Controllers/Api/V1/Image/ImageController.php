@@ -8,7 +8,9 @@ use App\Domains\Images\DTOs\UploadImageData;
 use App\Domains\Images\Models\Image;
 use App\Domains\Images\Requests\UploadImageRequest;
 use App\Domains\Images\Resources\ImageResource;
+use App\Domains\Shared\Exceptions\ApiServiceException;
 use App\Domains\Shared\Responses\ApiResponse;
+use App\Enums\HttpStatusEnum;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 
@@ -41,7 +43,11 @@ class ImageController
         $path = $image->getRawOriginal('url');
 
         if (! Storage::disk('local')->exists($path)) {
-            abort(404);
+            throw new ApiServiceException(
+                errorCode: 'IMAGE_NOT_FOUND',
+                message: __('Image not found'),
+                status: HttpStatusEnum::NotFound,
+            );
         }
 
         return response(Storage::disk('local')->get($path), 200, [

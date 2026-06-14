@@ -6,8 +6,10 @@ use App\Domains\MedicalRecords\Actions\TransferMedicalRecordAction;
 use App\Domains\MedicalRecords\Models\MedicalRecord;
 use App\Domains\Notifications\DTOs\NotificationData;
 use App\Domains\Notifications\Services\NotificationManager;
+use App\Domains\Shared\Exceptions\ApiServiceException;
 use App\Domains\Supervisions\Enums\SupervisionRequestStatusEnum;
 use App\Domains\Supervisions\Models\SupervisionRequest;
+use App\Enums\HttpStatusEnum;
 use App\Models\User;
 
 class ApproveSupervisionRequestAction
@@ -21,7 +23,11 @@ class ApproveSupervisionRequestAction
     public function execute(SupervisionRequest $request, User $approver): void
     {
         if ($request->status !== SupervisionRequestStatusEnum::Pending) {
-            abort(422, __('Supervision request is not pending'));
+            throw new ApiServiceException(
+                errorCode: 'SUPERVISION_REQUEST_NOT_PENDING',
+                message: __('Supervision request is not pending'),
+                status: HttpStatusEnum::UnprocessableEntity,
+            );
         }
 
         $request->loadMissing(['patient.user', 'doctor.user']);
