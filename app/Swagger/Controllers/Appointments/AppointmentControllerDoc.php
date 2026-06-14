@@ -13,7 +13,7 @@ class AppointmentControllerDoc
         tags: ['Appointments'],
         security: [['bearerAuth' => []]],
         parameters: [
-            new OA\Parameter(name: 'doctor', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Doctor UUID'),
+            new OA\Parameter(name: 'doctor', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Doctor user UUID'),
             new OA\Parameter(name: 'date', in: 'query', schema: new OA\Schema(type: 'string', format: 'date'), description: 'Filter by exact date (Y-m-d)'),
             new OA\Parameter(name: 'from_date', in: 'query', schema: new OA\Schema(type: 'string', format: 'date'), description: 'Filter from date (Y-m-d)'),
             new OA\Parameter(name: 'to_date', in: 'query', schema: new OA\Schema(type: 'string', format: 'date'), description: 'Filter to date (Y-m-d)'),
@@ -85,7 +85,7 @@ class AppointmentControllerDoc
             required: true,
             content: new OA\JsonContent(
                 properties: [
-                    new OA\Property(property: 'doctor_id', type: 'string', format: 'uuid', description: 'Doctor UUID'),
+                    new OA\Property(property: 'doctor_id', type: 'string', format: 'uuid', description: 'Doctor user UUID'),
                     new OA\Property(property: 'preferred_date', type: 'string', format: 'date', nullable: true, description: 'Preferred date (Y-m-d). The day-of-week must exist in the doctor\'s active schedule.'),
                     new OA\Property(property: 'reason', type: 'string', nullable: true, maxLength: 2000, description: 'Reason for appointment'),
                 ]

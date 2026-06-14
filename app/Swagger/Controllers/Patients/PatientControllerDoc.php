@@ -34,7 +34,7 @@ class PatientControllerDoc
         tags: ['Patients'],
         security: [['bearerAuth' => []]],
         parameters: [
-            new OA\Parameter(name: 'patient', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Patient UUID'),
+            new OA\Parameter(name: 'patient', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Patient user UUID'),
         ],
         responses: [
             new OA\Response(response: 200, description: 'Patient retrieved successfully'),
@@ -79,7 +79,7 @@ class PatientControllerDoc
         tags: ['Patients'],
         security: [['bearerAuth' => []]],
         parameters: [
-            new OA\Parameter(name: 'patient', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Patient UUID'),
+            new OA\Parameter(name: 'patient', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Patient user UUID'),
         ],
         requestBody: new OA\RequestBody(
             required: true,
@@ -108,7 +108,7 @@ class PatientControllerDoc
         tags: ['Patients'],
         security: [['bearerAuth' => []]],
         parameters: [
-            new OA\Parameter(name: 'patient', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Patient UUID'),
+            new OA\Parameter(name: 'patient', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Patient user UUID'),
         ],
         requestBody: new OA\RequestBody(
             required: true,
@@ -131,7 +131,7 @@ class PatientControllerDoc
         tags: ['Patients'],
         security: [['bearerAuth' => []]],
         parameters: [
-            new OA\Parameter(name: 'patient', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Patient UUID'),
+            new OA\Parameter(name: 'patient', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Patient user UUID'),
         ],
         responses: [
             new OA\Response(response: 204, description: 'Patient deleted successfully'),

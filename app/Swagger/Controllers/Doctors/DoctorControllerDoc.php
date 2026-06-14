@@ -175,7 +175,7 @@ class DoctorControllerDoc
         tags: ['Doctors'],
         security: [['bearerAuth' => []]],
         parameters: [
-            new OA\Parameter(name: 'doctor', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Doctor UUID'),
+            new OA\Parameter(name: 'doctor', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Doctor user UUID'),
         ],
         requestBody: new OA\RequestBody(
             required: true,
@@ -205,7 +205,7 @@ class DoctorControllerDoc
         tags: ['Doctors'],
         security: [['bearerAuth' => []]],
         parameters: [
-            new OA\Parameter(name: 'doctor', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Doctor UUID'),
+            new OA\Parameter(name: 'doctor', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Doctor user UUID'),
         ],
         requestBody: new OA\RequestBody(
             required: true,
@@ -228,7 +228,7 @@ class DoctorControllerDoc
         tags: ['Doctors'],
         security: [['bearerAuth' => []]],
         parameters: [
-            new OA\Parameter(name: 'doctor', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Doctor UUID'),
+            new OA\Parameter(name: 'doctor', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Doctor user UUID'),
         ],
         responses: [
             new OA\Response(response: 204, description: 'Doctor deleted successfully'),
@@ -246,7 +246,7 @@ class DoctorControllerDoc
         tags: ['Doctors'],
         security: [['bearerAuth' => []]],
         parameters: [
-            new OA\Parameter(name: 'doctor', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Doctor UUID'),
+            new OA\Parameter(name: 'doctor', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Doctor user UUID'),
         ],
         responses: [
             new OA\Response(response: 200, description: 'Account activated successfully', content: new OA\JsonContent(properties: [

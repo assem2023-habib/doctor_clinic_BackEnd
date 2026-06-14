@@ -13,12 +13,12 @@ class SupervisionRequestControllerDoc
         tags: ['Supervision Requests'],
         security: [['bearerAuth' => []]],
         parameters: [
-            new OA\Parameter(name: 'patient', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Patient UUID'),
+            new OA\Parameter(name: 'patient', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Patient user UUID'),
         ],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(properties: [
-                new OA\Property(property: 'doctor_id', type: 'string', format: 'uuid', description: 'Doctor UUID'),
+                new OA\Property(property: 'doctor_id', type: 'string', format: 'uuid', description: 'Doctor user UUID'),
             ])
         ),
         responses: [
@@ -37,7 +37,7 @@ class SupervisionRequestControllerDoc
         tags: ['Supervision Requests'],
         security: [['bearerAuth' => []]],
         parameters: [
-            new OA\Parameter(name: 'patient', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Patient UUID'),
+            new OA\Parameter(name: 'patient', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Patient user UUID'),
         ],
         responses: [
             new OA\Response(response: 200, description: 'Supervision requests retrieved successfully'),
@@ -53,7 +53,7 @@ class SupervisionRequestControllerDoc
         tags: ['Supervision Requests'],
         security: [['bearerAuth' => []]],
         parameters: [
-            new OA\Parameter(name: 'doctor', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Doctor UUID'),
+            new OA\Parameter(name: 'doctor', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid'), description: 'Doctor user UUID'),
             new OA\Parameter(name: 'status', in: 'query', schema: new OA\Schema(type: 'string', default: 'pending'), description: 'Filter by status'),
         ],
         responses: [
