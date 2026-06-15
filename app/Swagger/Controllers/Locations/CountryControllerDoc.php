@@ -64,6 +64,7 @@ class CountryControllerDoc
         path: '/api/v1/countries',
         summary: 'Create a new country',
         tags: ['Countries'],
+        security: [['bearerAuth' => []]],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
@@ -86,6 +87,7 @@ class CountryControllerDoc
         path: '/api/v1/countries/{country}',
         summary: 'Update a country',
         tags: ['Countries'],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(name: 'country', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],
@@ -111,6 +113,7 @@ class CountryControllerDoc
         path: '/api/v1/countries/{country}',
         summary: 'Delete a country',
         tags: ['Countries'],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(name: 'country', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],

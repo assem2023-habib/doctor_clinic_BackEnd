@@ -48,6 +48,7 @@ class SpecializationControllerDoc
         path: '/api/v1/specializations',
         summary: 'Create a new specialization',
         tags: ['Specializations'],
+        security: [['bearerAuth' => []]],
         requestBody: new OA\RequestBody(required: true, content: new OA\MediaType(
             mediaType: 'multipart/form-data',
             schema: new OA\Schema(
@@ -72,6 +73,7 @@ class SpecializationControllerDoc
         path: '/api/v1/specializations/{specialization}',
         summary: 'Update a specialization',
         tags: ['Specializations'],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(name: 'specialization', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],
@@ -99,6 +101,7 @@ class SpecializationControllerDoc
         path: '/api/v1/specializations/{specialization}',
         summary: 'Delete a specialization',
         tags: ['Specializations'],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(name: 'specialization', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],

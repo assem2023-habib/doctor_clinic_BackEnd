@@ -40,6 +40,7 @@ class CityControllerDoc
         path: '/api/v1/cities',
         summary: 'Create a new city',
         tags: ['Cities'],
+        security: [['bearerAuth' => []]],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
@@ -61,6 +62,7 @@ class CityControllerDoc
         path: '/api/v1/cities/{city}',
         summary: 'Update a city',
         tags: ['Cities'],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(name: 'city', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],
@@ -85,6 +87,7 @@ class CityControllerDoc
         path: '/api/v1/cities/{city}',
         summary: 'Delete a city',
         tags: ['Cities'],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(name: 'city', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid')),
         ],
