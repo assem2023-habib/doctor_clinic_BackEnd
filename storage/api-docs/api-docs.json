@@ -2136,6 +2136,68 @@
                         "schema": {
                             "type": "boolean"
                         }
+                    },
+                    {
+                        "name": "has_appointments",
+                        "in": "query",
+                        "description": "Filter doctors who have any appointments (true) or no appointments (false)",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "appointment_status",
+                        "in": "query",
+                        "description": "Filter by appointment status(es). Single (?appointment_status=accepted) or multiple (?appointment_status[]=set&appointment_status[]=accepted)",
+                        "style": "form",
+                        "explode": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "name": "appointment_date",
+                        "in": "query",
+                        "description": "Filter doctors who have appointments on a specific date (Y-m-d)",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "appointment_from_date",
+                        "in": "query",
+                        "description": "Filter doctors who have appointments from this date",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "appointment_to_date",
+                        "in": "query",
+                        "description": "Filter doctors who have appointments until this date",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "appointment_patient_id",
+                        "in": "query",
+                        "description": "Filter doctors who have appointments with specific patient(s) by User UUID",
+                        "style": "form",
+                        "explode": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "format": "uuid"
+                            }
+                        }
                     }
                 ],
                 "responses": {

@@ -22,6 +22,12 @@ class DoctorControllerDoc
             new OA\Parameter(name: 'date_from', in: 'query', schema: new OA\Schema(type: 'string', format: 'date'), description: 'Birthday date range start'),
             new OA\Parameter(name: 'date_to', in: 'query', schema: new OA\Schema(type: 'string', format: 'date'), description: 'Birthday date range end'),
             new OA\Parameter(name: 'is_active', in: 'query', schema: new OA\Schema(type: 'boolean'), description: 'Filter by active status'),
+            new OA\Parameter(name: 'has_appointments', in: 'query', schema: new OA\Schema(type: 'boolean'), description: 'Filter doctors who have any appointments (true) or no appointments (false)'),
+            new OA\Parameter(name: 'appointment_status', in: 'query', schema: new OA\Schema(type: 'array', items: new OA\Items(type: 'string')), style: 'form', explode: false, description: 'Filter by appointment status(es). Single (?appointment_status=accepted) or multiple (?appointment_status[]=set&appointment_status[]=accepted)'),
+            new OA\Parameter(name: 'appointment_date', in: 'query', schema: new OA\Schema(type: 'string', format: 'date'), description: 'Filter doctors who have appointments on a specific date (Y-m-d)'),
+            new OA\Parameter(name: 'appointment_from_date', in: 'query', schema: new OA\Schema(type: 'string', format: 'date'), description: 'Filter doctors who have appointments from this date'),
+            new OA\Parameter(name: 'appointment_to_date', in: 'query', schema: new OA\Schema(type: 'string', format: 'date'), description: 'Filter doctors who have appointments until this date'),
+            new OA\Parameter(name: 'appointment_patient_id', in: 'query', schema: new OA\Schema(type: 'array', items: new OA\Items(type: 'string', format: 'uuid')), style: 'form', explode: false, description: 'Filter doctors who have appointments with specific patient(s) by User UUID'),
         ],
         responses: [
             new OA\Response(

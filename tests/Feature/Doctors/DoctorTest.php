@@ -604,4 +604,173 @@ class DoctorTest extends TestCase
         $responseSearchNoMatch->assertStatus(200);
         $this->assertCount(0, $responseSearchNoMatch->json()['data']);
     }
+
+    public function test_doctor_list_filters_by_has_appointments(): void
+    {
+        $doctorWithAppointments = $this->createDoctor();
+        $doctorWithoutAppointments = $this->createDoctor();
+        $patient = User::factory()->create();
+        $patient->assignRole('patient');
+        $patient->patient()->create([]);
+        Appointment::create([
+            'doctor_id' => $doctorWithAppointments->doctor->id,
+            'patient_id' => $patient->patient->id,
+            'reason' => 'Test',
+            'status' => AppointmentStatusEnum::Requested,
+            'created_by' => $patient->id,
+        ]);
+
+        Passport::actingAs($this->createAdmin());
+        $response = $this->getJson('/api/v1/doctors?has_appointments=true');
+
+        $response->assertStatus(200);
+        $ids = collect($response->json()['data'])->pluck('id');
+        $this->assertContains($doctorWithAppointments->id, $ids);
+        $this->assertNotContains($doctorWithoutAppointments->id, $ids);
+    }
+
+    public function test_doctor_list_filters_by_appointment_status(): void
+    {
+        $doctorAccepted = $this->createDoctor();
+        $doctorRequested = $this->createDoctor();
+        $patient = User::factory()->create();
+        $patient->assignRole('patient');
+        $patient->patient()->create([]);
+        Appointment::create([
+            'doctor_id' => $doctorAccepted->doctor->id,
+            'patient_id' => $patient->patient->id,
+            'status' => AppointmentStatusEnum::Accepted,
+            'created_by' => $patient->id,
+        ]);
+        Appointment::create([
+            'doctor_id' => $doctorRequested->doctor->id,
+            'patient_id' => $patient->patient->id,
+            'status' => AppointmentStatusEnum::Requested,
+            'created_by' => $patient->id,
+        ]);
+
+        Passport::actingAs($this->createAdmin());
+        $response = $this->getJson('/api/v1/doctors?appointment_status[]=' . AppointmentStatusEnum::Accepted->value);
+
+        $response->assertStatus(200);
+        $ids = collect($response->json()['data'])->pluck('id');
+        $this->assertContains($doctorAccepted->id, $ids);
+        $this->assertNotContains($doctorRequested->id, $ids);
+    }
+
+    public function test_doctor_list_filters_by_appointment_date(): void
+    {
+        $doctorOnDate = $this->createDoctor();
+        $doctorOtherDate = $this->createDoctor();
+        $patient = User::factory()->create();
+        $patient->assignRole('patient');
+        $patient->patient()->create([]);
+        Appointment::create([
+            'doctor_id' => $doctorOnDate->doctor->id,
+            'patient_id' => $patient->patient->id,
+            'appointment_date' => '2026-06-15',
+            'start_time' => '10:00',
+            'end_time' => '11:00',
+            'status' => AppointmentStatusEnum::Accepted,
+            'created_by' => $patient->id,
+        ]);
+        Appointment::create([
+            'doctor_id' => $doctorOtherDate->doctor->id,
+            'patient_id' => $patient->patient->id,
+            'appointment_date' => '2026-07-01',
+            'start_time' => '10:00',
+            'end_time' => '11:00',
+            'status' => AppointmentStatusEnum::Accepted,
+            'created_by' => $patient->id,
+        ]);
+
+        Passport::actingAs($this->createAdmin());
+        $response = $this->getJson('/api/v1/doctors?appointment_date=2026-06-15');
+
+        $response->assertStatus(200);
+        $ids = collect($response->json()['data'])->pluck('id');
+        $this->assertContains($doctorOnDate->id, $ids);
+        $this->assertNotContains($doctorOtherDate->id, $ids);
+    }
+
+    public function test_doctor_list_filters_by_appointment_date_range(): void
+    {
+        $doctorInRange = $this->createDoctor();
+        $doctorOutOfRange = $this->createDoctor();
+        $patient = User::factory()->create();
+        $patient->assignRole('patient');
+        $patient->patient()->create([]);
+        Appointment::create([
+            'doctor_id' => $doctorInRange->doctor->id,
+            'patient_id' => $patient->patient->id,
+            'appointment_date' => '2026-06-15',
+            'start_time' => '10:00',
+            'end_time' => '11:00',
+            'status' => AppointmentStatusEnum::Accepted,
+            'created_by' => $patient->id,
+        ]);
+        Appointment::create([
+            'doctor_id' => $doctorOutOfRange->doctor->id,
+            'patient_id' => $patient->patient->id,
+            'appointment_date' => '2026-07-15',
+            'start_time' => '10:00',
+            'end_time' => '11:00',
+            'status' => AppointmentStatusEnum::Accepted,
+            'created_by' => $patient->id,
+        ]);
+
+        Passport::actingAs($this->createAdmin());
+        $response = $this->getJson('/api/v1/doctors?appointment_from_date=2026-06-01&appointment_to_date=2026-06-30');
+
+        $response->assertStatus(200);
+        $ids = collect($response->json()['data'])->pluck('id');
+        $this->assertContains($doctorInRange->id, $ids);
+        $this->assertNotContains($doctorOutOfRange->id, $ids);
+    }
+
+    public function test_doctor_list_filters_by_appointment_patient_id(): void
+    {
+        $doctor = $this->createDoctor();
+        $otherDoctor = $this->createDoctor();
+        $patient = User::factory()->create();
+        $patient->assignRole('patient');
+        $patient->patient()->create([]);
+        Appointment::create([
+            'doctor_id' => $doctor->doctor->id,
+            'patient_id' => $patient->patient->id,
+            'status' => AppointmentStatusEnum::Accepted,
+            'created_by' => $patient->id,
+        ]);
+
+        Passport::actingAs($this->createAdmin());
+        $response = $this->getJson('/api/v1/doctors?appointment_patient_id[]=' . $patient->id);
+
+        $response->assertStatus(200);
+        $ids = collect($response->json()['data'])->pluck('id');
+        $this->assertContains($doctor->id, $ids);
+        $this->assertNotContains($otherDoctor->id, $ids);
+    }
+
+    public function test_doctor_list_has_appointments_false_returns_doctors_without_appointments(): void
+    {
+        $doctorWithAppointments = $this->createDoctor();
+        $doctorWithoutAppointments = $this->createDoctor();
+        $patient = User::factory()->create();
+        $patient->assignRole('patient');
+        $patient->patient()->create([]);
+        Appointment::create([
+            'doctor_id' => $doctorWithAppointments->doctor->id,
+            'patient_id' => $patient->patient->id,
+            'status' => AppointmentStatusEnum::Requested,
+            'created_by' => $patient->id,
+        ]);
+
+        Passport::actingAs($this->createAdmin());
+        $response = $this->getJson('/api/v1/doctors?has_appointments=false');
+
+        $response->assertStatus(200);
+        $ids = collect($response->json()['data'])->pluck('id');
+        $this->assertContains($doctorWithoutAppointments->id, $ids);
+        $this->assertNotContains($doctorWithAppointments->id, $ids);
+    }
 }

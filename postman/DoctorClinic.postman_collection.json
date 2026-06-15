@@ -1,4 +1,4 @@
-﻿{
+{
     "info": {
         "name": "Doctor Clinic API",
         "description": "Doctor Clinic API – All Endpoints\n\n## Token Auto-Storage\n\nAll Login/Register responses include a **Tests** script that automatically stores `access_token`, `refresh_token`, and `expires_in` as collection variables. No manual copy-paste needed.\n\n## Authenticated Requests\n\nThe **Auth**, **Locations** (management), and **Images** folders have a **Pre-request Script** that attaches `Authorization: Bearer {{access_token}}` to every request automatically.",
@@ -973,11 +973,6 @@
                                             "key": "limit",
                                             "value": "20",
                                             "description": "Items per page (max 100)"
-                                        },
-                                        {
-                                            "key": "search",
-                                            "value": "",
-                                            "description": "Search by name (Arabic or English)"
                                         }
                                     ]
                                 }
@@ -1697,6 +1692,36 @@
                                     "key": "limit",
                                     "value": "20",
                                     "description": "Items per page (max 100)"
+                                },
+                                {
+                                    "key": "has_appointments",
+                                    "value": "",
+                                    "description": "Filter doctors who have any appointments (true) or no appointments (false)"
+                                },
+                                {
+                                    "key": "appointment_status",
+                                    "value": "",
+                                    "description": "Filter by appointment status(es). Single (?appointment_status=accepted) or multiple (?appointment_status[]=set&appointment_status[]=accepted)"
+                                },
+                                {
+                                    "key": "appointment_date",
+                                    "value": "",
+                                    "description": "Filter doctors who have appointments on a specific date (Y-m-d)"
+                                },
+                                {
+                                    "key": "appointment_from_date",
+                                    "value": "",
+                                    "description": "Filter doctors who have appointments from this date"
+                                },
+                                {
+                                    "key": "appointment_to_date",
+                                    "value": "",
+                                    "description": "Filter doctors who have appointments until this date"
+                                },
+                                {
+                                    "key": "appointment_patient_id",
+                                    "value": "",
+                                    "description": "Filter doctors who have appointments with specific patient(s) by User UUID"
                                 }
                             ]
                         }

@@ -8,6 +8,7 @@ use App\Domains\Doctors\Actions\DeleteDoctorAction;
 use App\Domains\Doctors\Actions\UpdateDoctorAction;
 use App\Domains\Doctors\Models\Doctor;
 use App\Domains\Doctors\Requests\PatchDoctorRequest;
+use App\Domains\Patients\Models\Patient;
 use App\Domains\Doctors\Requests\StoreDoctorRequest;
 use App\Domains\Doctors\Requests\UpdateDoctorRequest;
 use App\Domains\Doctors\Resources\DoctorResource;
@@ -46,6 +47,12 @@ class DoctorController
             ->when($request->date_from, fn ($q, $v) => $q->where('birthday_date', '>=', $v))
             ->when($request->date_to, fn ($q, $v) => $q->where('birthday_date', '<=', $v))
             ->when($request->has('is_active'), fn ($q) => $q->where('is_active', $request->boolean('is_active')))
+            ->when($request->filled('has_appointments'), fn ($q) => $request->boolean('has_appointments') ? $q->whereHas('doctor.appointments') : $q->whereDoesntHave('doctor.appointments'))
+            ->when($request->filled('appointment_status'), fn ($q) => $q->whereHas('doctor.appointments', fn ($q) => $q->whereIn('status', (array) $request->appointment_status)))
+            ->when($request->filled('appointment_date'), fn ($q) => $q->whereHas('doctor.appointments', fn ($q) => $q->whereDate('appointment_date', $request->appointment_date)))
+            ->when($request->filled('appointment_from_date'), fn ($q) => $q->whereHas('doctor.appointments', fn ($q) => $q->whereDate('appointment_date', '>=', $request->appointment_from_date)))
+            ->when($request->filled('appointment_to_date'), fn ($q) => $q->whereHas('doctor.appointments', fn ($q) => $q->whereDate('appointment_date', '<=', $request->appointment_to_date)))
+            ->when($request->filled('appointment_patient_id'), fn ($q) => $q->whereHas('doctor.appointments', fn ($q) => $q->whereIn('patient_id', Patient::whereIn('user_id', (array) $request->appointment_patient_id)->pluck('id'))))
             ->paginate(min($limit, 100));
 
         return ApiResponse::success(
