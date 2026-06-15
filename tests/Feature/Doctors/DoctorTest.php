@@ -458,17 +458,12 @@ class DoctorTest extends TestCase
         $user = $this->createDoctor();
         $this->createSchedule($user->doctor);
 
-        $raters = [];
-        for ($i = 0; $i < 3; $i++) {
-            $rater = User::factory()->create();
-            $rater->assignRole('patient');
-            $raters[] = $rater;
-        }
-
         $ratings = [];
         for ($i = 0; $i < 7; $i++) {
+            $rater = User::factory()->create();
+            $rater->assignRole('patient');
             $ratings[] = Rating::create([
-                'rater_id' => $raters[$i % 3]->id,
+                'rater_id' => $rater->id,
                 'type' => RatingTypeEnum::User,
                 'rateable_id' => $user->id,
                 'rateable_type' => 'App\Models\User',
@@ -515,17 +510,11 @@ class DoctorTest extends TestCase
     public function test_doctor_ratings_returns_paginated_ratings(): void
     {
         $doctor = $this->createDoctor();
-        $patientRaters = [];
-
-        for ($i = 0; $i < 4; $i++) {
+        for ($i = 0; $i < 15; $i++) {
             $rater = User::factory()->create();
             $rater->assignRole('patient');
-            $patientRaters[] = $rater;
-        }
-
-        for ($i = 0; $i < 15; $i++) {
             Rating::create([
-                'rater_id' => $patientRaters[$i % 4]->id,
+                'rater_id' => $rater->id,
                 'type' => RatingTypeEnum::User,
                 'rateable_id' => $doctor->id,
                 'rateable_type' => 'App\Models\User',
@@ -571,6 +560,8 @@ class DoctorTest extends TestCase
         $raterJohn->assignRole('patient');
         $raterJane = User::factory()->create(['first_name' => 'Jane', 'last_name' => 'Smith']);
         $raterJane->assignRole('patient');
+        $raterBob = User::factory()->create(['first_name' => 'Bob', 'last_name' => 'Brown']);
+        $raterBob->assignRole('patient');
 
         Rating::create([
             'rater_id' => $raterJohn->id,
@@ -591,7 +582,7 @@ class DoctorTest extends TestCase
         ]);
 
         Rating::create([
-            'rater_id' => $raterJohn->id,
+            'rater_id' => $raterBob->id,
             'type' => RatingTypeEnum::User,
             'rateable_id' => $doctor->id,
             'rateable_type' => 'App\Models\User',
@@ -603,7 +594,7 @@ class DoctorTest extends TestCase
 
         $responseSearchJohn = $this->getJson("/api/v1/doctors/{$doctor->id}/ratings?search=John");
         $responseSearchJohn->assertStatus(200);
-        $this->assertCount(2, $responseSearchJohn->json()['data']);
+        $this->assertCount(1, $responseSearchJohn->json()['data']);
 
         $responseSearchExcellent = $this->getJson("/api/v1/doctors/{$doctor->id}/ratings?search=Excellent");
         $responseSearchExcellent->assertStatus(200);
