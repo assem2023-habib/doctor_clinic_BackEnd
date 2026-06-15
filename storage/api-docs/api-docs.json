@@ -3041,6 +3041,586 @@
                 }
             }
         },
+        "/api/v1/files": {
+            "get": {
+                "tags": [
+                    "Files"
+                ],
+                "summary": "List files",
+                "operationId": "95637efe15ba453fb81a0c6454c83e55",
+                "parameters": [
+                    {
+                        "name": "mine",
+                        "in": "query",
+                        "description": "Filter by own files",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                0,
+                                1
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Files list",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/FileResource"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Files"
+                ],
+                "summary": "Direct file upload",
+                "operationId": "701db72d8bcaa5e9557f14bad818c41d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "medical_record_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "file_category": {
+                                        "type": "string",
+                                        "enum": [
+                                            "document",
+                                            "lab_result",
+                                            "xray",
+                                            "prescription",
+                                            "report",
+                                            "other"
+                                        ]
+                                    },
+                                    "checksum": {
+                                        "description": "SHA256 hex (64 chars)",
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "File uploaded successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/FileResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/files/init": {
+            "post": {
+                "tags": [
+                    "Files"
+                ],
+                "summary": "Initialize chunked upload",
+                "operationId": "8b27e41fc9a0a5e09f9403d2604fe277",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "medical_record_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "file_category": {
+                                        "type": "string",
+                                        "enum": [
+                                            "document",
+                                            "lab_result",
+                                            "xray",
+                                            "prescription",
+                                            "report",
+                                            "other"
+                                        ]
+                                    },
+                                    "original_name": {
+                                        "type": "string"
+                                    },
+                                    "mime_type": {
+                                        "type": "string"
+                                    },
+                                    "file_size": {
+                                        "description": "Total file size in bytes (max 20971520)",
+                                        "type": "integer"
+                                    },
+                                    "checksum": {
+                                        "description": "SHA256 hex (64 chars)",
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Chunked upload initialized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/FileResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/files/{file}/chunk": {
+            "post": {
+                "tags": [
+                    "Files"
+                ],
+                "summary": "Upload a single chunk",
+                "operationId": "c7b2ebcd8e04d997e21584ff1541b547",
+                "parameters": [
+                    {
+                        "name": "file",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "chunk": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "chunk_index": {
+                                        "description": "Zero-based chunk index",
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Chunk uploaded",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "format": "uuid"
+                                                },
+                                                "total_chunks": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/files/{file}/complete": {
+            "post": {
+                "tags": [
+                    "Files"
+                ],
+                "summary": "Assemble chunks into final file",
+                "operationId": "79ddabf32c8a97c2c7c14765ffc739cb",
+                "parameters": [
+                    {
+                        "name": "file",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "checksum": {
+                                        "description": "SHA256 hex (64 chars)",
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "File assembled successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/FileResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error / checksum mismatch"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/files/{file}": {
+            "get": {
+                "tags": [
+                    "Files"
+                ],
+                "summary": "Show file details",
+                "operationId": "d09efa725573c34f8f9f27d529574f8f",
+                "parameters": [
+                    {
+                        "name": "file",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "File details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/FileResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - no access"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Files"
+                ],
+                "summary": "Delete a file (soft delete)",
+                "operationId": "2ca4287b4b23e50ca84b3979cdd75057",
+                "parameters": [
+                    {
+                        "name": "file",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "File deleted successfully"
+                    },
+                    "403": {
+                        "description": "Forbidden - not the owner"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/files/{file}/download-link": {
+            "post": {
+                "tags": [
+                    "Files"
+                ],
+                "summary": "Generate signed download URL",
+                "operationId": "4f1936a4913f22b40c5df659b65cfb8f",
+                "parameters": [
+                    {
+                        "name": "file",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Download link generated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "url": {
+                                                    "description": "Temporary signed URL",
+                                                    "type": "string",
+                                                    "format": "uri"
+                                                },
+                                                "expires_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - no access"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/files/{file}/download": {
+            "get": {
+                "tags": [
+                    "Files"
+                ],
+                "summary": "Download file via signed URL",
+                "operationId": "6bba28b35df5fbddfc740f8eaac7768a",
+                "parameters": [
+                    {
+                        "name": "file",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "expires",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "signature",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "user",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "File binary (supports Range requests)"
+                    },
+                    "206": {
+                        "description": "Partial content (Range request)"
+                    },
+                    "403": {
+                        "description": "Invalid or expired signature"
+                    },
+                    "404": {
+                        "description": "File not found or deleted"
+                    }
+                }
+            }
+        },
         "/api/v1/images": {
             "post": {
                 "tags": [
@@ -8531,6 +9111,83 @@
                 },
                 "type": "object"
             },
+            "FileResource": {
+                "description": "File resource",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "original_name": {
+                        "type": "string",
+                        "example": "report.pdf"
+                    },
+                    "mime_type": {
+                        "type": "string",
+                        "example": "application/pdf"
+                    },
+                    "size": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1048576
+                    },
+                    "file_category": {
+                        "type": "string",
+                        "enum": [
+                            "document",
+                            "lab_result",
+                            "xray",
+                            "prescription",
+                            "report",
+                            "other"
+                        ]
+                    },
+                    "upload_status": {
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "uploading",
+                            "completed",
+                            "failed"
+                        ]
+                    },
+                    "disk": {
+                        "type": "string",
+                        "example": "local",
+                        "enum": [
+                            "local"
+                        ]
+                    },
+                    "checksum": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "abc123def456..."
+                    },
+                    "medical_record_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "user_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "downloads_count": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
             "ImageResource": {
                 "description": "Image resource",
                 "properties": {
@@ -9198,6 +9855,10 @@
         {
             "name": "Specializations",
             "description": "Specializations"
+        },
+        {
+            "name": "Files",
+            "description": "Files"
         },
         {
             "name": "Images",

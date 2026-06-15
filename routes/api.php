@@ -11,6 +11,7 @@ use App\Domains\Supervisions\Controllers\SupervisionController;
 use App\Domains\Supervisions\Controllers\SupervisionRequestController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Doctor\DoctorController;
+use App\Http\Controllers\Api\V1\File\FileController;
 use App\Http\Controllers\Api\V1\Image\ImageController;
 use App\Http\Controllers\Api\V1\Patient\PatientController;
 use App\Http\Controllers\Api\V1\Receptionist\ReceptionistController;
@@ -65,6 +66,10 @@ Route::prefix('v1/cities')->group(function () {
     Route::get('/', [CityController::class, 'index']);
     Route::get('/{city}', [CityController::class, 'show']);
 });
+
+Route::get('/v1/files/{file}/download', [FileController::class, 'download'])
+    ->name('files.download')
+    ->middleware('signed');
 
 Route::middleware(['auth:api', 'active'])->group(function () {
     Route::prefix('v1/doctors')->group(function () {
@@ -212,6 +217,17 @@ Route::middleware(['auth:api', 'active'])->group(function () {
         });
 
         Route::post('/v1/medical-records/{medical_record}/transfer', [MedicalRecordController::class, 'transfer']);
+    });
+
+    Route::prefix('v1/files')->group(function () {
+        Route::get('/', [FileController::class, 'index']);
+        Route::post('/init', [FileController::class, 'initUpload']);
+        Route::post('/{file}/chunk', [FileController::class, 'uploadChunk']);
+        Route::post('/{file}/complete', [FileController::class, 'completeUpload']);
+        Route::post('/', [FileController::class, 'store']);
+        Route::get('/{file}', [FileController::class, 'show']);
+        Route::delete('/{file}', [FileController::class, 'destroy']);
+        Route::post('/{file}/download-link', [FileController::class, 'requestDownloadLink']);
     });
 
     Route::prefix('v1/images')->group(function () {
