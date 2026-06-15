@@ -5,6 +5,7 @@ namespace Tests\Feature\Ratings;
 use App\Domains\Ratings\Models\Rating;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
 
@@ -279,5 +280,83 @@ class RatingTest extends TestCase
 
         $response = $this->postJson('/api/v1/ratings', []);
         $response->assertStatus(401);
+    }
+
+    public function test_ratings_list_cache_hit_returns_stale_data_until_update(): void
+    {
+        $user = $this->createUser();
+        Passport::actingAs($user);
+        Cache::forget('ratings:cache_version');
+
+        $rating = $this->createRating($user);
+        $rating->load('rater');
+
+        $response1 = $this->getJson('/api/v1/ratings');
+        $originalRating = $response1->json('data')[0]['rating'];
+
+        $rating->rating = 1;
+        $rating->saveQuietly();
+
+        $response2 = $this->getJson('/api/v1/ratings');
+        $this->assertEquals($originalRating, $response2->json('data')[0]['rating']);
+    }
+
+    public function test_ratings_list_cache_invalidated_after_create(): void
+    {
+        $user = $this->createUser();
+        Passport::actingAs($user);
+        Cache::forget('ratings:cache_version');
+
+        $response1 = $this->getJson('/api/v1/ratings');
+        $count1 = count($response1->json('data'));
+
+        $target = $this->createUser();
+        $this->postJson('/api/v1/ratings', [
+            'type' => 'user',
+            'rateable_id' => $target->id,
+            'rateable_type' => User::class,
+            'rating' => 4,
+            'comment' => 'Nice!',
+        ])->assertStatus(201);
+
+        $response2 = $this->getJson('/api/v1/ratings');
+        $this->assertCount($count1 + 1, $response2->json('data'));
+    }
+
+    public function test_ratings_list_cache_invalidated_after_update(): void
+    {
+        $user = $this->createUser();
+        Passport::actingAs($user);
+        Cache::forget('ratings:cache_version');
+
+        $rating = $this->createRating($user);
+
+        $this->getJson('/api/v1/ratings');
+
+        $this->putJson("/api/v1/ratings/{$rating->id}", [
+            'rating' => 2,
+            'comment' => 'Changed',
+        ])->assertStatus(200);
+
+        $response = $this->getJson('/api/v1/ratings');
+        $this->assertEquals(2, $response->json('data')[0]['rating']);
+    }
+
+    public function test_ratings_show_cache_hit_returns_stale_data_until_invalidation(): void
+    {
+        $user = $this->createUser();
+        Passport::actingAs($user);
+        Cache::forget('ratings:cache_version');
+
+        $rating = $this->createRating($user);
+
+        $response1 = $this->getJson("/api/v1/ratings/{$rating->id}");
+        $originalRating = $response1->json('data')['rating'];
+
+        $rating->comment = 'Modified directly';
+        $rating->saveQuietly();
+
+        $response2 = $this->getJson("/api/v1/ratings/{$rating->id}");
+        $this->assertEquals($originalRating, $response2->json('data')['rating']);
     }
 }

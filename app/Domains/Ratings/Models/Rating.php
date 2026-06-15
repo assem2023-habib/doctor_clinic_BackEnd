@@ -2,6 +2,7 @@
 
 namespace App\Domains\Ratings\Models;
 
+use App\Domains\Shared\Traits\ClearsCache;
 use App\Enums\RatingTypeEnum;
 use App\Models\User;
 use App\Traits\HasUuidV7;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Rating extends Model
 {
-    use HasUuidV7;
+    use HasUuidV7, ClearsCache;
 
     protected $fillable = [
         'rater_id',
@@ -38,5 +39,16 @@ class Rating extends Model
     public function rateable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function cacheVersionsToIncrement(): array
+    {
+        $versions = ['ratings:cache_version'];
+
+        if ($this->type === RatingTypeEnum::User) {
+            $versions[] = 'doctors:cache_version';
+        }
+
+        return $versions;
     }
 }

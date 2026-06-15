@@ -61,6 +61,8 @@ class DoctorDeletionService
 
             $doctor->schedules()->delete();
 
+            $doctor->delete();
+
             $user->delete();
         });
     }

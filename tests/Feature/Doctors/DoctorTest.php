@@ -14,6 +14,7 @@ use App\Enums\RatingTypeEnum;
 use App\Models\User;
 use Database\Seeders\SpecializationSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
 
@@ -772,5 +773,111 @@ class DoctorTest extends TestCase
         $ids = collect($response->json()['data'])->pluck('id');
         $this->assertContains($doctorWithoutAppointments->id, $ids);
         $this->assertNotContains($doctorWithAppointments->id, $ids);
+    }
+
+    public function test_doctor_list_cache_hit_returns_stale_data_until_update(): void
+    {
+        $doctor = $this->createDoctor();
+        Passport::actingAs($this->createAdmin());
+        Cache::forget('doctors:cache_version');
+
+        $response1 = $this->getJson('/api/v1/doctors?limit=50');
+        $firstName1 = $response1->json('data')[0]['first_name'];
+
+        $doctor->first_name = 'StaleName';
+        $doctor->saveQuietly();
+
+        $response2 = $this->getJson('/api/v1/doctors?limit=50');
+        $this->assertEquals($firstName1, $response2->json('data')[0]['first_name']);
+    }
+
+    public function test_doctor_list_cache_invalidated_after_update(): void
+    {
+        $doctor = $this->createDoctor();
+        $admin = $this->createAdmin();
+        Passport::actingAs($admin);
+        Cache::forget('doctors:cache_version');
+
+        $this->getJson('/api/v1/doctors');
+
+        $this->putJson("/api/v1/doctors/{$doctor->doctor->user_id}", [
+            'first_name' => 'PostUpdate',
+            'last_name' => $doctor->last_name,
+            'username' => $doctor->username,
+            'email' => $doctor->email,
+            'gender' => $doctor->gender->value,
+            'specialization_id' => $this->generalPractitioner->id,
+            'experience_months' => 36,
+        ])->assertStatus(200);
+
+        $response = $this->getJson('/api/v1/doctors');
+        $this->assertEquals('PostUpdate', $response->json('data')[0]['first_name']);
+    }
+
+    public function test_doctor_list_cache_invalidated_after_create(): void
+    {
+        $admin = $this->createAdmin();
+        Passport::actingAs($admin);
+        Cache::forget('doctors:cache_version');
+
+        $response1 = $this->getJson('/api/v1/doctors');
+        $count1 = count($response1->json('data'));
+
+        $this->postJson('/api/v1/doctors', [
+            'first_name' => 'Created',
+            'last_name' => 'Doctor',
+            'username' => 'createddoctor',
+            'email' => 'created@example.com',
+            'password' => 'Password1!',
+            'password_confirmation' => 'Password1!',
+            'gender' => 'male',
+            'phone' => '1234567890',
+            'specialization_id' => $this->generalPractitioner->id,
+            'experience_months' => 12,
+        ])->assertStatus(201);
+
+        $response2 = $this->getJson('/api/v1/doctors');
+        $this->assertCount($count1 + 1, $response2->json('data'));
+    }
+
+    public function test_doctor_list_cache_invalidated_after_delete(): void
+    {
+        $doctor = $this->createDoctor();
+        $admin = $this->createAdmin();
+        Passport::actingAs($admin);
+        Cache::forget('doctors:cache_version');
+
+        $response1 = $this->getJson('/api/v1/doctors');
+        $this->assertEquals(1, count($response1->json('data')));
+
+        $this->deleteJson("/api/v1/doctors/{$doctor->doctor->user_id}")->assertStatus(204);
+
+        $response2 = $this->getJson('/api/v1/doctors');
+        $this->assertEmpty($response2->json('data'));
+    }
+
+    public function test_doctor_ratings_cache_invalidated_when_new_rating_added(): void
+    {
+        $doctor = $this->createDoctor();
+        $patient = User::factory()->create();
+        $patient->assignRole('patient');
+        $patient->patient()->create([]);
+        Passport::actingAs($patient);
+        Cache::forget('doctors:cache_version');
+        Cache::forget('ratings:cache_version');
+
+        $initial = $this->getJson("/api/v1/doctors/{$doctor->doctor->user_id}/ratings");
+        $initialCount = count($initial->json('data'));
+
+        $this->postJson('/api/v1/ratings', [
+            'type' => 'user',
+            'rateable_id' => $doctor->id,
+            'rateable_type' => User::class,
+            'rating' => 5,
+            'comment' => 'Great doctor!',
+        ])->assertStatus(201);
+
+        $response = $this->getJson("/api/v1/doctors/{$doctor->doctor->user_id}/ratings");
+        $this->assertCount($initialCount + 1, $response->json('data'));
     }
 }

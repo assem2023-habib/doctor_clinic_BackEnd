@@ -5,6 +5,7 @@ namespace App\Domains\Doctors\Models;
 use App\Domains\Appointments\Models\Appointment;
 use App\Domains\Patients\Models\Patient;
 use App\Domains\Ratings\Models\Rating;
+use App\Domains\Shared\Traits\ClearsCache;
 use App\Enums\RatingTypeEnum;
 use App\Models\User;
 use App\Traits\HasUuidV7;
@@ -15,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Doctor extends Model
 {
-    use HasUuidV7;
+    use HasUuidV7, ClearsCache;
 
     protected $fillable = ['user_id', 'specialization_id', 'experience_months'];
 
@@ -63,5 +64,10 @@ class Doctor extends Model
         return $this->hasMany(Rating::class, 'rateable_id', 'user_id')
             ->where('type', RatingTypeEnum::User)
             ->where('rateable_type', 'App\Models\User');
+    }
+
+    public function cacheVersionsToIncrement(): array
+    {
+        return ['doctors:cache_version'];
     }
 }

@@ -12,7 +12,8 @@
         "kreait/firebase-php": "*",
         "laravel/framework": "^13.7",
         "laravel/passport": "^13.7",
-        "laravel/tinker": "^3.0"
+        "laravel/tinker": "^3.0",
+        "predis/predis": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

@@ -20,6 +20,7 @@ use App\Enums\RatingTypeEnum;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class DoctorController
 {
@@ -33,27 +34,37 @@ class DoctorController
     public function index(Request $request): JsonResponse
     {
         $limit = (int) $request->integer('limit', 20);
-        $doctors = User::whereHas('roles', fn($q) => $q->where('slug', 'doctor'))
-            ->with(['doctor.schedules', 'roles'])
-            ->when($request->search, fn ($q, $v) => $q->where(function ($q) use ($v) {
-                $q->where('first_name', 'like', "%{$v}%")
-                  ->orWhere('last_name', 'like', "%{$v}%")
-                  ->orWhere('email', 'like', "%{$v}%");
-            }))
-            ->when($request->specialization_id, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('specialization_id', $v)))
-            ->when($request->experience_from, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('experience_months', '>=', (int) $v)))
-            ->when($request->experience_to, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('experience_months', '<=', (int) $v)))
-            ->when($request->gender, fn ($q, $v) => $q->where('gender', $v))
-            ->when($request->date_from, fn ($q, $v) => $q->where('birthday_date', '>=', $v))
-            ->when($request->date_to, fn ($q, $v) => $q->where('birthday_date', '<=', $v))
-            ->when($request->has('is_active'), fn ($q) => $q->where('is_active', $request->boolean('is_active')))
-            ->when($request->filled('has_appointments'), fn ($q) => $request->boolean('has_appointments') ? $q->whereHas('doctor.appointments') : $q->whereDoesntHave('doctor.appointments'))
-            ->when($request->filled('appointment_status'), fn ($q) => $q->whereHas('doctor.appointments', fn ($q) => $q->whereIn('status', (array) $request->appointment_status)))
-            ->when($request->filled('appointment_date'), fn ($q) => $q->whereHas('doctor.appointments', fn ($q) => $q->whereDate('appointment_date', $request->appointment_date)))
-            ->when($request->filled('appointment_from_date'), fn ($q) => $q->whereHas('doctor.appointments', fn ($q) => $q->whereDate('appointment_date', '>=', $request->appointment_from_date)))
-            ->when($request->filled('appointment_to_date'), fn ($q) => $q->whereHas('doctor.appointments', fn ($q) => $q->whereDate('appointment_date', '<=', $request->appointment_to_date)))
-            ->when($request->filled('appointment_patient_id'), fn ($q) => $q->whereHas('doctor.appointments', fn ($q) => $q->whereIn('patient_id', Patient::whereIn('user_id', (array) $request->appointment_patient_id)->pluck('id'))))
-            ->paginate(min($limit, 100));
+        $version = Cache::get('doctors:cache_version', 0);
+        $cacheKey = 'doctors:index:v' . $version . ':' . md5(serialize($request->only([
+            'search', 'specialization_id', 'experience_from', 'experience_to',
+            'gender', 'date_from', 'date_to', 'is_active', 'has_appointments',
+            'appointment_status', 'appointment_date', 'appointment_from_date',
+            'appointment_to_date', 'appointment_patient_id', 'page', 'limit',
+        ])));
+
+        $doctors = Cache::remember($cacheKey, 172800, function () use ($request, $limit) {
+            return User::whereHas('roles', fn($q) => $q->where('slug', 'doctor'))
+                ->with(['doctor.schedules', 'roles'])
+                ->when($request->search, fn ($q, $v) => $q->where(function ($q) use ($v) {
+                    $q->where('first_name', 'like', "%{$v}%")
+                      ->orWhere('last_name', 'like', "%{$v}%")
+                      ->orWhere('email', 'like', "%{$v}%");
+                }))
+                ->when($request->specialization_id, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('specialization_id', $v)))
+                ->when($request->experience_from, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('experience_months', '>=', (int) $v)))
+                ->when($request->experience_to, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('experience_months', '<=', (int) $v)))
+                ->when($request->gender, fn ($q, $v) => $q->where('gender', $v))
+                ->when($request->date_from, fn ($q, $v) => $q->where('birthday_date', '>=', $v))
+                ->when($request->date_to, fn ($q, $v) => $q->where('birthday_date', '<=', $v))
+                ->when($request->has('is_active'), fn ($q) => $q->where('is_active', $request->boolean('is_active')))
+                ->when($request->filled('has_appointments'), fn ($q) => $request->boolean('has_appointments') ? $q->whereHas('doctor.appointments') : $q->whereDoesntHave('doctor.appointments'))
+                ->when($request->filled('appointment_status'), fn ($q) => $q->whereHas('doctor.appointments', fn ($q) => $q->whereIn('status', (array) $request->appointment_status)))
+                ->when($request->filled('appointment_date'), fn ($q) => $q->whereHas('doctor.appointments', fn ($q) => $q->whereDate('appointment_date', $request->appointment_date)))
+                ->when($request->filled('appointment_from_date'), fn ($q) => $q->whereHas('doctor.appointments', fn ($q) => $q->whereDate('appointment_date', '>=', $request->appointment_from_date)))
+                ->when($request->filled('appointment_to_date'), fn ($q) => $q->whereHas('doctor.appointments', fn ($q) => $q->whereDate('appointment_date', '<=', $request->appointment_to_date)))
+                ->when($request->filled('appointment_patient_id'), fn ($q) => $q->whereHas('doctor.appointments', fn ($q) => $q->whereIn('patient_id', Patient::whereIn('user_id', (array) $request->appointment_patient_id)->pluck('id'))))
+                ->paginate(min($limit, 100));
+        });
 
         return ApiResponse::success(
             DoctorResource::collection($doctors),
@@ -107,23 +118,27 @@ class DoctorController
     public function ratings(Request $request, string $doctor): JsonResponse
     {
         $limit = (int) $request->integer('limit', 20);
+        $version = Cache::get('doctors:cache_version', 0);
+        $cacheKey = 'doctors:ratings:v' . $version . ':' . $doctor . ':' . md5(serialize($request->only(['search', 'page', 'limit'])));
 
-        $doctor = Doctor::where('user_id', $doctor)->firstOrFail();
+        $paginator = Cache::remember($cacheKey, 172800, function () use ($request, $doctor, $limit) {
+            $doctor = Doctor::where('user_id', $doctor)->firstOrFail();
 
-        $ratings = $doctor->ratings()
-            ->with('rater')
-            ->when($request->search, fn ($q, $v) => $q->where(function ($q) use ($v) {
-                $q->where('comment', 'like', "%{$v}%")
-                  ->orWhereHas('rater', fn ($q) => $q->where('first_name', 'like', "%{$v}%")
-                      ->orWhere('last_name', 'like', "%{$v}%"));
-            }))
-            ->latest()
-            ->paginate(min($limit, 100));
+            return $doctor->ratings()
+                ->with('rater')
+                ->when($request->search, fn ($q, $v) => $q->where(function ($q) use ($v) {
+                    $q->where('comment', 'like', "%{$v}%")
+                      ->orWhereHas('rater', fn ($q) => $q->where('first_name', 'like', "%{$v}%")
+                          ->orWhere('last_name', 'like', "%{$v}%"));
+                }))
+                ->latest()
+                ->paginate(min($limit, 100));
+        });
 
         return ApiResponse::success(
-            RatingResource::collection($ratings),
+            RatingResource::collection($paginator),
             __('Doctor ratings retrieved successfully'),
-            pagination: ApiResponse::pagination($ratings)
+            pagination: ApiResponse::pagination($paginator)
         );
     }
 
@@ -160,10 +175,9 @@ class DoctorController
     {
         $user = $this->createDoctorAction->execute($request);
 
-        return ApiResponse::success(
+        return ApiResponse::created(
             new DoctorResource($user),
-            __('Doctor created successfully'),
-            status: 201
+            __('Doctor created successfully')
         );
     }
 

@@ -13,6 +13,7 @@ use App\Domains\Ratings\Resources\RatingResource;
 use App\Domains\Shared\Responses\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class RatingController
 {
@@ -25,15 +26,21 @@ class RatingController
     public function index(Request $request): JsonResponse
     {
         $limit = (int) $request->integer('limit', 20);
+        $version = Cache::get('ratings:cache_version', 0);
+        $cacheKey = 'ratings:index:v' . $version . ':' . md5(serialize($request->only([
+            'type', 'rater_id', 'rateable_id', 'rateable_type', 'rating', 'page', 'limit',
+        ])));
 
-        $ratings = Rating::with('rater')
-            ->when($request->type, fn ($q, $v) => $q->whereIn('type', (array) $v))
-            ->when($request->rater_id, fn ($q, $v) => $q->where('rater_id', $v))
-            ->when($request->rateable_id, fn ($q, $v) => $q->where('rateable_id', $v))
-            ->when($request->rateable_type, fn ($q, $v) => $q->where('rateable_type', $v))
-            ->when($request->rating, fn ($q, $v) => $q->where('rating', $v))
-            ->latest()
-            ->paginate(min($limit, 100));
+        $ratings = Cache::remember($cacheKey, 172800, function () use ($request, $limit) {
+            return Rating::with('rater')
+                ->when($request->type, fn ($q, $v) => $q->whereIn('type', (array) $v))
+                ->when($request->rater_id, fn ($q, $v) => $q->where('rater_id', $v))
+                ->when($request->rateable_id, fn ($q, $v) => $q->where('rateable_id', $v))
+                ->when($request->rateable_type, fn ($q, $v) => $q->where('rateable_type', $v))
+                ->when($request->rating, fn ($q, $v) => $q->where('rating', $v))
+                ->latest()
+                ->paginate(min($limit, 100));
+        });
 
         return ApiResponse::success(
             RatingResource::collection($ratings),
@@ -44,7 +51,12 @@ class RatingController
 
     public function show(Rating $rating): JsonResponse
     {
-        $rating->load('rater');
+        $version = Cache::get('ratings:cache_version', 0);
+        $cacheKey = 'ratings:show:v' . $version . ':' . $rating->id;
+
+        $rating = Cache::remember($cacheKey, 172800, function () use ($rating) {
+            return $rating->load('rater');
+        });
 
         return ApiResponse::success(
             new RatingResource($rating),
