@@ -279,6 +279,39 @@ Authorization: Bearer <token>
 
 ---
 
+---
+
+## Caching
+
+| الـ Endpoint | مخبأ | مدة التخزين | مفتاح الكاش |
+|-------------|------|-------------|-------------|
+| `GET /api/v1/ratings` | ✅ نعم | 2 يوم (172800 ثانية) | `ratings:index:v{version}:{md5(filters)}` |
+| `GET /api/v1/ratings/{rating}` | ✅ نعم | 2 يوم | `ratings:show:v{version}:{id}` |
+| `GET /api/v1/doctors/{doctor}/ratings` | ✅ نعم | 2 يوم | `doctors:ratings:v{doc_version}:{id}:{md5(filters)}` |
+
+**الإبطال التلقائي (Cache Invalidation):**
+
+| الإجراء | Cache tags المبطلة |
+|---------|-------------------|
+| إنشاء/تحديث/حذف تقييم (`type=user`) | `ratings` + `doctors` (Cross-invalidation) |
+| إنشاء/تحديث/حذف تقييم (`type!=user`) | `ratings` فقط |
+| إنشاء/تحديث/حذف طبيب | `doctors` |
+
+**آلية العمل (ClearsCache trait):**
+```
+1. Rating::saved() | Rating::deleted()
+   └── Cache::increment('ratings:cache_version')
+       └── if (type === RatingTypeEnum::User)
+           └── Cache::increment('doctors:cache_version')
+
+2. Doctor::saved() | Doctor::deleted()
+   └── Cache::increment('doctors:cache_version')
+
+3. Controller reads version → builds cache key → Cache::remember(ttl=172800)
+```
+
+---
+
 ## Architecture
 
 ```
@@ -288,17 +321,46 @@ app/Domains/Ratings/
 │   ├── UpdateRatingAction.php       # التحقق من الملكية + تحديث
 │   └── DeleteRatingAction.php       # التحقق من الملكية/الأدمن + حذف
 ├── Controllers/
-│   └── RatingController.php         # 5 endpoints
+│   └── RatingController.php         # 5 endpoints (index/show مُخبآن)
 ├── DTOs/
 │   └── RatingData.php               # fromStoreRequest / fromUpdateRequest
 ├── Models/
-│   └── Rating.php                   # rater(), rateable() (morphTo)
+│   └── Rating.php                   # rater(), rateable() (morphTo), ClearsCache trait
 ├── Requests/
 │   ├── StoreRatingRequest.php       # validation: type, rating 1-5, rateable required_if type=user
 │   └── UpdateRatingRequest.php      # validation: rating 1-5, comment max 1000
 └── Resources/
     └── RatingResource.php           # id, type, rater, rateable_id, rateable_type, rating, comment
+
+Traits (Shared):
+└── app/Domains/Shared/Traits/
+    └── ClearsCache.php              # bootClearsCache(): saved/deleted → Cache::increment()
 ```
+
+### Cross-invalidation بين Ratings و Doctors
+
+عند إنشاء/تحديث/حذف تقييم من نوع `user` (خاص بطبيب)، يتم **تلقائياً إبطال كاش الأطباء أيضاً** لأن متوسط التقييمات (`rating avg`) يظهر في `GET /api/v1/doctors/{doctor}`.
+
+يتم ذلك عبر `Rating::cacheVersionsToIncrement()`:
+```php
+public function cacheVersionsToIncrement(): array
+{
+    $versions = ['ratings:cache_version'];
+    if ($this->type === RatingTypeEnum::User) {
+        $versions[] = 'doctors:cache_version';
+    }
+    return $versions;
+}
+```
+
+### آليات مشتركة
+
+| الـ Trait | الموديل | التأثير |
+|-----------|---------|---------|
+| `ClearsCache` | `Doctor` | `saved`/`deleted` → `Cache::increment('doctors:cache_version')` |
+| `ClearsCache` | `Rating` | `saved`/`deleted` → `Cache::increment('ratings:cache_version')` + cross-invalidation |
+
+---
 
 ## Database Schema
 

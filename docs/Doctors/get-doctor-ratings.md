@@ -33,23 +33,27 @@
 public function ratings(Request $request, string $doctor): JsonResponse
 {
     $limit = (int) $request->integer('limit', 20);
+    $version = Cache::get('doctors:cache_version', 0);
+    $cacheKey = 'doctors:ratings:v' . $version . ':' . $doctor . ':' . md5(serialize($request->only(['search', 'page', 'limit'])));
 
-    $doctor = Doctor::where('user_id', $doctor)->firstOrFail();
+    $paginator = Cache::remember($cacheKey, 172800, function () use ($request, $doctor, $limit) {
+        $doctor = Doctor::where('user_id', $doctor)->firstOrFail();
 
-    $ratings = $doctor->ratings()
-        ->with('rater')
-        ->when($request->search, fn ($q, $v) => $q->where(function ($q) use ($v) {
-            $q->where('comment', 'like', "%{$v}%")
-              ->orWhereHas('rater', fn ($q) => $q->where('first_name', 'like', "%{$v}%")
-                  ->orWhere('last_name', 'like', "%{$v}%"));
-        }))
-        ->latest()
-        ->paginate(min($limit, 100));
+        return $doctor->ratings()
+            ->with('rater')
+            ->when($request->search, fn ($q, $v) => $q->where(function ($q) use ($v) {
+                $q->where('comment', 'like', "%{$v}%")
+                  ->orWhereHas('rater', fn ($q) => $q->where('first_name', 'like', "%{$v}%")
+                      ->orWhere('last_name', 'like', "%{$v}%"));
+            }))
+            ->latest()
+            ->paginate(min($limit, 100));
+    });
 
     return ApiResponse::success(
-        RatingResource::collection($ratings),
+        RatingResource::collection($paginator),
         __('Doctor ratings retrieved successfully'),
-        pagination: ApiResponse::pagination($ratings)
+        pagination: ApiResponse::pagination($paginator)
     );
 }
 ```
@@ -161,9 +165,21 @@ public function toArray($request): array
 
 ---
 
-## 7. ملاحظات
+## 7. Caching
+
+| الخاصية | القيمة |
+|---------|--------|
+| **مخبأ** | ✅ نعم |
+| **مدة التخزين** | 2 يوم (172800 ثانية) |
+| **مفتاح الكاش** | `doctors:ratings:v{version}:{doctor_id}:{md5(filters)}` |
+| **الإبطال** | إنشاء/تحديث/حذف طبيب أو إضافة تقييم جديد (`type=user`) |
+
+---
+
+## 8. ملاحظات
 
 - التقييمات مرتبة من الأحدث (`latest()`)
 - البحث (`search`) يطابق في `comment` أو `rater.first_name` أو `rater.last_name`
 - `rater` relationship يتم تحميله (`eager-loaded`) تلقائياً
 - جميع التقييمات من نوع `user` خاصة بهذا الطبيب
+- النتيجة تُخبّأ لمدة يومين وتُبطل تلقائياً عند أي تعديل

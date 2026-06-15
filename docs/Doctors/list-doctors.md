@@ -44,27 +44,38 @@
 ```php
 public function index(Request $request): JsonResponse
 {
-    $doctors = User::whereHas('roles', fn ($q) => $q->where('slug', 'doctor'))
-        ->with('doctor.schedules', 'roles')
-        ->when($request->search, fn ($q, $v) => $q->where(function ($q) use ($v) {
-            $q->where('first_name', 'like', "%{$v}%")
-              ->orWhere('last_name', 'like', "%{$v}%")
-              ->orWhere('email', 'like', "%{$v}%");
-        }))
-        ->when($request->specialization_id, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('specialization_id', $v)))
-        ->when($request->experience_from, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('experience_months', '>=', (int) $v)))
-        ->when($request->experience_to, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('experience_months', '<=', (int) $v)))
-        ->when($request->gender, fn ($q, $v) => $q->where('gender', $v))
-        ->when($request->date_from, fn ($q, $v) => $q->where('birthday_date', '>=', $v))
-        ->when($request->date_to, fn ($q, $v) => $q->where('birthday_date', '<=', $v))
-        ->when($request->has('is_active'), fn ($q) => $q->where('is_active', $request->boolean('is_active')))
-        ->when($request->filled('has_appointments'), fn ($q) => $request->boolean('has_appointments') ? $q->whereHas('doctor.appointments') : $q->whereDoesntHave('doctor.appointments'))
-        ->when($request->filled('appointment_status'), fn ($q) => $q->whereHas('doctor.appointments', fn ($q) => $q->whereIn('status', (array) $request->appointment_status)))
-        ->when($request->filled('appointment_date'), fn ($q) => $q->whereHas('doctor.appointments', fn ($q) => $q->whereDate('appointment_date', $request->appointment_date)))
-        ->when($request->filled('appointment_from_date'), fn ($q) => $q->whereHas('doctor.appointments', fn ($q) => $q->whereDate('appointment_date', '>=', $request->appointment_from_date)))
-        ->when($request->filled('appointment_to_date'), fn ($q) => $q->whereHas('doctor.appointments', fn ($q) => $q->whereDate('appointment_date', '<=', $request->appointment_to_date)))
-        ->when($request->filled('appointment_patient_id'), fn ($q) => $q->whereHas('doctor.appointments', fn ($q) => $q->whereIn('patient_id', Patient::whereIn('user_id', (array) $request->appointment_patient_id)->pluck('id'))))
-        ->paginate(min($limit, 100));
+    $limit = (int) $request->integer('limit', 20);
+    $version = Cache::get('doctors:cache_version', 0);
+    $cacheKey = 'doctors:index:v' . $version . ':' . md5(serialize($request->only([
+        'search', 'specialization_id', 'experience_from', 'experience_to',
+        'gender', 'date_from', 'date_to', 'is_active', 'has_appointments',
+        'appointment_status', 'appointment_date', 'appointment_from_date',
+        'appointment_to_date', 'appointment_patient_id', 'page', 'limit',
+    ])));
+
+    $doctors = Cache::remember($cacheKey, 172800, function () use ($request, $limit) {
+        return User::whereHas('roles', fn ($q) => $q->where('slug', 'doctor'))
+            ->with('doctor.schedules', 'roles')
+            ->when($request->search, fn ($q, $v) => $q->where(function ($q) use ($v) {
+                $q->where('first_name', 'like', "%{$v}%")
+                  ->orWhere('last_name', 'like', "%{$v}%")
+                  ->orWhere('email', 'like', "%{$v}%");
+            }))
+            ->when($request->specialization_id, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('specialization_id', $v)))
+            ->when($request->experience_from, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('experience_months', '>=', (int) $v)))
+            ->when($request->experience_to, fn ($q, $v) => $q->whereHas('doctor', fn ($q) => $q->where('experience_months', '<=', (int) $v)))
+            ->when($request->gender, fn ($q, $v) => $q->where('gender', $v))
+            ->when($request->date_from, fn ($q, $v) => $q->where('birthday_date', '>=', $v))
+            ->when($request->date_to, fn ($q, $v) => $q->where('birthday_date', '<=', $v))
+            ->when($request->has('is_active'), fn ($q) => $q->where('is_active', $request->boolean('is_active')))
+            ->when($request->filled('has_appointments'), fn ($q) => $request->boolean('has_appointments') ? $q->whereHas('doctor.appointments') : $q->whereDoesntHave('doctor.appointments'))
+            ->when($request->filled('appointment_status'), fn ($q) => $q->whereHas('doctor.appointments', fn ($q) => $q->whereIn('status', (array) $request->appointment_status)))
+            ->when($request->filled('appointment_date'), fn ($q) => $q->whereHas('doctor.appointments', fn ($q) => $q->whereDate('appointment_date', $request->appointment_date)))
+            ->when($request->filled('appointment_from_date'), fn ($q) => $q->whereHas('doctor.appointments', fn ($q) => $q->whereDate('appointment_date', '>=', $request->appointment_from_date)))
+            ->when($request->filled('appointment_to_date'), fn ($q) => $q->whereHas('doctor.appointments', fn ($q) => $q->whereDate('appointment_date', '<=', $request->appointment_to_date)))
+            ->when($request->filled('appointment_patient_id'), fn ($q) => $q->whereHas('doctor.appointments', fn ($q) => $q->whereIn('patient_id', Patient::whereIn('user_id', (array) $request->appointment_patient_id)->pluck('id'))))
+            ->paginate(min($limit, 100));
+    });
 
     return ApiResponse::success(
         DoctorResource::collection($doctors),
@@ -173,7 +184,20 @@ public function index(Request $request): JsonResponse
 
 ---
 
-## 6. الأخطاء المحتملة
+## 6. Caching
+
+| الخاصية | القيمة |
+|---------|--------|
+| **مخبأ** | ✅ نعم |
+| **مدة التخزين** | 2 يوم (172800 ثانية) |
+| **مفتاح الكاش** | `doctors:index:v{version}:{md5(filters)}` — يتغير لكل combination من الفلاتر |
+| **الإبطال** | إنشاء/تحديث/حذف طبيب — يرفع `doctors:cache_version` |
+
+> بعد أول طلب، النتيجة تُخبّأ لمدة يومين. أي تغيير على الأطباء (إضافة، تعديل، حذف) يُبطِل الكاش تلقائياً.
+
+---
+
+## 7. الأخطاء المحتملة
 
 | كود الحالة | الرسالة | السبب |
 |-----------|---------|-------|

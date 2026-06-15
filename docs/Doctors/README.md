@@ -81,6 +81,34 @@
 
 ---
 
+---
+
+## Caching
+
+| الـ Endpoint | مخبأ | مدة التخزين | مفتاح الكاش |
+|-------------|------|-------------|-------------|
+| `GET /api/v1/doctors` | ✅ نعم | 2 يوم (172800 ثانية) | `doctors:index:v{version}:{md5(filters)}` |
+| `GET /api/v1/doctors/{doctor}/ratings` | ✅ نعم | 2 يوم | `doctors:ratings:v{version}:{doctor_id}:{md5(filters)}` |
+
+**الإبطال التلقائي (Cache Invalidation):**
+
+| الإجراء | التأثير |
+|---------|---------|
+| إنشاء طبيب (`POST /api/v1/doctors`) | يرفع `doctors:cache_version` → إبطال كاش القائمة والتقييمات |
+| تحديث طبيب (`PUT/PATCH /api/v1/doctors/{doctor}`) | يرفع `doctors:cache_version` |
+| حذف طبيب (`DELETE /api/v1/doctors/{doctor}`) | يرفع `doctors:cache_version` |
+| إضافة تقييم لطبيب (`POST /api/v1/ratings` مع `type=user`) | يرفع `doctors:cache_version` + `ratings:cache_version` |
+
+**ملاحظة:** `GET /api/v1/doctors/{doctor}` (show) **غير مخبأ** لأنه يحتوي على بيانات خاصة بالمستخدم (`has_rated`, `supervision_request`).
+
+**آلية العمل:**
+1. `ClearsCache` trait على `Doctor` و `Rating` models
+2. عند `saved`/`deleted` → `Cache::increment('doctors:cache_version')`
+3. في الـ Controller يتم قراءة `version` وبناء مفتاح الكاش
+4. `Cache::remember()` يحفظ النتيجة لمدة يومين
+
+---
+
 ## هيكل المجلدات
 
 ```
