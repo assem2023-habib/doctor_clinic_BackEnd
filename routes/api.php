@@ -33,7 +33,7 @@ Route::prefix('v1/auth')->group(function () {
         ->middleware(['throttle:register', 'image.content']);
     Route::post('/register/receptionist', [AuthController::class, 'registerReceptionist'])
         ->middleware(['throttle:register', 'image.content']);
-    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login')->name('login');
     Route::post('/refresh', [AuthController::class, 'refresh']);
 
     Route::post('/firebase-token', [AuthController::class, 'firebaseToken'])->middleware(['auth:api', 'active']);
@@ -65,6 +65,11 @@ Route::prefix('v1/countries')->group(function () {
 Route::prefix('v1/cities')->group(function () {
     Route::get('/', [CityController::class, 'index']);
     Route::get('/{city}', [CityController::class, 'show']);
+});
+
+Route::prefix('v1/specializations')->group(function () {
+    Route::get('/', [SpecializationController::class, 'index']);
+    Route::get('/{specialization}', [SpecializationController::class, 'show']);
 });
 
 Route::get('/v1/files/{file}/download', [FileController::class, 'download'])
@@ -128,11 +133,6 @@ Route::middleware(['auth:api', 'active'])->group(function () {
 
     Route::prefix('v1/users/{user}/roles')->group(function () {
         Route::get('/', [UserRoleController::class, 'getUserRoles']);
-    });
-
-    Route::prefix('v1/specializations')->group(function () {
-        Route::get('/', [SpecializationController::class, 'index']);
-        Route::get('/{specialization}', [SpecializationController::class, 'show']);
     });
 
     Route::prefix('v1/ratings')->group(function () {
