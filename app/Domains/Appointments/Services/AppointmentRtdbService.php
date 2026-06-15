@@ -137,23 +137,14 @@ class AppointmentRtdbService
 
     private function buildAppointmentData(Appointment $appointment): array
     {
-        $patient = $appointment->patient;
-        $patientUser = $patient?->user;
-
         return [
             'id' => $appointment->id,
-            'doctor_id' => $appointment->doctor_id,
-            'patient_id' => $appointment->patient_id,
-            'patient_name' => $patientUser ? trim($patientUser->first_name . ' ' . $patientUser->last_name) : null,
-            'patient_phone' => $patientUser?->phone,
             'appointment_date' => $appointment->appointment_date?->format('Y-m-d'),
             'start_time' => $appointment->start_time?->format('H:i'),
             'end_time' => $appointment->end_time?->format('H:i'),
             'status' => $appointment->status->value,
             'reason' => $appointment->reason,
             'notes' => $appointment->notes,
-            'synced_at' => Carbon::now()->toIso8601String(),
-            'synced_at_timestamp' => ['.sv' => 'timestamp'],
         ];
     }
 }

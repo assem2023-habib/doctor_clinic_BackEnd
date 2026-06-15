@@ -113,21 +113,13 @@ Authorization: Bearer <laravel_access_token>
        └── booked-appointments/
             └── {date}:                                          ← Y-m-d (مثال: "2026-06-01")
                  └── {appointmentId}:                            ← UUID (appointments.id)
-                      ├── id:                    "uuid"          ← string (PK)
-                      ├── doctor_id:             "uuid"          ← string
-                      ├── patient_id:            "uuid"          ← string
-                      ├── patient_name:          "John Doe"      ← string | null
-                      ├── patient_phone:         "+123456789"    ← string | null
-                      ├── appointment_date:      "2026-06-01"   ← string (Y-m-d)
-                      ├── start_time:            "10:00"        ← string (H:i)
-                      ├── end_time:              "11:00"        ← string (H:i)
-                      ├── status:                "accepted"     ← string (enum)
-                      ├── reason:                "Checkup"      ← string | null
-                      ├── notes:                 "..."          ← string | null
-                      ├── synced_at:             "2026-05-23..." ← string (ISO8601)
-                      └── synced_at_timestamp:   { ".sv":      ← timestamp
-                                                    "timestamp"   (من Firebase Server)
-                                                  }
+                      ├── id:               "uuid"               ← string (PK)
+                      ├── appointment_date: "2026-06-01"        ← string (Y-m-d)
+                      ├── start_time:       "10:00"             ← string (H:i)
+                      ├── end_time:         "11:00"             ← string (H:i)
+                      ├── status:           "accepted"          ← string (enum)
+                      ├── reason:           "Checkup"           ← string | null
+                      └── notes:            "..."               ← string | null
 ```
 
 ### ملاحظات هيكلية
@@ -136,6 +128,7 @@ Authorization: Bearer <laravel_access_token>
 - **`booked-appointments`** مقسّم حسب **التاريخ** (`{date}`) لتسهيل جلب مواعيد يوم معين
 - كل موعد له مسار فريد: `/doctors/{doctorId}/booked-appointments/{date}/{appointmentId}`
 - المواعيد **تُحذف** من RTDB فور انتهائها أو إلغائها (لا تبقى كسجلات منتهية)
+- **لا تُخزّن بيانات المريض الشخصية (name, phone, patient_id)** في RTDB حفاظاً على الخصوصية — Flutter يجلب بيانات المريض عبر API عند الحاجة
 
 ---
 
@@ -144,18 +137,12 @@ Authorization: Bearer <laravel_access_token>
 | الحقل | Type PHP | RTDB Type | Nullable | الحد الأقصى | المصدر |
 |-------|----------|-----------|----------|-------------|--------|
 | `id` | `string` (UUID) | `string` | ❌ | 36 char | `$appointment->id` |
-| `doctor_id` | `string` (UUID) | `string` | ❌ | 36 char | `$appointment->doctor_id` |
-| `patient_id` | `string` (UUID) | `string` | ❌ | 36 char | `$appointment->patient_id` |
-| `patient_name` | `string` | `string` | ✅ | 510 char | `{$user->first_name} {$user->last_name}` |
-| `patient_phone` | `string` | `string` | ✅ | 255 char | `$user->phone` |
 | `appointment_date` | `string` (Y-m-d) | `string` | ✅ | 10 char | `$appointment->appointment_date->format('Y-m-d')` |
 | `start_time` | `string` (H:i) | `string` | ✅ | 5 char | `$appointment->start_time->format('H:i')` |
 | `end_time` | `string` (H:i) | `string` | ✅ | 5 char | `$appointment->end_time->format('H:i')` |
 | `status` | `string` (enum) | `string` | ❌ | 15 char | `$appointment->status->value` |
 | `reason` | `string` | `string` | ✅ | — | `$appointment->reason` |
 | `notes` | `string` | `string` | ✅ | — | `$appointment->notes` |
-| `synced_at` | `string` (ISO8601) | `string` | ❌ | — | `Carbon::now()->toIso8601String()` |
-| `synced_at_timestamp` | `array` | `{ ".sv": "timestamp" }` | ❌ | — | `[".sv" => "timestamp"]` |
 
 ### قيم `status` المسموح بكتابتها في RTDB
 
@@ -173,26 +160,17 @@ Authorization: Bearer <laravel_access_token>
 ### مصدر بناء الـ Object
 
 ```php
-// الملف: app/Domains/Appointments/Services/AppointmentRtdbService.php:138-158
+// الملف: app/Domains/Appointments/Services/AppointmentRtdbService.php:138-148
 private function buildAppointmentData(Appointment $appointment): array
 {
-    $patient = $appointment->patient;
-    $patientUser = $patient?->user;
-
     return [
         'id' => $appointment->id,
-        'doctor_id' => $appointment->doctor_id,
-        'patient_id' => $appointment->patient_id,
-        'patient_name' => $patientUser ? trim($patientUser->first_name . ' ' . $patientUser->last_name) : null,
-        'patient_phone' => $patientUser?->phone,
         'appointment_date' => $appointment->appointment_date?->format('Y-m-d'),
         'start_time' => $appointment->start_time?->format('H:i'),
         'end_time' => $appointment->end_time?->format('H:i'),
         'status' => $appointment->status->value,
         'reason' => $appointment->reason,
         'notes' => $appointment->notes,
-        'synced_at' => Carbon::now()->toIso8601String(),
-        'synced_at_timestamp' => ['.sv' => 'timestamp'],
     ];
 }
 ```
@@ -439,22 +417,14 @@ class _DoctorAppointmentsWidgetState extends State<DoctorAppointmentsWidget> {
 ```dart
 {
   "id": "019e1d0f-...",
-  "doctor_id": "019e1d0f-...",
-  "patient_id": "019e1d0f-...",
-  "patient_name": "John Doe",
-  "patient_phone": "+123456789",
   "appointment_date": "2026-06-01",
   "start_time": "10:00",
   "end_time": "11:00",
   "status": "accepted",
   "reason": "Checkup",
-  "notes": "...",
-  "synced_at": "2026-05-23T12:00:00+00:00",
-  "synced_at_timestamp": 1716451200000
+  "notes": "..."
 }
 ```
-
-> **ملاحظة:** `synced_at_timestamp` هو Firebase Server Timestamp (milliseconds since epoch)، بينما `synced_at` هو ISO8601 String من Laravel.
 
 ---
 
