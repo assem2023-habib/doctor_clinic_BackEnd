@@ -3,6 +3,7 @@
 namespace App\Domains\Doctors\Models;
 
 use App\Domains\Images\Models\Image;
+use App\Domains\Shared\Traits\ClearsCache;
 use App\Enums\SpecializationEnum;
 use App\Traits\HasUuidV7;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,12 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Specialization extends Model
 {
-    use HasUuidV7;
+    use HasUuidV7, ClearsCache;
+
+    public function cacheVersionsToIncrement(): array
+    {
+        return ['specializations:cache_version'];
+    }
 
     protected $fillable = [
         'name',

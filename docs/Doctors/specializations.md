@@ -59,6 +59,21 @@ Content-Type: `multipart/form-data`
 
 > `doctors_count` appears only when loaded via `withCount`. `image` appears only when the relationship is loaded (always in `show`, not by default in `index`).
 
+## Caching
+
+مخزنة مؤقتاً عبر Redis باستخدام version-based cache keys.
+
+| Endpoint | Cache Key | TTL |
+|----------|-----------|-----|
+| `GET /v1/specializations` | `specializations:index:v{version}:{hash}` | 2 يوم |
+| `GET /v1/specializations/{specialization}` | `specializations:show:v{version}:{id}` | 2 يوم |
+
+**الإبطال (Cache Invalidation):** يتم تلقائياً عند إنشاء/تحديث/حذف تخصص.
+
+- `Specialization::bootClearsCache()` ← `saved`/`deleted` ← `Cache::increment('specializations:cache_version')`
+
+> **ملاحظة:** `show()` مخبأ لأن البيانات عامة ولا تعتمد على هوية المستخدم.
+
 ## Errors
 
 | Status | Condition |

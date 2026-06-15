@@ -2,7 +2,7 @@
 
 ## Overview
 
-التخزين المؤقت للأطباء والتقييمات باستخدام version-based cache keys مع Redis.
+التخزين المؤقت للأطباء والتقييمات والمواقع (دول/مدن) والتخصصات باستخدام version-based cache keys مع Redis.
 
 ---
 
@@ -82,15 +82,25 @@ doctors:cache_version ──►   doctors:index:v{version}:{hash}
 
 ratings:cache_version ──►  ratings:index:v{version}:{hash}
   (integer)                 ratings:show:v{version}:{id}
+
+countries:cache_version ──► countries:index:v{version}:{hash}
+  (integer)                 countries:show:v{version}:{id}
+
+cities:cache_version ──►   cities:index:v{version}:{hash}
+  (integer)                 cities:show:v{version}:{id}
+
+specializations:cache_ver ─► specializations:index:v{version}:{hash}
+  (integer)                 specializations:show:v{version}:{id}
 ```
 
 ### How It Works
 
 1. **Model Event** (`saved`/`deleted`) ← **Observer Pattern**
-   - `Doctor::saved` → `Cache::increment('doctors:cache_version')`
-   - `Doctor::deleted` → `Cache::increment('doctors:cache_version')`
-   - `Rating::saved` → `Cache::increment('ratings:cache_version')`
-   - `Rating::deleted` → `Cache::increment('ratings:cache_version')`
+   - `Doctor::saved/deleted` → `Cache::increment('doctors:cache_version')`
+   - `Rating::saved/deleted` → `Cache::increment('ratings:cache_version')` (& `doctors:` if `type=user`)
+   - `Country::saved/deleted` → `Cache::increment('countries:cache_version')`
+   - `City::saved/deleted` → `Cache::increment('cities:cache_version')`
+   - `Specialization::saved/deleted` → `Cache::increment('specializations:cache_version')`
 
 2. **Controller Read** ← **Cache-Aside Pattern**
    ```php
@@ -105,7 +115,7 @@ ratings:cache_version ──►  ratings:index:v{version}:{hash}
 
 | المدة | الثواني | الاستخدام |
 |-------|---------|-----------|
-| يومان | 172800 | Doctors & Ratings lists |
+| يومان | 172800 | جميع القوائم المخبأة (Doctors, Ratings, Countries, Cities, Specializations) |
 
 ---
 
@@ -228,6 +238,25 @@ Rating::saved()/deleted()
 | تحديث مدينة | `PUT /api/v1/cities/{city}` | ✅ `cities:cache_version++` |
 | حذف مدينة | `DELETE /api/v1/cities/{city}` | ✅ `cities:cache_version++` |
 
+### Specializations
+
+| Method | Path | Cache Key | TTL |
+|--------|------|-----------|-----|
+| `GET` | `/api/v1/specializations` | `specializations:index:v{ver}:{md5(filters)}` | 172800s |
+| `GET` | `/api/v1/specializations/{specialization}` | `specializations:show:v{ver}:{id}` | 172800s |
+
+> **ملاحظة:** `show()` للتخصصات مخبأ (عكس `show()` للأطباء) لأن البيانات عامة ولا تعتمد على هوية المستخدم.
+
+### Cache Invalidation — Specializations
+
+| الإجراء | الـ Endpoint | يبطل؟ |
+|---------|-------------|-------|
+| قراءة القائمة | `GET /api/v1/specializations` | لا |
+| عرض تخصص | `GET /api/v1/specializations/{specialization}` | لا |
+| إنشاء تخصص | `POST /api/v1/specializations` | ✅ `specializations:cache_version++` |
+| تحديث تخصص | `PUT /api/v1/specializations/{specialization}` | ✅ `specializations:cache_version++` |
+| حذف تخصص | `DELETE /api/v1/specializations/{specialization}` | ✅ `specializations:cache_version++` |
+
 ---
 
 ## Adding Caching to New Endpoints
@@ -304,5 +333,8 @@ All cache tests are in the existing domain test files:
 |-----------|-------|
 | `tests/Feature/Doctors/DoctorTest.php` | Cache hit returns stale data, invalidation on create/update/delete, cross-invalidation from ratings |
 | `tests/Feature/Ratings/RatingTest.php` | Cache hit on list + show, invalidation on create/update |
+| `tests/Feature/Locations/CountryTest.php` | Cache hit returns stale data, invalidation on create/update/delete |
+| `tests/Feature/Locations/CityTest.php` | Cache hit returns stale data, invalidation on create/update/delete |
+| `tests/Feature/Doctors/SpecializationTest.php` | Cache hit returns stale data, invalidation on create/update/delete |
 
 Run with: `php artisan test`

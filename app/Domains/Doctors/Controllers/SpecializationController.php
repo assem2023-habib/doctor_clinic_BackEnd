@@ -13,6 +13,7 @@ use App\Domains\Doctors\Resources\SpecializationResource;
 use App\Domains\Shared\Responses\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class SpecializationController
 {
@@ -25,15 +26,19 @@ class SpecializationController
     public function index(Request $request): JsonResponse
     {
         $limit = (int) $request->integer('limit', 20);
+        $version = Cache::get('specializations:cache_version', 0);
+        $cacheKey = 'specializations:index:v' . $version . ':' . md5(serialize($request->only(['search', 'slug', 'is_active', 'page', 'limit'])));
 
-        $specializations = Specialization::withCount('doctors')
-            ->when($request->search, fn ($q, $v) => $q->where(function ($q) use ($v) {
-                $q->where('name->ar', 'like', "%{$v}%")
-                  ->orWhere('name->en', 'like', "%{$v}%");
-            }))
-            ->when($request->slug, fn ($q, $v) => $q->where('slug', $v))
-            ->when($request->has('is_active'), fn ($q) => $q->where('is_active', $request->boolean('is_active')))
-            ->paginate(min($limit, 100));
+        $specializations = Cache::remember($cacheKey, 172800, function () use ($request, $limit) {
+            return Specialization::withCount('doctors')
+                ->when($request->search, fn ($q, $v) => $q->where(function ($q) use ($v) {
+                    $q->where('name->ar', 'like', "%{$v}%")
+                      ->orWhere('name->en', 'like', "%{$v}%");
+                }))
+                ->when($request->slug, fn ($q, $v) => $q->where('slug', $v))
+                ->when($request->has('is_active'), fn ($q) => $q->where('is_active', $request->boolean('is_active')))
+                ->paginate(min($limit, 100));
+        });
 
         return ApiResponse::success(
             SpecializationResource::collection($specializations),
@@ -44,7 +49,12 @@ class SpecializationController
 
     public function show(Specialization $specialization): JsonResponse
     {
-        $specialization->loadCount('doctors')->load('image');
+        $version = Cache::get('specializations:cache_version', 0);
+        $cacheKey = 'specializations:show:v' . $version . ':' . $specialization->id;
+
+        $specialization = Cache::remember($cacheKey, 172800, function () use ($specialization) {
+            return $specialization->loadCount('doctors')->load('image');
+        });
 
         return ApiResponse::success(
             new SpecializationResource($specialization),
