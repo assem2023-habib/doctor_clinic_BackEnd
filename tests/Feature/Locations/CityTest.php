@@ -5,6 +5,7 @@ namespace Tests\Feature\Locations;
 use App\Domains\Locations\Models\City;
 use App\Domains\Locations\Models\Country;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
 
@@ -236,5 +237,77 @@ class CityTest extends TestCase
 
         $response->assertStatus(204);
         $this->assertDatabaseMissing('cities', ['id' => $city->id]);
+    }
+
+    public function test_city_list_cache_hit_returns_stale_data_until_update(): void
+    {
+        $city = City::create(['name' => ['ar' => 'دمشق', 'en' => 'Damascus'], 'country_id' => $this->country->id]);
+        Cache::forget('cities:cache_version');
+
+        $response1 = $this->getJson('/api/v1/cities?limit=50');
+        $originalName = $response1->json('data')[0]['name'];
+
+        $city->name = ['ar' => 'اسم قديم', 'en' => 'StaleCity'];
+        $city->saveQuietly();
+
+        $response2 = $this->getJson('/api/v1/cities?limit=50');
+        $this->assertEquals($originalName, $response2->json('data')[0]['name']);
+    }
+
+    public function test_city_list_cache_invalidated_after_update(): void
+    {
+        $city = City::create(['name' => ['ar' => 'دمشق', 'en' => 'Damascus'], 'country_id' => $this->country->id]);
+        $user = \App\Models\User::factory()->create();
+        $user->assignRole('admin');
+        Passport::actingAs($user);
+        Cache::forget('cities:cache_version');
+
+        $this->getJson('/api/v1/cities');
+
+        $this->putJson("/api/v1/cities/{$city->id}", [
+            'name_ar' => 'حلب',
+            'name_en' => 'Aleppo',
+            'country_id' => $this->country->id,
+        ])->assertStatus(200);
+
+        $response = $this->getJson('/api/v1/cities');
+        $this->assertEquals(['ar' => 'حلب', 'en' => 'Aleppo'], $response->json('data')[0]['name']);
+    }
+
+    public function test_city_list_cache_invalidated_after_create(): void
+    {
+        $user = \App\Models\User::factory()->create();
+        $user->assignRole('admin');
+        Passport::actingAs($user);
+        Cache::forget('cities:cache_version');
+
+        $response1 = $this->getJson('/api/v1/cities');
+        $count1 = count($response1->json('data'));
+
+        $this->postJson('/api/v1/cities', [
+            'name_ar' => 'دمشق',
+            'name_en' => 'Damascus',
+            'country_id' => $this->country->id,
+        ])->assertStatus(201);
+
+        $response2 = $this->getJson('/api/v1/cities');
+        $this->assertCount($count1 + 1, $response2->json('data'));
+    }
+
+    public function test_city_list_cache_invalidated_after_delete(): void
+    {
+        $city = City::create(['name' => ['ar' => 'دمشق', 'en' => 'Damascus'], 'country_id' => $this->country->id]);
+        $user = \App\Models\User::factory()->create();
+        $user->assignRole('admin');
+        Passport::actingAs($user);
+        Cache::forget('cities:cache_version');
+
+        $response1 = $this->getJson('/api/v1/cities');
+        $this->assertEquals(1, count($response1->json('data')));
+
+        $this->deleteJson("/api/v1/cities/{$city->id}")->assertStatus(204);
+
+        $response2 = $this->getJson('/api/v1/cities');
+        $this->assertEmpty($response2->json('data'));
     }
 }

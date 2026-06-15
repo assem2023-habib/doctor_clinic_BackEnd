@@ -191,6 +191,8 @@ Rating::saved()/deleted()
 
 ## Cached Endpoints
 
+### Doctors & Ratings
+
 | Method | Path | Cache Key | TTL |
 |--------|------|-----------|-----|
 | `GET` | `/api/v1/doctors` | `doctors:index:v{ver}:{md5(filters)}` | 172800s |
@@ -199,6 +201,32 @@ Rating::saved()/deleted()
 | `GET` | `/api/v1/ratings/{rating}` | `ratings:show:v{ver}:{id}` | 172800s |
 
 > **ملاحظة:** `GET /api/v1/doctors/{doctor}` (show) **غير مخبأ** لأن الـ Response يعتمد على هوية المستخدم (`has_rated`, `supervision_request` للمريض).
+
+### Countries & Cities
+
+| Method | Path | Cache Key | TTL | Middleware |
+|--------|------|-----------|-----|-----------|
+| `GET` | `/api/v1/countries` | `countries:index:v{ver}:{md5(filters)}` | 172800s | **بدون** (عام) |
+| `GET` | `/api/v1/countries/{country}` | `countries:show:v{ver}:{id}` | 172800s | **بدون** (عام) |
+| `GET` | `/api/v1/cities` | `cities:index:v{ver}:{md5(filters)}` | 172800s | **بدون** (عام) |
+| `GET` | `/api/v1/cities/{city}` | `cities:show:v{ver}:{id}` | 172800s | **بدون** (عام) |
+
+> **ملاحظة:** هذه الـ endpoints عامة (غير مصادقة) ومستخدمة في صفحة التسجيل (register). التخزين المؤقت عبر Redis يمنع الضغط المتكرر على قاعدة البيانات من الزوار غير المسجلين.
+
+### Cache Invalidation — Countries & Cities
+
+| الإجراء | الـ Endpoint | يبطل؟ |
+|---------|-------------|-------|
+| قراءة القائمة | `GET /api/v1/countries` | لا |
+| عرض دولة | `GET /api/v1/countries/{country}` | لا |
+| إنشاء دولة | `POST /api/v1/countries` | ✅ `countries:cache_version++` |
+| تحديث دولة | `PUT /api/v1/countries/{country}` | ✅ `countries:cache_version++` |
+| حذف دولة | `DELETE /api/v1/countries/{country}` | ✅ `countries:cache_version++` |
+| قراءة المدن | `GET /api/v1/cities` | لا |
+| عرض مدينة | `GET /api/v1/cities/{city}` | لا |
+| إنشاء مدينة | `POST /api/v1/cities` | ✅ `cities:cache_version++` |
+| تحديث مدينة | `PUT /api/v1/cities/{city}` | ✅ `cities:cache_version++` |
+| حذف مدينة | `DELETE /api/v1/cities/{city}` | ✅ `cities:cache_version++` |
 
 ---
 

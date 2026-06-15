@@ -13,6 +13,7 @@ use App\Domains\Locations\Resources\CountryResource;
 use App\Domains\Shared\Responses\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class CountryController
 {
@@ -25,12 +26,17 @@ class CountryController
     public function index(Request $request): JsonResponse
     {
         $limit = (int) $request->integer('limit', 20);
-        $countries = Country::with('cities')
-            ->when($request->search, fn ($q, $v) => $q->where(function ($q) use ($v) {
-                $q->where('name->ar', 'like', "%{$v}%")
-                  ->orWhere('name->en', 'like', "%{$v}%");
-            }))
-            ->paginate(min($limit, 100));
+        $version = Cache::get('countries:cache_version', 0);
+        $cacheKey = 'countries:index:v' . $version . ':' . md5(serialize($request->only(['search', 'page', 'limit'])));
+
+        $countries = Cache::remember($cacheKey, 172800, function () use ($request, $limit) {
+            return Country::with('cities')
+                ->when($request->search, fn ($q, $v) => $q->where(function ($q) use ($v) {
+                    $q->where('name->ar', 'like', "%{$v}%")
+                      ->orWhere('name->en', 'like', "%{$v}%");
+                }))
+                ->paginate(min($limit, 100));
+        });
 
         return ApiResponse::success(
             CountryResource::collection($countries),
@@ -41,7 +47,12 @@ class CountryController
 
     public function show(Country $country): JsonResponse
     {
-        $country->load('cities');
+        $version = Cache::get('countries:cache_version', 0);
+        $cacheKey = 'countries:show:v' . $version . ':' . $country->id;
+
+        $country = Cache::remember($cacheKey, 172800, function () use ($country) {
+            return $country->load('cities');
+        });
 
         return ApiResponse::success(
             new CountryResource($country),

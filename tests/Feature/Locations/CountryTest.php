@@ -4,6 +4,7 @@ namespace Tests\Feature\Locations;
 
 use App\Domains\Locations\Models\Country;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
 
@@ -249,5 +250,87 @@ class CountryTest extends TestCase
 
         $response->assertStatus(204);
         $this->assertDatabaseMissing('countries', ['id' => $country->id]);
+    }
+
+    public function test_country_list_cache_hit_returns_stale_data_until_update(): void
+    {
+        $country = Country::create([
+            'name' => ['ar' => 'سوريا', 'en' => 'Syria'],
+            'code' => 'SY',
+        ]);
+        Cache::forget('countries:cache_version');
+
+        $response1 = $this->getJson('/api/v1/countries?limit=50');
+        $originalName = $response1->json('data')[0]['name'];
+
+        $country->name = ['ar' => 'اسم قديم', 'en' => 'StaleName'];
+        $country->saveQuietly();
+
+        $response2 = $this->getJson('/api/v1/countries?limit=50');
+        $this->assertEquals($originalName, $response2->json('data')[0]['name']);
+    }
+
+    public function test_country_list_cache_invalidated_after_update(): void
+    {
+        $country = Country::create([
+            'name' => ['ar' => 'سوريا', 'en' => 'Syria'],
+            'code' => 'SY',
+        ]);
+        $user = \App\Models\User::factory()->create();
+        $user->assignRole('admin');
+        Passport::actingAs($user);
+        Cache::forget('countries:cache_version');
+
+        $this->getJson('/api/v1/countries');
+
+        $this->putJson("/api/v1/countries/{$country->id}", [
+            'name_ar' => 'سوريا',
+            'name_en' => 'Syria',
+            'code' => 'SY',
+            'flag' => 'https://flagcdn.com/sy.svg',
+        ])->assertStatus(200);
+
+        $response = $this->getJson('/api/v1/countries');
+        $this->assertEquals('https://flagcdn.com/sy.svg', $response->json('data')[0]['flag']);
+    }
+
+    public function test_country_list_cache_invalidated_after_create(): void
+    {
+        $user = \App\Models\User::factory()->create();
+        $user->assignRole('admin');
+        Passport::actingAs($user);
+        Cache::forget('countries:cache_version');
+
+        $response1 = $this->getJson('/api/v1/countries');
+        $count1 = count($response1->json('data'));
+
+        $this->postJson('/api/v1/countries', [
+            'name_ar' => 'العراق',
+            'name_en' => 'Iraq',
+            'code' => 'IQ',
+        ])->assertStatus(201);
+
+        $response2 = $this->getJson('/api/v1/countries');
+        $this->assertCount($count1 + 1, $response2->json('data'));
+    }
+
+    public function test_country_list_cache_invalidated_after_delete(): void
+    {
+        $country = Country::create([
+            'name' => ['ar' => 'سوريا', 'en' => 'Syria'],
+            'code' => 'SY',
+        ]);
+        $user = \App\Models\User::factory()->create();
+        $user->assignRole('admin');
+        Passport::actingAs($user);
+        Cache::forget('countries:cache_version');
+
+        $response1 = $this->getJson('/api/v1/countries');
+        $this->assertEquals(1, count($response1->json('data')));
+
+        $this->deleteJson("/api/v1/countries/{$country->id}")->assertStatus(204);
+
+        $response2 = $this->getJson('/api/v1/countries');
+        $this->assertEmpty($response2->json('data'));
     }
 }

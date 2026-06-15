@@ -13,6 +13,7 @@ use App\Domains\Locations\Resources\CityResource;
 use App\Domains\Shared\Responses\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class CityController
 {
@@ -25,13 +26,18 @@ class CityController
     public function index(Request $request): JsonResponse
     {
         $limit = (int) $request->integer('limit', 20);
-        $cities = City::with('country')
-            ->when($request->country_id, fn ($q, $v) => $q->where('country_id', $v))
-            ->when($request->search, fn ($q, $v) => $q->where(function ($q) use ($v) {
-                $q->where('name->ar', 'like', "%{$v}%")
-                  ->orWhere('name->en', 'like', "%{$v}%");
-            }))
-            ->paginate(min($limit, 100));
+        $version = Cache::get('cities:cache_version', 0);
+        $cacheKey = 'cities:index:v' . $version . ':' . md5(serialize($request->only(['country_id', 'search', 'page', 'limit'])));
+
+        $cities = Cache::remember($cacheKey, 172800, function () use ($request, $limit) {
+            return City::with('country')
+                ->when($request->country_id, fn ($q, $v) => $q->where('country_id', $v))
+                ->when($request->search, fn ($q, $v) => $q->where(function ($q) use ($v) {
+                    $q->where('name->ar', 'like', "%{$v}%")
+                      ->orWhere('name->en', 'like', "%{$v}%");
+                }))
+                ->paginate(min($limit, 100));
+        });
 
         return ApiResponse::success(
             CityResource::collection($cities),
@@ -42,7 +48,12 @@ class CityController
 
     public function show(City $city): JsonResponse
     {
-        $city->load('country');
+        $version = Cache::get('cities:cache_version', 0);
+        $cacheKey = 'cities:show:v' . $version . ':' . $city->id;
+
+        $city = Cache::remember($cacheKey, 172800, function () use ($city) {
+            return $city->load('country');
+        });
 
         return ApiResponse::success(
             new CityResource($city),

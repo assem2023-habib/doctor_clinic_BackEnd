@@ -40,3 +40,21 @@ CountryController / CityController
 - **Names:** Multilingual — stored as JSON `{"ar": "مصر", "en": "Egypt"}`; searchable by both languages
 - **DTOs:** `CountryData` / `CityData` — construct from store or update requests, convert to `toArray()`
 - **Actions:** 6 total — simple pass-through to `Model::create()` / `->update()` / `->delete()`
+
+## Caching
+
+بما أن هذه الـ endpoints عامة (غير مصادقة) وتستخدم في صفحة التسجيل، تم تخزينها مؤقتاً عبر **Redis** لتخفيف الضغط على قاعدة البيانات.
+
+| Endpoint | Cache Key | TTL |
+|----------|-----------|-----|
+| `GET /v1/countries` | `countries:index:v{version}:{hash}` | 2 يوم |
+| `GET /v1/countries/{country}` | `countries:show:v{version}:{id}` | 2 يوم |
+| `GET /v1/cities` | `cities:index:v{version}:{hash}` | 2 يوم |
+| `GET /v1/cities/{city}` | `cities:show:v{version}:{id}` | 2 يوم |
+
+**الإبطال (Cache Invalidation):** يتم تلقائياً عند إنشاء/تحديث/حذف دولة أو مدينة عبر الـ API.
+
+- Country: `bootClearsCache()` ← `saved`/`deleted` ← `Cache::increment('countries:cache_version')`
+- City: `bootClearsCache()` ← `saved`/`deleted` ← `Cache::increment('cities:cache_version')`
+
+> **ملاحظة:** هذين الـ endpoint الغير مصادقين هما الوحيدين المخزنين مؤقتاً. باقي الـ endpoints المحمية يتولى authentication و rate limiting الحماية.
