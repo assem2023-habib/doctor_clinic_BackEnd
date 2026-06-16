@@ -3,6 +3,7 @@
 namespace App\Domains\RBAC\Models;
 
 use App\Domains\RBAC\Services\PermissionService;
+use App\Domains\Shared\Traits\ClearsCache;
 use App\Models\User;
 use App\Traits\HasUuidV7;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +11,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Role extends Model
 {
-    use HasUuidV7;
+    use HasUuidV7, ClearsCache;
+
+    public function cacheVersionsToIncrement(): array
+    {
+        return ['roles:cache_version'];
+    }
 
     protected $fillable = ['name', 'slug', 'description', 'guard_name', 'is_system'];
 

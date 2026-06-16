@@ -37,7 +37,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ])
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->appendToGroup('api', SecurityHeaders::class);
-        $middleware->appendToGroup('api', 'throttle:api');
+        // $middleware->appendToGroup('api', 'throttle:api');
         $middleware->prependToGroup('api', ValidateApiBodySize::class);
         $middleware->prependToGroup('api', LogApiBearerAndRequestDetails::class);
         $middleware->prependToGroup('api', NormalizeDuplicateBearerAuthorization::class);

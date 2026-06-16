@@ -9,17 +9,23 @@ use App\Domains\RBAC\Resources\PermissionResource;
 use App\Domains\Shared\Responses\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class PermissionController
 {
     public function index(Request $request): JsonResponse
     {
         $limit = (int) $request->integer('limit', 50);
-        $permissions = Permission::query()
-            ->when($request->group, fn ($q, $v) => $q->where('group', $v))
-            ->when($request->search, fn ($q, $v) => $q->where('name', 'like', "%{$v}%")
-                ->orWhere('slug', 'like', "%{$v}%"))
-            ->paginate(min($limit, 200));
+        $version = Cache::get('permissions:cache_version', 0);
+        $cacheKey = 'permissions:index:v' . $version . ':' . md5(serialize($request->only(['search', 'group', 'page', 'limit'])));
+
+        $permissions = Cache::remember($cacheKey, 172800, function () use ($request, $limit) {
+            return Permission::query()
+                ->when($request->group, fn ($q, $v) => $q->where('group', $v))
+                ->when($request->search, fn ($q, $v) => $q->where('name', 'like', "%{$v}%")
+                    ->orWhere('slug', 'like', "%{$v}%"))
+                ->paginate(min($limit, 200));
+        });
 
         return ApiResponse::success(
             PermissionResource::collection($permissions),
@@ -30,6 +36,13 @@ class PermissionController
 
     public function show(Permission $permission): JsonResponse
     {
+        $version = Cache::get('permissions:cache_version', 0);
+        $cacheKey = 'permissions:show:v' . $version . ':' . $permission->id;
+
+        $permission = Cache::remember($cacheKey, 172800, function () use ($permission) {
+            return $permission;
+        });
+
         return ApiResponse::success(
             new PermissionResource($permission),
             __('Permission retrieved successfully')

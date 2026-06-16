@@ -28,12 +28,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1/auth')->group(function () {
     Route::post('/register/patient', [AuthController::class, 'registerPatient'])
-        ->middleware(['throttle:register', 'image.content']);
+        ->middleware('image.content');
     Route::post('/register/doctor', [AuthController::class, 'registerDoctor'])
-        ->middleware(['throttle:register', 'image.content']);
+        ->middleware('image.content');
     Route::post('/register/receptionist', [AuthController::class, 'registerReceptionist'])
-        ->middleware(['throttle:register', 'image.content']);
-    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login')->name('login');
+        ->middleware('image.content');
+    Route::post('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/refresh', [AuthController::class, 'refresh']);
 
     Route::post('/firebase-token', [AuthController::class, 'firebaseToken'])->middleware(['auth:api', 'active']);

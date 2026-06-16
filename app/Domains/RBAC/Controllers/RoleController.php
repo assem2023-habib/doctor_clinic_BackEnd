@@ -10,16 +10,22 @@ use App\Domains\RBAC\Resources\RoleResource;
 use App\Domains\Shared\Responses\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class RoleController
 {
     public function index(Request $request): JsonResponse
     {
         $limit = (int) $request->integer('limit', 20);
-        $roles = Role::withCount('users')
-            ->when($request->search, fn ($q, $v) => $q->where('name', 'like', "%{$v}%")
-                ->orWhere('slug', 'like', "%{$v}%"))
-            ->paginate(min($limit, 100));
+        $version = Cache::get('roles:cache_version', 0);
+        $cacheKey = 'roles:index:v' . $version . ':' . md5(serialize($request->only(['search', 'page', 'limit'])));
+
+        $roles = Cache::remember($cacheKey, 172800, function () use ($request, $limit) {
+            return Role::withCount('users')
+                ->when($request->search, fn ($q, $v) => $q->where('name', 'like', "%{$v}%")
+                    ->orWhere('slug', 'like', "%{$v}%"))
+                ->paginate(min($limit, 100));
+        });
 
         return ApiResponse::success(
             RoleResource::collection($roles),
@@ -30,7 +36,12 @@ class RoleController
 
     public function show(Role $role): JsonResponse
     {
-        $role->load('permissions');
+        $version = Cache::get('roles:cache_version', 0);
+        $cacheKey = 'roles:show:v' . $version . ':' . $role->id;
+
+        $role = Cache::remember($cacheKey, 172800, function () use ($role) {
+            return $role->load('permissions');
+        });
 
         return ApiResponse::success(
             new RoleResource($role),
