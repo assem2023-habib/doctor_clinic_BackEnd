@@ -23,21 +23,19 @@ export default function () {
   ];
 
   for (const ep of endpoints) {
-    const res = get(ep.path);
+    const res = get(ep.path, null, { name: ep.name });
     check(res, {
       [`${ep.name} status 200`]: (r) => r.status === 200,
     });
-    res.tags = { name: ep.name };
     sleep(randomSleep(1, 3));
   }
 
   // Browse doctors pages
   for (let page = 1; page <= 3; page++) {
-    const res = get(`/v1/doctors?page=${page}&limit=20`);
+    const res = get(`/v1/doctors?page=${page}&limit=20`, null, { name: 'get_doctors' });
     check(res, {
       'doctors page status 200': (r) => r.status === 200,
     });
-    res.tags = { name: 'get_doctors' };
     sleep(randomSleep(1, 2));
   }
 }

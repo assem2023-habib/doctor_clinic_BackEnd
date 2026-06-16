@@ -40,9 +40,8 @@ export default function () {
   res = post('/v1/appointments', {
     reason: 'K6 lifecycle test - routine checkup',
     notes: 'Created during load test',
-  }, patientToken);
+  }, patientToken, { name: 'lifecycle_create_appointment' });
   check(res, { 'create appointment 201': (r) => r.status === 201 });
-  res.tags = { name: 'lifecycle_create_appointment' };
   sleep(randomSleep(0.5, 1));
 
   // Step 4: Doctor logs in
@@ -65,9 +64,8 @@ export default function () {
         appointment_date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
         start_time: '10:00',
         end_time: '10:30',
-      }, doctorToken);
+      }, doctorToken, { name: 'lifecycle_set_time' });
       check(res, { 'set time 200': (r) => r.status === 200 });
-      res.tags = { name: 'lifecycle_set_time' };
     }
   }
   sleep(randomSleep(0.5, 1));
@@ -82,9 +80,8 @@ export default function () {
       check(res, { 'start appointment 200': (r) => r.status === 200 });
       sleep(randomSleep(0.5, 1));
 
-      res = post(`/v1/appointments/${apptId}/complete`, {}, doctorToken);
+      res = post(`/v1/appointments/${apptId}/complete`, {}, doctorToken, { name: 'lifecycle_complete' });
       check(res, { 'complete appointment 200': (r) => r.status === 200 });
-      res.tags = { name: 'lifecycle_complete' };
     }
   }
 }

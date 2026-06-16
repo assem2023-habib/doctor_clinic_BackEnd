@@ -33,11 +33,10 @@ export default function () {
   ];
 
   const ep = randomItem(endpoints);
-  const res = get(ep);
+  const res = get(ep, null, { name: `spike_${ep.replace(/\//g, '_')}` });
   check(res, {
     'spike request ok': (r) => r.status === 200 || r.status === 429,
   });
-  res.tags = { name: `spike_${ep.replace(/\//g, '_')}` };
 
   sleep(randomSleep(0.5, 1.5));
 }

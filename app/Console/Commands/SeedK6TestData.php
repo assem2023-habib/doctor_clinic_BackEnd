@@ -34,19 +34,27 @@ class SeedK6TestData extends Command
     {
         $this->info('Starting K6 test data seeding...');
 
-        // 1. Base seeders
         $this->seedBaseData();
 
-        // 2. Create reference data counts
         $specializations = Specialization::all();
         $cities = City::all();
 
-        // 3. Create users by role
-        $this->info('Creating test users...');
-        $doctors = $this->createDoctors(50, $specializations, $cities);
-        $patients = $this->createPatients(200, $cities);
-        $receptionists = $this->createReceptionists(5, $cities);
-        $admins = $this->createAdmins(2, $cities);
+        // Check if test users already exist
+        $existingDoctor = User::where('email', 'doctor_test_1@example.com')->first();
+        if ($existingDoctor) {
+            $this->warn('Test users already exist, skipping user creation...');
+            $doctors = User::where('email', 'like', 'doctor_test_%@example.com')->get()->all();
+            $patients = User::where('email', 'like', 'patient_test_%@example.com')->get()->all();
+            $receptionists = User::where('email', 'like', 'receptionist_test_%@example.com')->get()->all();
+            $admins = User::where('email', 'like', 'admin_test_%@example.com')->get()->all();
+
+            $this->info("Found " . count($doctors) . " doctors, " . count($patients) . " patients, " . count($receptionists) . " receptionists, " . count($admins) . " admins");
+        } else {
+            $doctors = $this->createDoctors(50, $specializations, $cities);
+            $patients = $this->createPatients(200, $cities);
+            $receptionists = $this->createReceptionists(5, $cities);
+            $admins = $this->createAdmins(2, $cities);
+        }
 
         // 4. Create doctor schedules
         $this->info('Creating doctor schedules...');
@@ -58,16 +66,16 @@ class SeedK6TestData extends Command
 
         // 6. Create ratings
         $this->info('Creating ratings...');
-        $this->createRatings($patients, $doctors, 500);
+        $this->tryStep(fn() => $this->createRatings($patients, $doctors, 500), 'ratings');
 
         // 7. Create notifications
         $this->info('Creating notifications...');
-        $this->createNotifications(array_merge($admins, $doctors, $patients, $receptionists), 1000);
+        $this->tryStep(fn() => $this->createNotifications(array_merge($admins, $doctors, $patients, $receptionists), 1000), 'notifications');
 
         // 8. Generate tokens for all users
         $this->info('Generating access tokens...');
         $allUsers = array_merge($admins, $doctors, $patients, $receptionists);
-        $tokens = $this->generateTokens($allUsers, $authService);
+        $tokens = $this->tryStep(fn() => $this->generateTokens($allUsers, $authService), 'tokens', []);
 
         // 9. Save output files
         $this->saveOutputFiles($tokens, $doctors, $patients, $receptionists, $admins);
@@ -75,6 +83,16 @@ class SeedK6TestData extends Command
         $this->info('K6 test data seeding complete!');
         $this->warn("Total users: " . count($allUsers));
         $this->warn("Tokens saved to: " . self::TOKENS_PATH);
+    }
+
+    private function tryStep(\Closure $callback, string $label, mixed $default = null): mixed
+    {
+        try {
+            return $callback();
+        } catch (\Exception $e) {
+            $this->warn("Step '{$label}' failed: {$e->getMessage()}");
+            return $default;
+        }
     }
 
     private function seedBaseData(): void
@@ -279,19 +297,32 @@ class SeedK6TestData extends Command
      */
     private function createRatings(array $patients, array $doctors, int $count): void
     {
-        for ($i = 0; $i < $count; $i++) {
+        $created = 0;
+        $attempts = 0;
+        $maxAttempts = $count * 3;
+
+        while ($created < $count && $attempts < $maxAttempts) {
+            $attempts++;
             $rater = $patients[array_rand($patients)];
             $target = $doctors[array_rand($doctors)];
 
-            Rating::create([
-                'rater_id' => $rater->id,
-                'type' => 'user',
-                'rateable_id' => $target->id,
-                'rateable_type' => 'App\Models\User',
-                'rating' => rand(1, 5),
-                'comment' => 'K6 test rating',
-            ]);
+            Rating::firstOrCreate(
+                [
+                    'rater_id' => $rater->id,
+                    'type' => 'user',
+                    'rateable_id' => $target->id,
+                    'rateable_type' => 'App\Models\User',
+                ],
+                [
+                    'rating' => rand(1, 5),
+                    'comment' => 'K6 test rating',
+                ]
+            );
+
+            $created++;
         }
+
+        $this->info("Created {$created} ratings ({$attempts} attempts)");
     }
 
     /**
@@ -306,7 +337,11 @@ class SeedK6TestData extends Command
                 'body' => ['message' => 'K6 test notification body', 'type' => 'reminder'],
             ]);
 
-            $recipients = (array) array_rand(array_flip(array_map(fn($u) => $u->id, $allUsers)), rand(1, 10));
+            $userIds = array_map(fn($u) => $u->id, $allUsers);
+            if (empty($userIds)) continue;
+            $numRecipients = min(rand(1, 10), count($userIds));
+            $keys = (array) array_rand($userIds, $numRecipients);
+            $recipients = array_map(fn($k) => $userIds[$k], $keys);
             $notification->users()->attach($recipients, ['read_at' => rand(0, 1) ? now() : null]);
         }
     }

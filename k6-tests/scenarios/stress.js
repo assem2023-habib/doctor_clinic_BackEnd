@@ -21,11 +21,10 @@ const ENDPOINTS = [
 
 export default function () {
   const ep = randomItem(ENDPOINTS);
-  const res = get(ep);
+  const res = get(ep, null, { name: `stress_${ep.replace(/[\/?]/g, '_')}` });
   check(res, {
     'stress request responded': (r) => r.status < 500,
   });
-  res.tags = { name: `stress_${ep.replace(/[\/?]/g, '_')}` };
 
   sleep(randomSleep(0.5, 1));
 }

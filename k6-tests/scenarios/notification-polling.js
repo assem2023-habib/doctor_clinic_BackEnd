@@ -26,15 +26,13 @@ export default function () {
   if (!token) return;
 
   // Poll notifications every iteration (simulates Flutter polling every 10s)
-  let res = get('/v1/notifications?limit=20', token);
+  let res = get('/v1/notifications?limit=20', token, { name: 'poll_notifications' });
   check(res, { 'poll notifications 200': (r) => r.status === 200 });
-  res.tags = { name: 'poll_notifications' };
   sleep(randomSleep(0.5, 1));
 
   // Mark some as read
-  res = post('/v1/notifications/read', { ids: [] }, token);
+  res = post('/v1/notifications/read', { ids: [] }, token, { name: 'mark_read' });
   check(res, { 'mark read 200': (r) => r.status === 200 });
-  res.tags = { name: 'mark_read' };
 
   sleep(randomSleep(5, 10));
 }

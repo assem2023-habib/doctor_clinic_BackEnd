@@ -56,47 +56,40 @@ export default function () {
 
 function patientWorkflow(token, email) {
   // Dashboard (every 30s)
-  let res = get('/v1/dashboard', token);
+  let res = get('/v1/dashboard', token, { name: 'get_dashboard' });
   check(res, { 'patient dashboard 200': (r) => r.status === 200 });
-  res.tags = { name: 'get_dashboard' };
   sleep(randomSleep(1, 2));
 
   // Appointments list (every 60s)
-  res = get('/v1/appointments?limit=10', token);
+  res = get('/v1/appointments?limit=10', token, { name: 'get_appointments' });
   check(res, { 'patient appointments 200': (r) => r.status === 200 });
-  res.tags = { name: 'get_appointments' };
   sleep(randomSleep(1, 2));
 
   // Create an appointment (once per iteration)
   res = post('/v1/appointments', {
     reason: 'K6 load test appointment',
     notes: 'Automated test',
-  }, token);
+  }, token, { name: 'post_appointment' });
   check(res, { 'patient create appointment 201': (r) => r.status === 201 });
-  res.tags = { name: 'post_appointment' };
   sleep(randomSleep(1, 3));
 }
 
 function doctorWorkflow(token) {
-  let res = get('/v1/dashboard', token);
+  let res = get('/v1/dashboard', token, { name: 'get_dashboard' });
   check(res, { 'doctor dashboard 200': (r) => r.status === 200 });
-  res.tags = { name: 'get_dashboard' };
   sleep(randomSleep(1, 2));
 
-  res = get('/v1/appointments?limit=10', token);
+  res = get('/v1/appointments?limit=10', token, { name: 'get_appointments' });
   check(res, { 'doctor appointments 200': (r) => r.status === 200 });
-  res.tags = { name: 'get_appointments' };
   sleep(randomSleep(1, 2));
 }
 
 function receptionistWorkflow(token) {
-  let res = get('/v1/dashboard', token);
+  let res = get('/v1/dashboard', token, { name: 'get_dashboard' });
   check(res, { 'receptionist dashboard 200': (r) => r.status === 200 });
-  res.tags = { name: 'get_dashboard' };
   sleep(randomSleep(1, 2));
 
-  res = get('/v1/appointments?limit=10', token);
+  res = get('/v1/appointments?limit=10', token, { name: 'get_appointments' });
   check(res, { 'receptionist appointments 200': (r) => r.status === 200 });
-  res.tags = { name: 'get_appointments' };
   sleep(randomSleep(1, 2));
 }

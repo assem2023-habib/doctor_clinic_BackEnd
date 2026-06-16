@@ -1,4 +1,4 @@
-export const BASE_URL = 'http://localhost:8000/api';
+export const BASE_URL = 'http://localhost:8081/api';
 
 export const DEFAULT_THRESHOLDS = {
   http_req_duration: ['p(95)<500', 'p(99)<1000'],
