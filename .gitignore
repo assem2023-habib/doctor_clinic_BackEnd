@@ -31,3 +31,5 @@ Thumbs.db
 
 # Firebase service account
 /storage/app/firebase/
+
+k6-tests/data/tokens.json

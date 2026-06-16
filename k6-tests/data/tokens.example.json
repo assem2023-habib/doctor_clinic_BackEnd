@@ -1,0 +1,15 @@
+{
+  "password": "Password1!",
+  "tokens": {
+    "doctor_test_1@example.com": {
+      "access_token": "eyJ...generated_by_artisan_k6:seed",
+      "refresh_token": "def...generated_by_artisan_k6:seed",
+      "expires_in": 86400
+    },
+    "patient_test_1@example.com": {
+      "access_token": "eyJ...generated_by_artisan_k6:seed",
+      "refresh_token": "def...generated_by_artisan_k6:seed",
+      "expires_in": 86400
+    }
+  }
+}
