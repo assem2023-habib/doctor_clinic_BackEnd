@@ -1,9 +1,12 @@
+# Firebase service account
+# OpenSSL random seed.rnd
 *.log
 .DS_Store
 .env
 .env.backup
-.env.production
 .env.docker
+.env.production
+.opencode/
 .phpactor.json
 .phpunit.result.cache
 /.codex
@@ -20,16 +23,11 @@
 /public/hot
 /public/storage
 /storage/*.key
+/storage/app/firebase/
 /storage/pail
 /vendor
 _ide_helper.php
 Homestead.json
 Homestead.yaml
-Thumbs.db
-
-# OpenSSL random seed.rnd
-
-# Firebase service account
-/storage/app/firebase/
-
 k6-tests/data/tokens.json
+Thumbs.db
